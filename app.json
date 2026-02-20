@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "SwiperDeck-temp",
-    "slug": "SwiperDeck-temp",
+    "name": "TasteDeck",
+    "slug": "tastedeck",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "swiperdecktemp",
+    "scheme": "tastedeck",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {

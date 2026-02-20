@@ -1,13 +1,16 @@
 import { StyleSheet } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 
 import { Text, View } from '@/components/Themed';
 
-export default function DeckScreen() {
+export default function DetailScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Deck</Text>
+      <Text style={styles.title}>Entity Detail</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <Text style={styles.subtitle}>Swipe to teach your taste.</Text>
+      <Text style={styles.id}>ID: {id}</Text>
     </View>
   );
 }
@@ -27,8 +30,8 @@ const styles = StyleSheet.create({
     height: 1,
     width: '80%',
   },
-  subtitle: {
+  id: {
     fontSize: 16,
-    opacity: 0.6,
+    fontFamily: 'SpaceMono',
   },
 });
