@@ -32,6 +32,28 @@ For swipe-heavy apps, small delays in event handling, state writes, re-renders, 
 - Large architecture rewrites (unless clearly necessary and justified by profiling evidence).
 - Feature changes unrelated to responsiveness.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Profile and measure baseline performance | **Codex** | Requires running code and analyzing output |
+| Implement preload strategy and deferred work scheduling | **Codex** | Core optimization implementation |
+| Reduce unnecessary re-renders in deck/card components | **Codex** | React performance optimization |
+| Review re-render risk in deck/card/profile components | **Gemini** | Spatial reasoning for component render boundaries |
+| Optimize data access/query hot paths | **Codex** | SQLite query optimization |
+| Verify correctness with Iteration 24 test suite | **Codex** | Regression testing |
+
+### Parallel run opportunity
+- Run **Gemini** (re-render risk audit of component trees) and **Codex** (baseline measurement + first optimization) in parallel. Merge Gemini's findings into Codex's optimization priorities.
+
 ---
 
 ## Repository context for the coding agent

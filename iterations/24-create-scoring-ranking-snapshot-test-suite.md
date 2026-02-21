@@ -28,6 +28,27 @@ This iteration creates durable guardrails so future tuning can happen confidentl
 - End-to-end device automation.
 - Product-level formula redesign (this is verification and guardrails, not major algorithm changes).
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Define test matrix and scenario coverage requirements | **Claude** | Product thinking for edge-case identification |
+| Produce Task Brief with fixture personas and expected behaviors | **Claude** | Test design decomposition |
+| Implement test suite, fixtures, deterministic helpers | **Codex** | Primary test authoring |
+| Add regression fixtures for scoring/ranking/snapshot modules | **Codex** | Implementation of test infrastructure |
+
+### Notes
+- **Claude first**: Claude should define the test matrix (which scenarios, which edge cases, which invariants) before Codex writes the actual test code.
+- Gemini is not needed (pure test logic, no spatial/UI work).
+
 ---
 
 ## Repository context for the coding agent

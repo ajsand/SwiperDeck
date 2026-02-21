@@ -25,6 +25,30 @@ Warm-start ranking is where personalization becomes visible to users. Once swipe
 - Repetition suppression windows/guardrails (Iteration 15).
 - UI-level explanation rendering (later profile/transparency iterations).
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Design decision memo: normalization strategy for match scores | **Claude** | Tradeoff analysis for formula design |
+| Review formula weights against CLAUDE.md Section 8.3 | **Claude** | Spec enforcement for scoring formula |
+| Implement ranker service, scoring components, normalization | **Codex** | Core algorithmic implementation |
+| Add deterministic tests with explicit numeric expectations | **Codex** | Test authoring |
+
+### Parallel run opportunity
+- If normalization approach is uncertain (min-max vs z-score vs percentile), Claude can produce a design decision memo while Codex implements the scoring infrastructure. Merge once Claude's recommendation is finalized.
+
+### Notes
+- **Claude first**: Claude should verify the `0.45*pop + 0.40*match + 0.15*novel` formula and sparse-profile fallback behavior before Codex implements.
+- Gemini is not needed (pure algorithmic work).
+
 ## Agent resources and navigation map
 ### Source-of-truth references
 - `CLAUDE.md` Section 1 (product intent for practical recommender behavior).

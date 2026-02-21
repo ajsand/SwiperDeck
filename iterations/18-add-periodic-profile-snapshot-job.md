@@ -26,6 +26,27 @@ Profile v1 shows current state, but trend UX requires historical checkpoints. A 
 - Advanced background execution orchestration across OS-level job schedulers.
 - Long-term retention/compaction policies beyond basic guardrails.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Implement scheduler decision logic and trigger policy | **Codex** | Core data pipeline implementation |
+| Implement idempotent persistence and debounce logic | **Codex** | Data reliability code |
+| Add deterministic tests for triggers and payload stability | **Codex** | Test authoring |
+| Review trigger policy design (thresholds, day boundary) | **Claude** | Architecture decision for snapshot frequency |
+
+### Notes
+- This is a **Codex-primary** iteration. Gemini is not needed (no spatial/UI work).
+- Claude should review the trigger policy constants before implementation to ensure they align with profile evolution goals.
+
 ## Product/engineering requirements
 - Snapshot generation must be deterministic for same source aggregates.
 - Job must be safe under rapid swipe bursts (no write storms).

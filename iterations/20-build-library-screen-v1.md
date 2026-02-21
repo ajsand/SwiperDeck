@@ -27,6 +27,29 @@ Library is the user’s source of truth for “what the app thinks I told it.”
 - Reclassify/delete actions (prepare row API for these in future iterations).
 - Cloud sync history merge.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| List layout and segmented control UX design | **Gemini** | Spatial reasoning for list + filter UI |
+| Produce Codex-ready brief for Library screen structure | **Gemini** | Layout specification |
+| Implement query layer with bucket/filter/pagination | **Codex** | Data access implementation |
+| Build segmented control, filter UI, virtualized list | **Codex** | Primary UI implementation |
+| Add tests for mapping, query filters, UI state transitions | **Codex** | Test authoring |
+| Review bucket-to-action mapping for spec alignment | **Claude** | Verify against CLAUDE.md Section 3 |
+
+### Notes
+- Gemini advises on list layout and segmented control UX; Codex implements.
+- Claude reviews the action-to-bucket mapping to ensure it aligns with the 5-state swipe action model.
+
 ## Product/engineering requirements
 - **Deterministic grouping:** same DB state must yield same bucket counts/items.
 - **Stable sort:** default sort should be explicit (typically newest first by `created_at`, then deterministic tie-break).

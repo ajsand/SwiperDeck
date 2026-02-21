@@ -28,6 +28,28 @@ Filters are a direct trust lever: users should be able to quickly steer what the
 - Per-profile collaborative filter sharing.
 - Complex preset marketplace or social presets.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Modal routing strategy (route vs imperative vs bottom sheet) | **Gemini** | Navigation/spatial reasoning for modal presentation |
+| Produce Codex-ready implementation brief for modal structure | **Gemini** | Layout specification and edge cases |
+| Implement modal UI, filter controls, persistence, deck refresh | **Codex** | Primary UI + data implementation |
+| Wire filter state into candidate-generation pipeline | **Codex** | Selector integration |
+| Add deterministic tests for state transitions + selector effect | **Codex** | Test authoring |
+| Review UX decisions and CLAUDE.md alignment | **Claude** | Spec enforcement |
+
+### Parallel run opportunity
+- Run **Gemini** (modal routing strategy) and **Codex** (filter state model + persistence) in parallel. Merge Gemini's routing recommendation before Codex builds the modal component.
+
 ## Product/UX requirements
 - Modal should open quickly from Deck and reflect the latest persisted state.
 - Reset returns all controls to documented defaults.

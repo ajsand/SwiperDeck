@@ -29,6 +29,31 @@ This pass ensures:
 - Non-essential UI redesign.
 - Backend/platform expansion beyond launch-critical needs.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Own the release readiness checklist and risk assessment | **Claude** | Product thinking and quality gate definition |
+| Produce Task Brief for hardening fixes | **Claude** | Decomposition of hardening work items |
+| Implement error boundaries, startup hardening, offline checks | **Codex** | Core implementation of reliability features |
+| Add empty/loading/error state completeness | **Codex** | UI state implementation |
+| Navigation edge-case audit (tab state, deep links, modal dismiss) | **Gemini** | Spatial reasoning for navigation reliability |
+| Final verification pass using Iteration 24-25 test suites | **Codex** | Regression and correctness testing |
+
+### Notes
+- **All three models** contribute to this iteration:
+  - Claude owns the checklist and risk log.
+  - Codex implements the hardening fixes.
+  - Gemini audits navigation edge cases.
+
 ---
 
 ## Repository context for the coding agent

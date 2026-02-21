@@ -1,0 +1,19 @@
+{
+  "model": "claude-opus-4-6",
+  "permissions": {
+    "allow": [
+      "Bash(npm install*)",
+      "Bash(npm run lint*)",
+      "Bash(npm run typecheck*)",
+      "Bash(npm run format*)",
+      "Bash(npm run test*)",
+      "Bash(npm run build*)",
+      "Bash(npm run start*)",
+      "Bash(npm run dev*)",
+      "Bash(npx expo*)",
+      "Bash(npx create-expo-app*)",
+      "Bash(node*)"
+    ],
+    "deny": []
+  }
+}

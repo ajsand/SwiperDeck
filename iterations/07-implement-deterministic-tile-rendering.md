@@ -20,6 +20,28 @@ Card visuals are a core part of swipe UX. Deterministic tiles provide immediate,
 - Licensed cover/poster provider integrations.
 - Personalized/themed runtime palettes unrelated to `tile_key`.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Advise on visual layout, gradient strategy, icon mapping approach | **Gemini** | Visual/spatial reasoning for tile composition |
+| Produce Codex-ready implementation brief for tile component | **Gemini** | Layout specification is Gemini's output |
+| Implement hash utility, palette derivation, icon mapping | **Codex** | Algorithm + component implementation |
+| Build reusable tile component and fallback rendering | **Codex** | UI component code |
+| Add deterministic tests and snapshots | **Codex** | Test authoring |
+| Review tile contract for backward compatibility | **Claude** | Spec enforcement |
+
+### Parallel run opportunity
+- Optionally run **Gemini** (visual layout brief) and **Codex** (hash/palette algorithm) in parallel. Gemini focuses on component hierarchy and visual specs; Codex focuses on the deterministic algorithm. Merge outputs before final implementation.
+
 ## Agent resources and navigation map
 ### Source-of-truth references
 - `CLAUDE.md` Section 1 (Product principles), especially:

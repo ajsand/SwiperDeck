@@ -28,6 +28,26 @@ This iteration establishes production-safe novelty constraints before later tuni
 - Cross-device synchronized repetition history.
 - Real-time adaptive threshold learning (online RL/bandits tuning).
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Implement guardrail layer (recent-history, tag streak cap, fallback) | **Codex** | Core algorithmic implementation |
+| Add telemetry fields and deterministic tests | **Codex** | Test authoring and instrumentation |
+| Review policy design for safety and fallback ordering | **Claude** | Risk assessment for guardrail behavior |
+
+### Notes
+- This is a **Codex-primary** iteration. Claude reviews the fallback relaxation order for safety.
+- Gemini is not needed (pure algorithmic work with no UI component).
+
 ## Core guardrail concepts
 - **Recent entity window**: short rolling memory of recently shown entity IDs.
 - **Hard block**: immediate exclusion of candidates that violate strict repetition policy (e.g., same ID as last served, within N recent IDs).

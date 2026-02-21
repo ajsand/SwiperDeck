@@ -30,6 +30,29 @@ It also sets up a clean seam for future cloud model providers without coupling U
 - Building advanced provider orchestration or multi-provider routing.
 - Introducing non-deterministic local fallback behavior.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Review privacy contract and payload allowlist design | **Claude** | Privacy-critical design decision |
+| Verify aggregate-only payload excludes raw swipe history | **Claude** | Spec enforcement for CLAUDE.md Section 10 |
+| Implement settings toggle, consent persistence | **Codex** | UI + data implementation |
+| Build cloud client wrapper with timeout/retry | **Codex** | Network client implementation |
+| Implement gate + fallback orchestration | **Codex** | Integration logic |
+| Add tests for opt-out enforcement and payload shape | **Codex** | Test authoring |
+
+### Notes
+- **Claude first**: Claude must review the payload schema to ensure no raw swipe events or personal identifiers leak into cloud requests. This is a privacy-critical gate.
+- Gemini is not needed (settings toggle is straightforward UI).
+
 ---
 
 ## Repository context for the coding agent
