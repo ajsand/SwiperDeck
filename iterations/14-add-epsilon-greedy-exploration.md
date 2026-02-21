@@ -123,6 +123,27 @@ Provide evidence artifacts in PR description or linked test output:
 - **Compatibility tests**
   - Warm-ranker score payload (`finalScore` + explain components) remains attached after wrapper selection.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Review policy design and edge cases (empty/small pools) | **Claude** | Risk assessment for exploration behavior |
+| Implement epsilon-greedy wrapper, RNG abstraction | **Codex** | Core algorithmic implementation |
+| Add seeded deterministic test suite | **Codex** | Test authoring with statistical verification |
+| Review distribution test results against 85/15 target | **Claude** | Verify acceptance criteria |
+
+### Notes
+- Claude reviews the policy design before and after implementation.
+- Gemini is not needed (pure algorithmic work with no UI component).
+
 ## File-location hints (repo navigation)
 Likely implementation points are in recommendation/deck selection pipeline modules, such as:
 - candidate selector services,

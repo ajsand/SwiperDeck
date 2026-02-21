@@ -20,6 +20,27 @@ A single “current profile” score is useful but incomplete. Trend visuals mak
 - Advanced chart interactions (pinch zoom, tooltips for every point, annotations).
 - Server sync/cross-device historical merge.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Sparkline/chart layout and window control design | **Gemini** | Visual/spatial reasoning for trend visualization |
+| Produce Codex-ready brief for chart component wrapper | **Gemini** | Layout specification |
+| Implement snapshot query, transform utilities, chart wrapper | **Codex** | Primary implementation |
+| Add window switch control and memoized rendering | **Codex** | UI state management and performance |
+| Add deterministic tests for transforms and fallback states | **Codex** | Test authoring |
+
+### Parallel run opportunity
+- Run **Gemini** (chart layout + component hierarchy) and **Codex** (snapshot query/transform layer) in parallel. Merge before building the visual chart component.
+
 ## Product/engineering requirements
 - **Deterministic rendering:** same snapshot inputs must produce identical plotted series.
 - **Stable ordering:** theme/category ordering must be deterministic (tie-break rules documented).

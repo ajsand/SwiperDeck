@@ -26,6 +26,28 @@ It also improves:
 - Personalized natural-language generation beyond deterministic templates.
 - Multi-locale translation system (English-only baseline unless already present).
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Design rule precedence model and template system | **Claude** | Product thinking for label language and priority |
+| Produce Task Brief with rule contract and example personas | **Claude** | Decomposition and constraint specification |
+| Implement rule engine, label generator, summary templates | **Codex** | Core implementation of deterministic pipeline |
+| Wire into profile/library surfaces | **Codex** | UI integration |
+| Add fixture-driven determinism and precedence tests | **Codex** | Test authoring |
+
+### Notes
+- **Claude first**: Claude should design the rule precedence model (priority, tie-breaking, conflict groups) and produce example label outputs for representative personas before Codex implements.
+- Gemini is not needed (this is rule-based logic, not spatial/layout work).
+
 ---
 
 ## Repository context for the coding agent
