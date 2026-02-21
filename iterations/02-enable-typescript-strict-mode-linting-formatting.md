@@ -17,6 +17,26 @@ Strict static checks reduce regression risk as iterative work scales, especially
 - Refactoring unrelated feature code to satisfy optional style preferences.
 - Introducing heavy architectural lint rule sets that block delivery velocity.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Configure tsconfig, ESLint, Prettier; fix baseline violations | **Codex** | Tooling configuration is implementation work |
+| Add package.json scripts (`lint`, `typecheck`, `format`) | **Codex** | Script setup is straightforward implementation |
+| Review config decisions if ESLint/Prettier conflict arises | **Claude** | Tradeoff analysis for config layering |
+
+### Notes
+- This is a **Codex-primary** iteration. No spatial/layout work; Gemini is not needed.
+- Claude should review only if there are ambiguous config conflicts between ESLint and Prettier.
+
 ## Agent resources and navigation map
 ### Source-of-truth references
 - `CLAUDE.md` Section 1 (Product Principles: quality + stability), Section 17 (iterative sequence), and quality guardrail themes throughout the document.

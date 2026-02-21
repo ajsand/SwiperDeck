@@ -17,6 +17,26 @@ A stable navigation shell is the foundation for all later feature work and preve
 - Building business logic for ranking or persistence.
 - Final visual polish.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Validate/propose Expo Router file tree and deep-link structure | **Gemini** | Spatial/navigation reasoning is Gemini's strength |
+| Produce implementation plan + Task Brief | **Claude** | Orchestration and spec alignment |
+| Implement tab/stack setup, placeholder screens, icons | **Codex** | Primary implementation work |
+| Review final structure against CLAUDE.md Section 5 | **Claude** | Spec enforcement |
+
+### Parallel run opportunity
+- Run **Gemini** and **Codex** in parallel for the initial routing proposal if uncertain about structure. Compare outputs using the evaluation rubric in `MULTI_MODEL_WORKFLOW.md` Section 4.
+
 ## Agent resources and navigation map
 ### Source-of-truth references
 - `CLAUDE.md` Section 1 (Product Principles), Section 5 (Navigation & Screens), and Section 17 (delivery sequence).

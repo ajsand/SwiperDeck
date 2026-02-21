@@ -22,6 +22,27 @@ Incremental updates are required for responsive ranking and near real-time perso
 - Time-decay and seasonality weighting.
 - Multi-objective ranking fusion (handled in later iterations).
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Review delta formula against CLAUDE.md Section 7 | **Claude** | Verify scoring math matches spec |
+| Implement pure delta calculator and upsert logic | **Codex** | Algorithmic implementation |
+| Integrate score updates into swipe transaction boundary | **Codex** | Data pipeline wiring |
+| Add deterministic tests for delta math and transactions | **Codex** | Test authoring |
+
+### Notes
+- **Claude first**: Claude should verify the delta formula and action weights align with `CLAUDE.md` Section 7.1 before Codex implements.
+- Gemini is not needed (pure algorithmic + data work).
+
 ## Agent resources and navigation map
 ### Source-of-truth references
 - `CLAUDE.md` Section 6 (data model: score tables and event relationships).
