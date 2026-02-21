@@ -1,10 +1,13 @@
 # Iteration 14: Add epsilon-greedy exploration
 
 ## Objective
+
 Add an ε-greedy selection wrapper (default 85% exploit / 15% explore) **on top of** the Iteration 13 warm-start ranking output, so the system can discover new user interests without replacing the underlying ranking formula.
 
 ## Why this matters
+
 Warm ranking alone can over-optimize for current preferences and repeatedly surface similar entities. A controlled exploration layer helps:
+
 - prevent local optima / recommendation echo chambers,
 - collect signal on less-exposed but still-eligible entities,
 - improve long-term personalization quality,
@@ -13,7 +16,9 @@ Warm ranking alone can over-optimize for current preferences and repeatedly surf
 This iteration is the first production-safe exploration mechanism before stronger repetition and policy guardrails in later work.
 
 ## Scope
+
 ### In scope
+
 - Implement ε-greedy policy as a post-ranking wrapper around Iteration 13 output.
 - Preserve warm ranker score payload (`finalScore`, components/explain data) through selection.
 - Default to `epsilon = 0.15` (explore) and `1 - epsilon = 0.85` (exploit), configurable via constants.
@@ -22,11 +27,13 @@ This iteration is the first production-safe exploration mechanism before stronge
 - Add telemetry/logging fields: `mode`, `epsilon`, `candidatePoolSize`, `selectedEntityId`.
 
 ### Out of scope
+
 - Replacing or re-tuning Iteration 13 warm ranking formula.
 - Contextual bandits (UCB/Thompson), reinforcement-learning policies, or online-learning loops.
 - Iteration 15 repetition suppression/abuse guardrails (only design for compatibility).
 
 ## Core concepts
+
 - **Exploit**: select the top-ranked eligible candidate from warm ranker output.
 - **Explore**: randomly select from a controlled non-top slice of ranked eligible candidates.
 - **Epsilon (`ε`)**: probability of taking explore path on each selection event.
@@ -34,11 +41,14 @@ This iteration is the first production-safe exploration mechanism before stronge
 - **Eligibility invariants**: exploration never bypasses existing filter constraints.
 
 ## Data/contracts and integration points
+
 ### Upstream contract (from Iteration 13)
+
 - Input should be already ranked and filtered candidates from warm-start ranker.
 - Each candidate should retain score/explain metadata (e.g., `finalScore`, `components`, `weights`, `reason` if present).
 
 ### Iteration 14 contract
+
 - `selectCandidateWithExploration(rankedCandidates, policyConfig, rng, context?) -> SelectionResult`
 - `SelectionResult` should include:
   - selected candidate (including warm-ranker score payload intact),
@@ -46,10 +56,12 @@ This iteration is the first production-safe exploration mechanism before stronge
   - optional diagnostics (e.g., `explorePoolSize`, `rngSample`, fallback reason).
 
 ### Downstream expectations
+
 - Consumers should not need to know whether item came from exploit or explore for baseline rendering.
 - Telemetry pipeline should ingest `mode`, `epsilon`, `candidatePoolSize`, `selectedEntityId` for observability and policy monitoring.
 
 ## Recommended implementation approach
+
 1. **Wrap, don’t replace, warm ranker output**
    - Keep Iteration 13 ranking as source-of-truth ordering and score semantics.
 2. **Introduce policy config + defaults**
@@ -79,6 +91,7 @@ This iteration is the first production-safe exploration mechanism before stronge
    - Required fields per attempt: `mode`, `epsilon`, `candidatePoolSize`, `selectedEntityId`.
 
 ## Implementation checklist
+
 - [ ] Add epsilon-greedy policy config constants (default 0.15 explore).
 - [ ] Implement RNG abstraction with seeded deterministic utility for tests.
 - [ ] Add wrapper selector that consumes ranked candidates from Iteration 13.
@@ -90,12 +103,14 @@ This iteration is the first production-safe exploration mechanism before stronge
 - [ ] Add policy-focused test suite (distribution, determinism, contracts, edge cases).
 
 ## Deliverables
+
 - Production-ready epsilon-greedy exploration wrapper integrated into recommendation/deck selection pipeline.
 - Seeded RNG utility + test harness support for deterministic exploration behavior.
 - Updated telemetry contract for exploit/explore observability.
 - Test suite proving policy correctness and compatibility with warm-ranker outputs.
 
 ## Acceptance criteria
+
 - Iteration 13 warm ranker remains intact and continues to determine base ordering.
 - Over large sample sizes, selection modes approximate 85/15 exploit/explore within defined tolerance.
 - With fixed seed and same inputs, selection sequence is deterministic.
@@ -104,7 +119,9 @@ This iteration is the first production-safe exploration mechanism before stronge
 - Small/exhausted pools return deterministic, safe fallback behavior.
 
 ## Definition-of-done evidence
+
 Provide evidence artifacts in PR description or linked test output:
+
 - Distribution test summary showing exploit/explore ratio near target (e.g., within ±2-3% over large N).
 - Determinism proof: repeated seeded runs produce identical selected ID sequence.
 - Edge-case matrix output for empty, 1-item, 2-item, all-filtered, duplicate-ID scenarios.
@@ -112,6 +129,7 @@ Provide evidence artifacts in PR description or linked test output:
 - Telemetry sample record including `mode`, `epsilon`, `candidatePoolSize`, `selectedEntityId`.
 
 ## Concrete testing requirements
+
 - **Statistical tolerance test**
   - Run many draws (e.g., 10k+) and assert exploit/explore split ~85/15 with bounded tolerance.
 - **Determinism tests**
@@ -126,6 +144,7 @@ Provide evidence artifacts in PR description or linked test output:
 ## Multi-model execution strategy
 
 > **Before starting this iteration**, read these workflow documents:
+>
 > - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
 > - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
 > - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
@@ -133,25 +152,29 @@ Provide evidence artifacts in PR description or linked test output:
 
 ### Model routing for this iteration
 
-| Sub-task | Model | Rationale |
-|---|---|---|
-| Review policy design and edge cases (empty/small pools) | **Claude** | Risk assessment for exploration behavior |
-| Implement epsilon-greedy wrapper, RNG abstraction | **Codex** | Core algorithmic implementation |
-| Add seeded deterministic test suite | **Codex** | Test authoring with statistical verification |
-| Review distribution test results against 85/15 target | **Claude** | Verify acceptance criteria |
+| Sub-task                                                | Model      | Rationale                                    |
+| ------------------------------------------------------- | ---------- | -------------------------------------------- |
+| Review policy design and edge cases (empty/small pools) | **Claude** | Risk assessment for exploration behavior     |
+| Implement epsilon-greedy wrapper, RNG abstraction       | **Codex**  | Core algorithmic implementation              |
+| Add seeded deterministic test suite                     | **Codex**  | Test authoring with statistical verification |
+| Review distribution test results against 85/15 target   | **Claude** | Verify acceptance criteria                   |
 
 ### Notes
+
 - Claude reviews the policy design before and after implementation.
 - Gemini is not needed (pure algorithmic work with no UI component).
 
 ## File-location hints (repo navigation)
+
 Likely implementation points are in recommendation/deck selection pipeline modules, such as:
+
 - candidate selector services,
 - ranking-to-selection orchestration layer,
 - recommendation policy/config constants,
 - recommendation-focused test directories.
 
 Use search strings to navigate quickly:
+
 - `epsilon`
 - `explore`
 - `exploit`
@@ -162,11 +185,13 @@ Use search strings to navigate quickly:
 ## Resources when stuck
 
 ### YouTube tutorials
+
 - Multi-Armed Bandits (StatQuest): https://www.youtube.com/results?search_query=statquest+multi+armed+bandit
 - Epsilon-Greedy intuition: https://www.youtube.com/results?search_query=epsilon+greedy+algorithm+explained
 - Exploration vs exploitation in recommenders: https://www.youtube.com/results?search_query=recommender+systems+exploration+exploitation
 
 ### Official docs
+
 - Expo docs (runtime/platform considerations): https://docs.expo.dev/
 - React Native JavaScript runtime notes (Hermes/context): https://reactnative.dev/docs/hermes
 - MDN `Math.random()` behavior/details: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
@@ -174,38 +199,45 @@ Use search strings to navigate quickly:
 - Jest `expect` and matchers for statistical assertions: https://jestjs.io/docs/expect
 
 ### Step-by-step guides / blogs
+
 - Epsilon-greedy overview (concept + practical framing): https://www.geeksforgeeks.org/machine-learning/epsilon-greedy-algorithm-in-reinforcement-learning/
 - Explore-exploit in recommender systems (industry perspective): https://eugeneyan.com/writing/bandits/
 - Ranking/recommender strategy references (Google ML recommendation overview): https://developers.google.com/machine-learning/recommendation
 
 ### Books
-- *Bandit Algorithms* (Lattimore & Szepesvári): https://tor-lattimore.com/downloads/book/book.pdf
-- *Recommender Systems Handbook*: https://link.springer.com/book/10.1007/978-1-4899-7637-6
-- *Practical Recommender Systems* (Manning): https://www.manning.com/books/practical-recommender-systems
+
+- _Bandit Algorithms_ (Lattimore & Szepesvári): https://tor-lattimore.com/downloads/book/book.pdf
+- _Recommender Systems Handbook_: https://link.springer.com/book/10.1007/978-1-4899-7637-6
+- _Practical Recommender Systems_ (Manning): https://www.manning.com/books/practical-recommender-systems
 
 ### GitHub repos
+
 - Vowpal Wabbit contextual bandit examples: https://github.com/VowpalWabbit/vowpal_wabbit
 - MABWiser (bandit policies in Python): https://github.com/fidelity/mabwiser
 - Microsoft Recommenders: https://github.com/recommenders-team/recommenders
 - RecBole: https://github.com/RUCAIBox/RecBole
 
 ### Stack Overflow tags
+
 - `multi-armed-bandit`: https://stackoverflow.com/questions/tagged/multi-armed-bandit
 - `recommendation-engine`: https://stackoverflow.com/questions/tagged/recommendation-engine
 - `jestjs`: https://stackoverflow.com/questions/tagged/jestjs
 - `typescript`: https://stackoverflow.com/questions/tagged/typescript
 
 ### Discussion boards
+
 - Cross Validated (Stats.SE): https://stats.stackexchange.com/questions/tagged/multi-armed-bandit
 - Reddit r/MachineLearning: https://www.reddit.com/r/MachineLearning/
 - Reddit r/recommendersystems: https://www.reddit.com/r/recommendersystems/
 - Reddit r/datascience: https://www.reddit.com/r/datascience/
 
 ## Validation commands
+
 - `npm run typecheck`
 - `npm run lint`
 - `npm test -- exploration-policy`
 - `npm test -- recommendation`
 
 ## Notes for next iteration
+
 Iteration 15 guardrails (repetition suppression, safety constraints, policy caps) must be applied **after or alongside** this exploration wrapper, while preserving deterministic seeded test mode and without breaking warm-ranker score payload compatibility.

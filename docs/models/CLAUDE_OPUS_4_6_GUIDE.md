@@ -36,21 +36,23 @@
 ```md
 Read `iterations/<NN>-...md` and relevant `CLAUDE.md` sections.
 Produce:
-1) file-level plan
-2) model routing
-3) risks/edge cases
-4) Codex-ready Task Brief
-5) validation checklist
-Do not implement code.
+
+1. file-level plan
+2. model routing
+3. risks/edge cases
+4. Codex-ready Task Brief
+5. validation checklist
+   Do not implement code.
 ```
 
 ### Review Changes
 
 ```md
 Review this diff against:
+
 - iteration acceptance criteria
 - CLAUDE.md principles
-Return:
+  Return:
 - pass/fail checklist
 - likely bugs
 - test gaps
@@ -69,12 +71,12 @@ Recommend one minimal viable path.
 
 ## Failure Modes and Mitigations
 
-| Failure Mode | Mitigation |
-|---|---|
-| Over-specifying implementation internals | Plan at boundaries, not exact code internals |
-| Architecture astronauting | Enforce iteration scope and minimal path |
-| Hallucinating repo state | Read actual files first |
-| Missing existing logic | Search first before proposing new abstractions |
+| Failure Mode                             | Mitigation                                     |
+| ---------------------------------------- | ---------------------------------------------- |
+| Over-specifying implementation internals | Plan at boundaries, not exact code internals   |
+| Architecture astronauting                | Enforce iteration scope and minimal path       |
+| Hallucinating repo state                 | Read actual files first                        |
+| Missing existing logic                   | Search first before proposing new abstractions |
 
 ## Quality Gates
 
@@ -94,6 +96,7 @@ Recommend one minimal viable path.
 
 ```md
 ## Task Brief - <Title>
+
 Iteration: <NN>
 Assigned model: <Codex|Gemini>
 
@@ -109,6 +112,7 @@ Validation commands:
 ## Iteration 1 Example
 
 For `01-bootstrap-app-shell`:
+
 - Claude defines constraints, acceptance checks, and routes spatial planning to Gemini.
 - Gemini owns the tab + stack routing brief (including deep-link behavior).
 - Codex implements missing wiring/placeholders.

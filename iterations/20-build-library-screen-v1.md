@@ -1,13 +1,17 @@
 # Iteration 20: Build Library screen v1
 
 ## Objective
+
 Implement a production-ready **Library v1** that lets users review and audit their swipe history via segmented buckets (`Liked`, `Disliked`, `Skipped`) with deterministic filtering and smooth list performance.
 
 ## Why this matters
+
 Library is the user’s source of truth for “what the app thinks I told it.” A clear history view improves trust, helps users spot mistakes, and sets up future correction workflows (reclassify/remove/undo).
 
 ## Scope
+
 ### In scope
+
 - Build segmented control UI with three deterministic buckets:
   - `Liked` (e.g., yes/love)
   - `Disliked` (e.g., no/hard_no)
@@ -22,6 +26,7 @@ Library is the user’s source of truth for “what the app thinks I told it.”
 - Add basic pagination/virtualization for mobile performance.
 
 ### Out of scope
+
 - Full-text search.
 - Semantic/vector search.
 - Reclassify/delete actions (prepare row API for these in future iterations).
@@ -30,6 +35,7 @@ Library is the user’s source of truth for “what the app thinks I told it.”
 ## Multi-model execution strategy
 
 > **Before starting this iteration**, read these workflow documents:
+>
 > - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
 > - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
 > - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
@@ -37,20 +43,22 @@ Library is the user’s source of truth for “what the app thinks I told it.”
 
 ### Model routing for this iteration
 
-| Sub-task | Model | Rationale |
-|---|---|---|
-| List layout and segmented control UX design | **Gemini** | Spatial reasoning for list + filter UI |
-| Produce Codex-ready brief for Library screen structure | **Gemini** | Layout specification |
-| Implement query layer with bucket/filter/pagination | **Codex** | Data access implementation |
-| Build segmented control, filter UI, virtualized list | **Codex** | Primary UI implementation |
-| Add tests for mapping, query filters, UI state transitions | **Codex** | Test authoring |
-| Review bucket-to-action mapping for spec alignment | **Claude** | Verify against CLAUDE.md Section 3 |
+| Sub-task                                                   | Model      | Rationale                              |
+| ---------------------------------------------------------- | ---------- | -------------------------------------- |
+| List layout and segmented control UX design                | **Gemini** | Spatial reasoning for list + filter UI |
+| Produce Codex-ready brief for Library screen structure     | **Gemini** | Layout specification                   |
+| Implement query layer with bucket/filter/pagination        | **Codex**  | Data access implementation             |
+| Build segmented control, filter UI, virtualized list       | **Codex**  | Primary UI implementation              |
+| Add tests for mapping, query filters, UI state transitions | **Codex**  | Test authoring                         |
+| Review bucket-to-action mapping for spec alignment         | **Claude** | Verify against CLAUDE.md Section 3     |
 
 ### Notes
+
 - Gemini advises on list layout and segmented control UX; Codex implements.
 - Claude reviews the action-to-bucket mapping to ensure it aligns with the 5-state swipe action model.
 
 ## Product/engineering requirements
+
 - **Deterministic grouping:** same DB state must yield same bucket counts/items.
 - **Stable sort:** default sort should be explicit (typically newest first by `created_at`, then deterministic tie-break).
 - **Filter correctness:** combining bucket + type + date must return exact intersection.
@@ -61,10 +69,13 @@ Library is the user’s source of truth for “what the app thinks I told it.”
 ## Data/contracts and integration points
 
 ### Suggested query contract
+
 Create a repository/DAO method such as:
+
 - `getLibraryEvents(params: LibraryQueryParams): Promise<LibraryPage>`
 
 Where `LibraryQueryParams` can include:
+
 - `bucket: 'LIKED' | 'DISLIKED' | 'SKIPPED'`
 - `types?: EntityType[]`
 - `dateFrom?: number | string`
@@ -73,22 +84,28 @@ Where `LibraryQueryParams` can include:
 - `cursor?: string | number`
 
 And `LibraryPage` returns:
+
 - `items: LibraryRow[]`
 - `nextCursor?: string | number`
 - `totalCount?` (optional if cheap enough)
 
 ### Action-to-bucket mapping contract
+
 Centralize mapping in one utility (avoid duplicated logic across UI/query layers), e.g.:
+
 - `mapActionToBucket(action)`
 - `bucketToActions(bucket)`
 
 Document expected mapping:
+
 - `LIKED` → `yes`, `love` (and maybe `curious` later if product decides)
 - `DISLIKED` → `no`, `hard_no`
 - `SKIPPED` → `skip`
 
 ### List item contract
+
 Define a UI-safe row type:
+
 - `eventId`
 - `entityId`
 - `title`
@@ -103,6 +120,7 @@ Define a UI-safe row type:
 Keep this shape stable so later iterations can add row actions without refactoring all consumers.
 
 ## Recommended implementation approach
+
 1. **Define bucket/filter types and mapping first**
    - lock in deterministic semantics for bucket membership.
 2. **Implement repository query with joins/index-aware predicates**
@@ -119,6 +137,7 @@ Keep this shape stable so later iterations can add row actions without refactori
    - mapping, query filter intersections, sort stability, pagination boundaries.
 
 ## Implementation checklist
+
 - [ ] Add/confirm `LibraryBucket` and filter DTO types.
 - [ ] Add central action↔bucket mapping utility with tests.
 - [ ] Implement/extend repository query for bucket + type + date filters.
@@ -131,12 +150,14 @@ Keep this shape stable so later iterations can add row actions without refactori
 - [ ] Add tests for mapping, repository filtering, and UI state transitions.
 
 ## Deliverables
+
 - Functional Library v1 screen accessible via tab navigation.
 - Deterministic data query + mapping utilities.
 - Stable list rendering with filter controls and fallback states.
 - Test coverage for core bucket/filter behavior.
 
 ## Acceptance criteria
+
 - User can switch between `Liked`, `Disliked`, and `Skipped` buckets and see corresponding events.
 - Type/date filters correctly narrow results for each bucket.
 - Empty states display meaningful copy when no results match.
@@ -144,13 +165,16 @@ Keep this shape stable so later iterations can add row actions without refactori
 - No crashes when optional entity metadata is missing.
 
 ## Definition-of-done evidence
+
 Include in PR notes/artifacts:
+
 - Screen capture or screenshots for each bucket.
 - One example query/filter combination and resulting item count.
 - Test output for mapping + repository query tests.
 - Brief note on virtualization/pagination strategy used.
 
 ## Concrete testing requirements
+
 - **Mapping tests**
   - each action maps to expected bucket.
   - unsupported/unknown actions handled safely.
@@ -165,7 +189,9 @@ Include in PR notes/artifacts:
   - empty/loading/error states render correctly.
 
 ## File-location hints (repo navigation)
+
 Likely implementation points:
+
 - `app/(tabs)/library.tsx`
 - database query/repository modules for `swipe_events` and `catalog_entities`
 - shared types/contracts for swipe actions and entity metadata
@@ -173,6 +199,7 @@ Likely implementation points:
 - tests for selectors/repositories/components
 
 Useful search strings:
+
 - `library`
 - `swipe_events`
 - `catalog_entities`
@@ -185,12 +212,14 @@ Useful search strings:
 ## Resources when stuck
 
 ### YouTube tutorials
+
 - React Native FlatList performance tips: https://www.youtube.com/results?search_query=react+native+flatlist+performance+tutorial
 - FlashList usage/performance walkthrough: https://www.youtube.com/results?search_query=shopify+flashlist+react+native+tutorial
 - Expo Router tabs + screen architecture: https://www.youtube.com/results?search_query=expo+router+tabs+tutorial
 - SQLite querying in React Native/Expo: https://www.youtube.com/results?search_query=expo+sqlite+react+native+tutorial
 
 ### Official documentation
+
 - Expo Router: https://docs.expo.dev/router/introduction/
 - Expo SQLite: https://docs.expo.dev/versions/latest/sdk/sqlite/
 - React Native FlatList: https://reactnative.dev/docs/flatlist
@@ -202,17 +231,20 @@ Useful search strings:
 - TypeScript Handbook: https://www.typescriptlang.org/docs/
 
 ### Step-by-step guides / blogs
+
 - React docs on list keys/state thinking (transferable concepts): https://react.dev/learn/rendering-lists
 - Mobile list optimization checklist (RN community article): https://blog.logrocket.com/deep-dive-react-native-flatlist/
 - Filtering large datasets patterns: https://www.freecodecamp.org/news/implement-search-and-filtering-using-javascript/
 - Time/date pitfalls (important for date filters): https://infiniteundo.com/post/25326999628/falsehoods-programmers-believe-about-time
 
 ### Books
-- *Designing Data-Intensive Applications* (query/filter/index thinking): https://dataintensive.net/
-- *Refactoring UI* (clear, usable filter/segmented controls): https://www.refactoringui.com/
-- *Refactoring* (extracting pure query/mapping logic): https://martinfowler.com/books/refactoring.html
+
+- _Designing Data-Intensive Applications_ (query/filter/index thinking): https://dataintensive.net/
+- _Refactoring UI_ (clear, usable filter/segmented controls): https://www.refactoringui.com/
+- _Refactoring_ (extracting pure query/mapping logic): https://martinfowler.com/books/refactoring.html
 
 ### GitHub repositories
+
 - Expo examples (routing/UI/data patterns): https://github.com/expo/examples
 - Expo Router repo/examples: https://github.com/expo/router
 - Shopify FlashList examples: https://github.com/Shopify/flash-list
@@ -220,6 +252,7 @@ Useful search strings:
 - SQLite official mirror/docs: https://github.com/sqlite/sqlite
 
 ### Stack Overflow tags
+
 - `react-native`: https://stackoverflow.com/questions/tagged/react-native
 - `expo`: https://stackoverflow.com/questions/tagged/expo
 - `expo-router`: https://stackoverflow.com/questions/tagged/expo-router
@@ -228,6 +261,7 @@ Useful search strings:
 - `typescript`: https://stackoverflow.com/questions/tagged/typescript
 
 ### Discussion boards / communities
+
 - Expo forums: https://forums.expo.dev/
 - React Native community discussions: https://github.com/react-native-community/discussions-and-proposals
 - Reactiflux Discord: https://www.reactiflux.com/
@@ -235,10 +269,12 @@ Useful search strings:
 - DEV Community React Native tag: https://dev.to/t/reactnative
 
 ## Validation commands
+
 - `npm run typecheck`
 - `npm run lint`
 - `npm test -- library-v1`
 - `npm test -- library-filters`
 
 ## Notes for next iteration
+
 Keep `LibraryRow` API extensible for future actions (reclassify/remove/undo) so iteration 21+ can add controls without rewriting query contracts.

@@ -7,10 +7,14 @@ export default function DeckScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Deck</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      <View
+        style={styles.separator}
+        lightColor="#eee"
+        darkColor="rgba(255,255,255,0.1)"
+      />
       <Text style={styles.subtitle}>Swipe to teach your taste.</Text>
       <Link href="/details/example-id" style={styles.link}>
-        Open example detail route
+        <Text style={styles.linkText}>Open example detail route</Text>
       </Link>
     </View>
   );
@@ -37,6 +41,9 @@ const styles = StyleSheet.create({
   },
   link: {
     marginTop: 20,
+    paddingVertical: 8,
+  },
+  linkText: {
     fontSize: 16,
     color: '#2e78b7',
   },

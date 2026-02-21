@@ -17,8 +17,8 @@ Each swipe is a **preference signal**. The app uses those signals to:
 
 ### Core idea
 
-- The swipe deck is the *input*.
-- The taste profile is the *output*.
+- The swipe deck is the _input_.
+- The taste profile is the _output_.
 - AI is used to **summarize and label** computed taste stats — not to “magically understand a person.”
 
 ---
@@ -243,7 +243,7 @@ Indexes:
 - `id TEXT PK`
 - `session_id TEXT`
 - `entity_id TEXT`
-- `action TEXT`  // hard_no, no, skip, yes, love, respect, curious
+- `action TEXT` // hard_no, no, skip, yes, love, respect, curious
 - `strength INTEGER` // map actions to weights
 - `created_at INTEGER`
 
@@ -398,7 +398,7 @@ Most viable:
   - tag prefix groups
   - co-occurrence graph (tags that appear together frequently)
 - v2: embed tags and cluster (k-means / hierarchical)
-- v3: LLM labels clusters *only after clusters exist*
+- v3: LLM labels clusters _only after clusters exist_
 
 ### 9.3 Optional “Best–Worst” calibration rounds
 

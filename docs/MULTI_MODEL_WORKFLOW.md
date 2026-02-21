@@ -11,52 +11,55 @@ This workflow assumes models do not collaborate live; use model selection up fro
 
 ## Model Roles
 
-| Model | Primary Role | Secondary Role |
-|---|---|---|
-| Claude Opus 4.6 | Orchestrate, decompose, review, enforce spec | Design memos and risk analysis |
-| GPT-5.3 Codex | Primary implementation and refactors | Debugging, tests, migrations |
-| Gemini 3.1 | Spatial/layout/navigation reasoning | UI behavior diagnosis and chart layout guidance |
+| Model           | Primary Role                                 | Secondary Role                                  |
+| --------------- | -------------------------------------------- | ----------------------------------------------- |
+| Claude Opus 4.6 | Orchestrate, decompose, review, enforce spec | Design memos and risk analysis                  |
+| GPT-5.3 Codex   | Primary implementation and refactors         | Debugging, tests, migrations                    |
+| Gemini 3.1      | Spatial/layout/navigation reasoning          | UI behavior diagnosis and chart layout guidance |
 
 ## Model Selection Rubric (0-3)
 
 Score each attribute by model, sum totals, pick highest score.
 
 Tie-breakers:
+
 - If implementation heavy -> Codex.
 - If architecture/tradeoff heavy -> Claude.
 - If navigation/layout/gesture heavy -> Gemini.
 
-| Task Attribute | Claude | Codex | Gemini |
-|---|---:|---:|---:|
-| Implementation complexity | 1 | 3 | 1 |
-| Refactor risk | 2 | 3 | 1 |
-| Spatial/layout/navigation | 1 | 2 | 3 |
-| Algorithmic reasoning | 2 | 3 | 1 |
-| Debugging | 1 | 3 | 2 |
-| Documentation writing | 3 | 1 | 1 |
-| Product/tradeoff thinking | 3 | 1 | 2 |
+| Task Attribute            | Claude | Codex | Gemini |
+| ------------------------- | -----: | ----: | -----: |
+| Implementation complexity |      1 |     3 |      1 |
+| Refactor risk             |      2 |     3 |      1 |
+| Spatial/layout/navigation |      1 |     2 |      3 |
+| Algorithmic reasoning     |      2 |     3 |      1 |
+| Debugging                 |      1 |     3 |      2 |
+| Documentation writing     |      3 |     1 |      1 |
+| Product/tradeoff thinking |      3 |     1 |      2 |
 
 ## Iteration-Type Decision Table
 
-| Iteration Type | Recommended Model(s) |
-|---|---|
-| Navigation shell | Claude orchestration + Gemini (spatial plan) -> Codex (implement) |
-| SQLite migrations/schema | Codex, Claude review |
-| Ranking and scoring math | Codex, Claude formula review |
-| UI cards and gestures | Codex, Gemini layout audit |
-| Charts and profile visuals | Gemini layout brief -> Codex |
-| Test suites | Codex |
-| Performance pass | Codex + Gemini rerender audit |
-| Release hardening | Claude checklist + Codex fixes + Gemini nav audit |
+| Iteration Type             | Recommended Model(s)                                              |
+| -------------------------- | ----------------------------------------------------------------- |
+| Navigation shell           | Claude orchestration + Gemini (spatial plan) -> Codex (implement) |
+| SQLite migrations/schema   | Codex, Claude review                                              |
+| Ranking and scoring math   | Codex, Claude formula review                                      |
+| UI cards and gestures      | Codex, Gemini layout audit                                        |
+| Charts and profile visuals | Gemini layout brief -> Codex                                      |
+| Test suites                | Codex                                                             |
+| Performance pass           | Codex + Gemini rerender audit                                     |
+| Release hardening          | Claude checklist + Codex fixes + Gemini nav audit                 |
 
 ## When to Run Parallel Models
 
 Run 2 models in parallel when:
+
 - architecture choice is ambiguous,
 - UI/gesture behavior has competing designs,
 - there are multiple valid ranking approaches.
 
 Evaluate outputs with this rubric:
+
 - correctness,
 - minimal diff,
 - CLAUDE.md alignment,
@@ -92,27 +95,34 @@ Iteration: <NN>
 Assigned model: <Claude|Codex|Gemini>
 
 ### Problem Statement
+
 <what and why>
 
 ### Constraints (from CLAUDE.md)
+
 - Local-first
 - Compute-first, AI-second
 - Keep iteration scope tight
 
 ### Files to touch
+
 - <path>: <reason>
 
 ### Acceptance Criteria
+
 1. ...
 2. ...
 
 ### Non-goals
+
 - ...
 
 ### Risks
+
 - ...
 
 ### Validation
+
 - npm run typecheck
 - npm run lint
 - npm test -- <pattern>
