@@ -6,8 +6,14 @@ export default function LibraryScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Library</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <Text style={styles.subtitle}>Review your liked, disliked, and skipped items.</Text>
+      <View
+        style={styles.separator}
+        lightColor="#eee"
+        darkColor="rgba(255,255,255,0.1)"
+      />
+      <Text style={styles.subtitle}>
+        Review your liked, disliked, and skipped items.
+      </Text>
     </View>
   );
 }

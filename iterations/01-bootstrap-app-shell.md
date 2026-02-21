@@ -1,25 +1,31 @@
 # Iteration 1: Bootstrap app shell
 
 ## Objective
+
 Set up the Expo Router app skeleton with bottom tabs for Deck, Profile, Library, and Settings, plus stack support for detail screens.
 
 ## Why this matters
+
 A stable navigation shell is the foundation for all later feature work and prevents layout churn.
 
 ## Scope
+
 ### In scope
+
 - Initialize or standardize Expo Router file structure under `app/`.
 - Add tab navigator with 4 required tabs and placeholder screens.
 - Add stack layout for future detail routes and modals.
 - Ensure tabs are reachable on iOS/Android/web where supported.
 
 ### Out of scope
+
 - Building business logic for ranking or persistence.
 - Final visual polish.
 
 ## Multi-model execution strategy
 
 > **Before starting this iteration**, read these workflow documents:
+>
 > - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
 > - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
 > - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
@@ -27,22 +33,26 @@ A stable navigation shell is the foundation for all later feature work and preve
 
 ### Model routing for this iteration
 
-| Sub-task | Model | Rationale |
-|---|---|---|
+| Sub-task                                                       | Model      | Rationale                                         |
+| -------------------------------------------------------------- | ---------- | ------------------------------------------------- |
 | Validate/propose Expo Router file tree and deep-link structure | **Gemini** | Spatial/navigation reasoning is Gemini's strength |
-| Produce implementation plan + Task Brief | **Claude** | Orchestration and spec alignment |
-| Implement tab/stack setup, placeholder screens, icons | **Codex** | Primary implementation work |
-| Review final structure against CLAUDE.md Section 5 | **Claude** | Spec enforcement |
+| Produce implementation plan + Task Brief                       | **Claude** | Orchestration and spec alignment                  |
+| Implement tab/stack setup, placeholder screens, icons          | **Codex**  | Primary implementation work                       |
+| Review final structure against CLAUDE.md Section 5             | **Claude** | Spec enforcement                                  |
 
 ### Parallel run opportunity
+
 - Run **Gemini** and **Codex** in parallel for the initial routing proposal if uncertain about structure. Compare outputs using the evaluation rubric in `MULTI_MODEL_WORKFLOW.md` Section 4.
 
 ## Agent resources and navigation map
+
 ### Source-of-truth references
+
 - `CLAUDE.md` Section 1 (Product Principles), Section 5 (Navigation & Screens), and Section 17 (delivery sequence).
 - `iterations/README.md` for iteration ordering and naming consistency.
 
 ### Current repo implementation anchors
+
 - `app/_layout.tsx`: root stack setup, `initialRouteName`, and details route registration.
 - `app/(tabs)/_layout.tsx`: tab registration plus tab labels/icons.
 - `app/(tabs)/index.tsx`: Deck placeholder currently mapped to the `index` tab route.
@@ -50,6 +60,7 @@ A stable navigation shell is the foundation for all later feature work and preve
 - `app/details/[id].tsx`: nested detail route pattern and `useLocalSearchParams` usage.
 
 ### External troubleshooting and learning resources
+
 - Official docs:
   - Expo Router docs: https://docs.expo.dev/router/introduction/
   - Expo Router notation (layouts, groups, dynamic routes): https://docs.expo.dev/router/basics/notation/
@@ -69,37 +80,44 @@ A stable navigation shell is the foundation for all later feature work and preve
   - Expo Discussions (GitHub): https://github.com/expo/expo/discussions
   - React Navigation Discussions: https://github.com/react-navigation/react-navigation/discussions
 - Books / long-form references:
-  - *Fullstack React Native* (for navigation architecture context): https://www.fullstackreact.com/react-native/
-  - *React Native in Action* (Manning; foundational patterns): https://www.manning.com/books/react-native-in-action
+  - _Fullstack React Native_ (for navigation architecture context): https://www.fullstackreact.com/react-native/
+  - _React Native in Action_ (Manning; foundational patterns): https://www.manning.com/books/react-native-in-action
 
 ### When stuck
+
 - Verify Expo Router naming conventions are intact: `(tabs)` group and `index.tsx` as the default tab route.
 - Confirm the root stack includes `(tabs)` and at least one nested route such as `details/[id]`.
 - Confirm imports follow the alias style already used in the repo (for example, `@/components/...`).
 
 ## Implementation checklist
+
 - [ ] Keep the Deck tab on `app/(tabs)/index.tsx` (or equivalent default tab route) and label it “Deck” in tab options.
 - [ ] Configure tab labels/icons and sane defaults.
 - [ ] Add minimal placeholder content and loading-safe components.
 - [ ] Add stack wrappers for future detail pages while preserving `initialRouteName: '(tabs)'` unless intentionally changing startup routing.
 
 ## Deliverables
+
 - Navigation file structure committed.
 - App launches directly into Deck tab.
 - No red-screen/router resolution errors.
 
 ## Acceptance criteria
+
 - User can switch among all 4 tabs without crash.
 - Deep-link route resolution works for at least one nested detail path.
 
 ### Definition of done evidence
+
 - Provide a screenshot or short recording that shows all 4 tabs are reachable.
 - Perform and note a manual deep-link check for one details route (for example, `/details/example-id` on web).
 
 ## Validation commands
+
 - `npm run start -- --web` (or `npm run start`)
 
 Lint/typecheck/test scripts are introduced in Iteration 02.
 
 ## Notes for next iteration
+
 Document any route naming conventions introduced so next tasks follow the same pattern.

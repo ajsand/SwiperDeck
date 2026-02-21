@@ -1,12 +1,15 @@
 # Iteration 23: Add optional cloud summary toggle
 
 ## Objective
+
 Introduce an explicit, user-controlled **opt-in** for cloud-generated profile summaries while keeping local deterministic summaries as the default and reliable fallback path.
 
 Cloud requests must use **aggregate-only payloads** (no raw swipe event history) and must be gated behind persisted consent.
 
 ## Why this matters
+
 This iteration operationalizes product promises around:
+
 - **Privacy-by-default** (toggle OFF by default)
 - **User agency** (clear, revocable consent)
 - **Reliability** (local summary still works when cloud is off/fails)
@@ -17,6 +20,7 @@ It also sets up a clean seam for future cloud model providers without coupling U
 ## Scope
 
 ### In scope
+
 - Add Settings toggle with explicit privacy copy and clear default state (`OFF`).
 - Persist consent flag in app settings/state storage.
 - Build cloud request payload exclusively from aggregate profile stats.
@@ -26,6 +30,7 @@ It also sets up a clean seam for future cloud model providers without coupling U
 - Add tests proving no calls when opt-out and no raw history in payload.
 
 ### Out of scope
+
 - Sending raw swipe events, item-by-item history, or identifiers not required for aggregate summarization.
 - Building advanced provider orchestration or multi-provider routing.
 - Introducing non-deterministic local fallback behavior.
@@ -33,6 +38,7 @@ It also sets up a clean seam for future cloud model providers without coupling U
 ## Multi-model execution strategy
 
 > **Before starting this iteration**, read these workflow documents:
+>
 > - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
 > - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
 > - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
@@ -40,16 +46,17 @@ It also sets up a clean seam for future cloud model providers without coupling U
 
 ### Model routing for this iteration
 
-| Sub-task | Model | Rationale |
-|---|---|---|
-| Review privacy contract and payload allowlist design | **Claude** | Privacy-critical design decision |
+| Sub-task                                                 | Model      | Rationale                                 |
+| -------------------------------------------------------- | ---------- | ----------------------------------------- |
+| Review privacy contract and payload allowlist design     | **Claude** | Privacy-critical design decision          |
 | Verify aggregate-only payload excludes raw swipe history | **Claude** | Spec enforcement for CLAUDE.md Section 10 |
-| Implement settings toggle, consent persistence | **Codex** | UI + data implementation |
-| Build cloud client wrapper with timeout/retry | **Codex** | Network client implementation |
-| Implement gate + fallback orchestration | **Codex** | Integration logic |
-| Add tests for opt-out enforcement and payload shape | **Codex** | Test authoring |
+| Implement settings toggle, consent persistence           | **Codex**  | UI + data implementation                  |
+| Build cloud client wrapper with timeout/retry            | **Codex**  | Network client implementation             |
+| Implement gate + fallback orchestration                  | **Codex**  | Integration logic                         |
+| Add tests for opt-out enforcement and payload shape      | **Codex**  | Test authoring                            |
 
 ### Notes
+
 - **Claude first**: Claude must review the payload schema to ensure no raw swipe events or personal identifiers leak into cloud requests. This is a privacy-critical gate.
 - Gemini is not needed (settings toggle is straightforward UI).
 
@@ -58,6 +65,7 @@ It also sets up a clean seam for future cloud model providers without coupling U
 ## Repository context for the coding agent
 
 Before implementing, review:
+
 - `CLAUDE.md` for privacy, local-first baseline, and product constraints.
 - Iteration outputs from `22` (local deterministic summary) and settings/profile flows from `17`, `19`, `21`.
 - Existing settings persistence pattern and network abstraction utilities already used in the app.
@@ -69,11 +77,13 @@ Prefer extending existing settings and profile-summary pathways rather than crea
 ## Implementation checklist (detailed)
 
 ### 1) Define settings contract + persistence
+
 - [ ] Add/confirm a typed setting such as `cloudSummaryOptIn: boolean` with default `false`.
 - [ ] Persist in existing settings store (or equivalent source of truth).
 - [ ] Ensure hydration path handles missing/legacy value as `false`.
 
 ### 2) Build consent-aware UI in Settings
+
 - [ ] Add toggle control with plain-language privacy copy:
   - cloud is optional
   - only aggregate stats are sent
@@ -82,6 +92,7 @@ Prefer extending existing settings and profile-summary pathways rather than crea
 - [ ] Ensure toggle updates persist immediately and idempotently.
 
 ### 3) Define aggregate-only payload schema
+
 - [ ] Create explicit schema/type for outbound cloud summary payload (e.g., `CloudSummaryPayload`).
 - [ ] Include only aggregate fields (examples):
   - top liked/disliked tags or categories
@@ -91,12 +102,14 @@ Prefer extending existing settings and profile-summary pathways rather than crea
 - [ ] Add serializer function that maps internal profile state -> bounded payload.
 
 ### 4) Implement cloud summary client wrapper
+
 - [ ] Add single entrypoint function (e.g., `requestCloudSummary(payload, options)`).
 - [ ] Enforce timeout via `AbortController` (or current networking stack equivalent).
 - [ ] Add bounded retry (e.g., max 1-2 retries for transient errors only).
 - [ ] Normalize errors into stable domain error types for calling code.
 
 ### 5) Gate and fallback orchestration
+
 - [ ] In profile summary flow, check consent first.
 - [ ] If opt-out: skip network call entirely, return local deterministic summary immediately.
 - [ ] If opt-in: request cloud summary using aggregate payload.
@@ -104,11 +117,13 @@ Prefer extending existing settings and profile-summary pathways rather than crea
 - [ ] Ensure UI communicates optional enhancement without blocking core profile display.
 
 ### 6) Safety/logging controls
+
 - [ ] Log request attempts with redacted metadata only (e.g., payload byte size, latency, status).
 - [ ] Never log raw payload fields that may reveal sensitive preferences.
 - [ ] Add guardrails to prevent accidental inclusion of disallowed fields in debug output.
 
 ### 7) Tests and verification
+
 - [ ] Unit test: serializer excludes raw swipe history fields.
 - [ ] Unit test: when toggle is `OFF`, cloud client is never called.
 - [ ] Unit test: when toggle is `ON` and cloud fails, fallback summary is returned.
@@ -140,7 +155,9 @@ export interface SummaryResult {
 ```
 
 ```ts
-async function getProfileSummary(input: LocalProfileState): Promise<SummaryResult> {
+async function getProfileSummary(
+  input: LocalProfileState,
+): Promise<SummaryResult> {
   const local = generateLocalProfileSummary(input);
 
   if (!settings.cloudSummaryOptIn) {
@@ -149,7 +166,10 @@ async function getProfileSummary(input: LocalProfileState): Promise<SummaryResul
 
   try {
     const payload = buildCloudSummaryPayload(input);
-    const cloud = await requestCloudSummary(payload, { timeoutMs: 3500, retries: 1 });
+    const cloud = await requestCloudSummary(payload, {
+      timeoutMs: 3500,
+      retries: 1,
+    });
     return { source: 'cloud', text: cloud.text ?? local };
   } catch {
     return { source: 'local', text: local };
@@ -160,6 +180,7 @@ async function getProfileSummary(input: LocalProfileState): Promise<SummaryResul
 ---
 
 ## Acceptance criteria
+
 1. Toggle exists in Settings with explicit privacy copy and defaults to `OFF`.
 2. With toggle `OFF`, zero cloud summary requests are made.
 3. With toggle `ON`, payload contains only approved aggregate fields.
@@ -170,6 +191,7 @@ async function getProfileSummary(input: LocalProfileState): Promise<SummaryResul
 ---
 
 ## Validation commands
+
 - `npm run typecheck`
 - `npm run lint`
 - `npm test -- cloud-summary-toggle`
@@ -183,26 +205,31 @@ If targeted tests do not exist yet, create focused tests in this iteration.
 ## Troubleshooting playbook (when agent gets stuck)
 
 ### Problem: cloud still called when toggle is OFF
+
 - Confirm orchestration path checks consent before any payload build/request call.
 - Add a spy/mock assertion verifying zero invocations.
 - Check stale closure/state hydration bugs in hooks/selectors.
 
 ### Problem: accidental raw-history leakage in payload
+
 - Centralize payload construction in one serializer module.
 - Add allowlist-based field selection (not pass-through object spread).
 - Add test asserting forbidden fields are absent.
 
 ### Problem: request hangs or degrades UX
+
 - Ensure timeout is enforced with cancellation.
 - Return local summary immediately on timeout.
 - Avoid awaiting cloud response on critical render path when not necessary.
 
 ### Problem: flaky retry behavior
+
 - Retry only transient/network failures (not 4xx validation errors).
 - Cap retries and include minimal backoff.
 - Keep error normalization deterministic for tests.
 
 ### Problem: user confused by privacy implications
+
 - Tighten copy in settings: “Optional. Sends only aggregate preference stats; never raw swipe history.”
 - Keep language non-technical and unambiguous.
 
@@ -213,6 +240,7 @@ If targeted tests do not exist yet, create focused tests in this iteration.
 Use this order: official docs/specs → privacy/consent patterns → implementation examples → community troubleshooting.
 
 ### Official documentation (highest priority)
+
 1. Expo docs (Settings/state patterns, app architecture):
    - https://docs.expo.dev/
 2. React Native docs (UI controls, accessibility, state):
@@ -226,6 +254,7 @@ Use this order: official docs/specs → privacy/consent patterns → implementat
    - https://owasp.org/API-Security/
 
 ### Step-by-step guides / practical references
+
 1. Retry strategies + exponential backoff concepts:
    - https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/
 2. Privacy-by-design principles (consent + minimization framing):
@@ -234,6 +263,7 @@ Use this order: official docs/specs → privacy/consent patterns → implementat
    - https://jestjs.io/docs/asynchronous
 
 ### YouTube references (for quick implementation refreshers)
+
 1. Search: “React Native settings screen toggle best practices”
    - https://www.youtube.com/results?search_query=react+native+settings+screen+toggle+best+practices
 2. Search: “AbortController fetch timeout JavaScript”
@@ -242,6 +272,7 @@ Use this order: official docs/specs → privacy/consent patterns → implementat
    - https://www.youtube.com/results?search_query=jest+mock+fetch+retry+timeout+tests
 
 ### High-signal GitHub repositories (reference implementations)
+
 1. TanStack Query examples (network state + retries patterns):
    - https://github.com/TanStack/query
 2. Expo repository/discussions for platform-specific behavior:
@@ -252,6 +283,7 @@ Use this order: official docs/specs → privacy/consent patterns → implementat
    - https://github.com/sindresorhus/ky
 
 ### Community troubleshooting resources
+
 1. Stack Overflow (React Native settings/toggle patterns):
    - https://stackoverflow.com/questions/tagged/react-native
 2. Stack Overflow (Fetch/AbortController/retries):
@@ -265,14 +297,16 @@ Use this order: official docs/specs → privacy/consent patterns → implementat
    - https://www.reactiflux.com/
 
 ### Books / long-form references
-1. *Designing Data-Intensive Applications* (Kleppmann) — robust distributed/network thinking.
-2. *Building Secure & Reliable Systems* (Google SRE) — reliability + safety practices.
-3. *API Security in Action* (Neil Madden) — API data exposure risk patterns.
-4. *Refactoring* (Martin Fowler) — keeping orchestration clean and testable.
+
+1. _Designing Data-Intensive Applications_ (Kleppmann) — robust distributed/network thinking.
+2. _Building Secure & Reliable Systems_ (Google SRE) — reliability + safety practices.
+3. _API Security in Action_ (Neil Madden) — API data exposure risk patterns.
+4. _Refactoring_ (Martin Fowler) — keeping orchestration clean and testable.
 
 ---
 
 ## Definition of done
+
 - Settings toggle exists, defaults OFF, and persists.
 - Cloud summary path is strictly opt-in and aggregate-only.
 - Fallback to local deterministic summary is reliable and tested.
@@ -280,4 +314,5 @@ Use this order: official docs/specs → privacy/consent patterns → implementat
 - Payload/logging protections prevent raw-history leakage.
 
 ## Notes for next iteration
+
 Iteration 24 focuses on scoring/ranking snapshot tests. Reuse fixtures from cloud payload tests where possible so profile summary behavior and ranking expectations stay coherent across changes.
