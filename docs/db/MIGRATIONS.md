@@ -46,10 +46,15 @@ lib/db/migrations.ts
 Each migration is an object in an ordered array:
 
 ```typescript
+export type MigrationDb = Pick<
+  SQLiteDatabase,
+  'execAsync' | 'runAsync' | 'getFirstAsync' | 'getAllAsync'
+>;
+
 export interface Migration {
   version: number;
   name: string;
-  up: (db: SQLiteDatabase) => Promise<void>;
+  up: (db: MigrationDb) => Promise<void>;
 }
 
 export const migrations: Migration[] = [
@@ -57,14 +62,25 @@ export const migrations: Migration[] = [
     version: 1,
     name: '001_init',
     up: async (db) => {
-      await db.execAsync(`PRAGMA journal_mode = 'wal'`);
-      await db.execAsync(`PRAGMA foreign_keys = ON`);
+      await db.execAsync(`
+        PRAGMA foreign_keys = ON;
+
+        CREATE TABLE IF NOT EXISTS __healthcheck (
+          id INTEGER PRIMARY KEY NOT NULL CHECK (id = 1),
+          last_checked_at INTEGER NOT NULL
+        );
+
+        INSERT OR IGNORE INTO __healthcheck (id, last_checked_at)
+        VALUES (1, CAST(strftime('%s', 'now') AS INTEGER));
+      `);
     },
   },
   // Iteration 04 adds: version 2, '002_base_schema'
   // Future iterations append here
 ];
 ```
+
+The `MigrationDb` type is a narrow pick of the `SQLiteDatabase` interface. This ensures migration code only uses the subset of APIs available both on the raw DB and inside exclusive transactions.
 
 ### Why a single file with an array (not file-per-migration)?
 
@@ -189,15 +205,33 @@ Downgrades are **not supported**. If `user_version` is higher than `TARGET_VERSI
 
 ## 6) Integration with Expo Router
 
-The migration runner integrates via `SQLiteProvider`'s `onInit` prop in the root layout:
+The migration runner integrates via a manual initialization hook in `app/_layout.tsx`:
 
 ```tsx
-<SQLiteProvider databaseName="tastedeck.db" onInit={migrateDbIfNeeded}>
-  {children}
-</SQLiteProvider>
+// app/_layout.tsx (simplified)
+const [isDbReady, setIsDbReady] = useState(false);
+const [dbInitError, setDbInitError] = useState<Error | null>(null);
+
+useEffect(() => {
+  async function init() {
+    await initializeDatabase(); // opens DB, runs migrations, health check
+    setIsDbReady(true);
+  }
+  init().catch(setDbInitError);
+}, []);
+
+if (dbInitError) return <DbInitializationError error={dbInitError} />;
+if (!isDbReady) return <DbInitializationLoading />;
+return <RootLayoutNav />;
 ```
 
-The `onInit` callback receives the database instance and runs the migration runner before any child component can access the database via `useSQLiteContext()`. This guarantees the schema is ready before any data-dependent rendering.
+This approach:
+
+- **Gates all navigation** — no tab screen renders until `isDbReady === true`.
+- **Shows actionable error UI** — if migrations fail, the user sees a message (not a blank screen).
+- **Uses the singleton `getDb()` client** — child components import `getDb()` from `@/lib/db` rather than using `useSQLiteContext()`.
+
+The singleton pattern was chosen over `SQLiteProvider` because it gives explicit control over initialization timing and doesn't require all DB access to flow through React context.
 
 ## 7) Forward Compatibility Notes
 

@@ -7,10 +7,12 @@ import {
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
+import { initializeDatabase } from '@/lib/db';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -25,14 +27,50 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
+  const [isDbReady, setIsDbReady] = useState(false);
+  const [dbInitError, setDbInitError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (error) throw error;
   }, [error]);
 
   useEffect(() => {
+    if (!loaded || isDbReady || dbInitError) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const initDb = async () => {
+      try {
+        await initializeDatabase();
+
+        if (cancelled) {
+          return;
+        }
+
+        setIsDbReady(true);
+      } catch (initError) {
+        if (cancelled) {
+          return;
+        }
+
+        const normalizedError =
+          initError instanceof Error ? initError : new Error(String(initError));
+        setDbInitError(normalizedError);
+      }
+    };
+
+    void initDb();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [dbInitError, isDbReady, loaded]);
+
+  useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
+      void SplashScreen.hideAsync();
     }
   }, [loaded]);
 
@@ -40,7 +78,38 @@ export default function RootLayout() {
     return null;
   }
 
+  if (dbInitError) {
+    return <DbInitializationError error={dbInitError} />;
+  }
+
+  if (!isDbReady) {
+    return <DbInitializationLoading />;
+  }
+
   return <RootLayoutNav />;
+}
+
+function DbInitializationLoading() {
+  return (
+    <View style={styles.initContainer}>
+      <Text style={styles.title}>Preparing local database...</Text>
+      <Text style={styles.subtitle}>
+        TasteDeck is running startup migrations.
+      </Text>
+    </View>
+  );
+}
+
+function DbInitializationError({ error }: { error: Error }) {
+  return (
+    <View style={styles.initContainer}>
+      <Text style={styles.title}>Database initialization failed</Text>
+      <Text style={styles.subtitle}>
+        Please restart the app. If this continues, clear app data and try again.
+      </Text>
+      <Text style={styles.errorText}>{error.message}</Text>
+    </View>
+  );
 }
 
 function RootLayoutNav() {
@@ -60,3 +129,29 @@ function RootLayoutNav() {
     </ThemeProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  initContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  subtitle: {
+    marginTop: 12,
+    fontSize: 14,
+    opacity: 0.7,
+    textAlign: 'center',
+  },
+  errorText: {
+    marginTop: 16,
+    fontSize: 12,
+    opacity: 0.6,
+    textAlign: 'center',
+  },
+});

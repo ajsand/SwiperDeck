@@ -48,3 +48,12 @@ npm run android         # Android emulator
 ```bash
 npm test                # Jest test suite
 ```
+
+### Database
+
+TasteDeck uses local SQLite via `expo-sqlite`. The database initializes automatically on app startup — no manual setup needed.
+
+- **Migrations** run at startup before any screen renders. Schema version is tracked via `PRAGMA user_version`.
+- **Fresh DB for testing:** `npx expo start --clear` resets the Metro cache (delete app data on device/simulator to reset the DB).
+- **DB module lives at:** `lib/db/` (client, migrations, runner, health check, logger).
+- **To add a new migration:** follow the recipe in [`docs/db/MIGRATIONS.md`](docs/db/MIGRATIONS.md).
