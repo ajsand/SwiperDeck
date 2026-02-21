@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
 
-import DeckScreen from '../app/(tabs)/index';
+import DeckScreen from '../app/(tabs)/deck';
 import ProfileScreen from '../app/(tabs)/profile';
 import LibraryScreen from '../app/(tabs)/library';
 import SettingsScreen from '../app/(tabs)/settings';
