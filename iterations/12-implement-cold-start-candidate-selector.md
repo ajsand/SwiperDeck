@@ -22,6 +22,27 @@ Cold-start quality determines first-session retention. If recommendations are on
 - ε-greedy exploration policy (Iteration 14).
 - Long-window repetition guardrails beyond the cold-start query horizon (Iteration 15).
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Review algorithm design (popularity + diversity blend) | **Claude** | Verify approach aligns with CLAUDE.md Section 8.2 |
+| Produce Task Brief with threshold, quota, and sampling strategy | **Claude** | Decomposition and constraint specification |
+| Implement selector, quota allocator, weighted sampler | **Codex** | Core algorithmic implementation |
+| Add deterministic tests with seeded RNG | **Codex** | Test authoring |
+
+### Notes
+- **Claude first**: Claude should review the cold-start strategy against `CLAUDE.md` Section 8.1-8.2 and define the threshold/quota parameters before Codex implements.
+- Gemini is not needed (pure algorithmic work).
+
 ## Agent resources and navigation map
 ### Source-of-truth references
 - `CLAUDE.md` Section 1 (product principle: practical ranking behavior).

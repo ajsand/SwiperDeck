@@ -34,6 +34,28 @@ These requirements map directly to the original product principles in `CLAUDE.md
 - Remote backup restore flows.
 - Legal-policy hosting backend.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Implement JSON export service and file sharing | **Codex** | Data export is core implementation |
+| Implement destructive clear-data flow with confirmation UX | **Codex** | DB wipe + UI flow implementation |
+| Build Privacy and About static content screens | **Codex** | Screen creation |
+| Review privacy copy and data handling compliance | **Claude** | Spec enforcement for CLAUDE.md privacy principles |
+| Review export payload shape for completeness | **Claude** | Verify all required tables are included |
+
+### Notes
+- This is a **Codex-primary** iteration. Gemini is not needed (settings screens are straightforward layout).
+- Claude should review the privacy/about content to ensure it accurately describes local-first behavior per `CLAUDE.md` Section 10.
+
 ---
 
 ## Repository context for the coding agent

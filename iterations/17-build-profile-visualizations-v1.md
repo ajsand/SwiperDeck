@@ -29,6 +29,28 @@ The recommendation engine is only useful if users can understand what the app ha
 - Cross-device profile sync or server-side profile APIs.
 - Advanced explainability features (e.g., per-swipe causal trace).
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Chart type selection and layout specifications | **Gemini** | Visual/spatial reasoning for data visualization |
+| Component hierarchy for profile sections | **Gemini** | Layout composition and accessibility |
+| Produce Codex-ready implementation brief | **Gemini** | Structured handoff for implementation |
+| Implement selectors, chart/list components, empty states | **Codex** | Primary UI + data implementation |
+| Add tests for selector correctness and rendering states | **Codex** | Test authoring |
+| Review profile sections against CLAUDE.md Section 9 | **Claude** | Spec enforcement for required outputs |
+
+### Parallel run opportunity
+- Run **Gemini** (chart layout brief) and **Codex** (selector/query layer) in parallel. Merge before building the visual components.
+
 ## Product/UX requirements
 - Profile sections should be readable on small screens and not require perfect data density.
 - Every visual should have clear labels (no ambiguous scores).

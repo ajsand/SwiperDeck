@@ -19,6 +19,27 @@ Local-first product requirements depend on resilient on-device storage. A robust
 - Complex seed/import flows (handled in Iteration 06).
 - Remote sync/cloud data behavior.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Build DB module (client, migration runner, health check) | **Codex** | Core implementation work with SQLite |
+| Design migration versioning strategy (table vs PRAGMA) | **Claude** | Architecture decision with long-term implications |
+| Add startup initialization hook in app layout | **Codex** | Wiring code into existing Expo Router structure |
+| Review migration framework against CLAUDE.md Section 6 | **Claude** | Spec enforcement for data model compatibility |
+
+### Notes
+- This is a **Codex-primary** iteration. Gemini is not needed (no spatial/UI work).
+- Claude should produce a short design decision memo if the versioning strategy choice is unclear (tracking table vs `PRAGMA user_version`).
+
 ## Agent resources and navigation map
 ### Source-of-truth references
 - `CLAUDE.md` Section 6 (Data Model), and Section 17 item #3 (SQLite initialization layer).

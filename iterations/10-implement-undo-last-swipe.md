@@ -21,6 +21,27 @@ Undo is a trust feature. Users make accidental swipes, and without a reliable ro
 - Cross-session undo behavior.
 - Product-level analytics dashboards (basic local instrumentation is sufficient).
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Plan rollback strategy (hard delete vs soft flag) | **Claude** | Architecture decision with data integrity implications |
+| Produce Task Brief with rollback approach + edge cases | **Claude** | Orchestration and risk assessment |
+| Implement undo service, transactional rollback, deck restoration | **Codex** | Core implementation of undo logic |
+| Add tests for rollback correctness and idempotency | **Codex** | Test authoring |
+
+### Notes
+- **Claude first**: Claude should decide and document the persistence strategy (hard delete vs soft undo flag) before Codex implements.
+- Gemini is not needed (no spatial/UI work beyond button state toggling).
+
 ## Agent resources and navigation map
 ### Source-of-truth references
 - `CLAUDE.md` Section 3.1 action model (undo must operate across all supported actions).

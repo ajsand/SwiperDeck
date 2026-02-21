@@ -19,6 +19,27 @@ Everything after Deck UI depends on event integrity. If swipe events are dropped
 - Incremental updates to `taste_tag_scores`, `taste_type_scores`, `entity_affinity` (Iteration 11).
 - Candidate selection/ranking changes.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Implement session lifecycle + event recording pipeline | **Codex** | Core data persistence implementation |
+| Wire Deck action callbacks to unified recording API | **Codex** | Integration with Iteration 08 UI |
+| Add tests for mapping, integrity, rapid-write resilience | **Codex** | Test authoring for data layer |
+| Review data contract alignment with CLAUDE.md Section 6-7 | **Claude** | Spec enforcement for action weights and schema |
+
+### Notes
+- This is a **Codex-primary** iteration. Gemini is not needed (no spatial/UI work).
+- Claude should verify that action-to-weight mapping matches `CLAUDE.md` Section 7.1 exactly.
+
 ## Agent resources and navigation map
 ### Source-of-truth references
 - `CLAUDE.md` Section 3.1 (required 5-state action model semantics).

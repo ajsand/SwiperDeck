@@ -19,6 +19,28 @@ This is the core engagement loop of TasteDeck. If card rendering, controls, and 
 - Undo/reversal behavior (Iteration 10).
 - Ranking/candidate selection changes beyond rendering currently provided card data.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Gesture zone mapping and layout brief | **Gemini** | Spatial reasoning for swipe areas vs button taps |
+| Component hierarchy and accessibility audit | **Gemini** | Layout specification and a11y review |
+| Implement card component, action bar, gesture hook | **Codex** | Primary UI component implementation |
+| Add loading/empty/error placeholders | **Codex** | State-based rendering code |
+| Add tests for dispatch parity and placeholder states | **Codex** | Test authoring |
+| Review action callback contract for downstream compatibility | **Claude** | Spec enforcement for Iteration 09 handoff |
+
+### Parallel run opportunity
+- Run **Gemini** (gesture zone + layout brief) and **Codex** (static card rendering) in parallel for the first phase. Merge Gemini's layout constraints into Codex's gesture implementation.
+
 ## Agent resources and navigation map
 ### Source-of-truth references
 - `CLAUDE.md` Section 5.2 Deck Screen (screen contract, swipe + button interaction expectations).

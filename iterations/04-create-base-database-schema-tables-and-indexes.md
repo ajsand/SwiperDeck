@@ -20,6 +20,26 @@ This iteration is the storage foundation for all subsequent behavior (ranking, s
 - Ranking formula implementation (Iterations 11–14).
 - Profile visualization queries (Iterations 17–19).
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Review schema DDL against CLAUDE.md Section 6 before implementation | **Claude** | Ensure table/column/index alignment with spec |
+| Implement migration SQL with tables, indexes, constraints | **Codex** | Primary implementation of schema DDL |
+| Add schema introspection checks and tests | **Codex** | Verification code is implementation work |
+
+### Notes
+- **Claude first**: Claude should verify the schema design against `CLAUDE.md` Section 6 and produce a checklist of required tables/columns/indexes before Codex implements.
+- Gemini is not needed (no spatial/UI work).
+
 ## Agent resources and navigation map
 ### Source-of-truth references
 - `CLAUDE.md` Section 6 (data model + schema intent), and any naming conventions used there.
