@@ -1,13 +1,17 @@
 # Iteration 19: Build Profile over-time view
 
 ## Objective
+
 Build a production-ready **Profile Over-Time** section that visualizes historical preference movement from `profile_snapshots` (created in Iteration 18), so users can quickly understand how their taste profile evolves.
 
 ## Why this matters
+
 A single “current profile” score is useful but incomplete. Trend visuals make personalization transparent, increase trust, and provide product feedback loops (“my swipes changed the model in this direction”).
 
 ## Scope
+
 ### In scope
+
 - Query and transform `profile_snapshots` into chart-ready time-series datasets.
 - Render compact trend visuals (sparkline or minimal line chart) for top themes/categories.
 - Provide deterministic time window controls: `7D`, `30D`, `ALL`.
@@ -16,6 +20,7 @@ A single “current profile” score is useful but incomplete. Trend visuals mak
 - Keep implementation lightweight for mobile performance.
 
 ### Out of scope
+
 - Forecasting or predictive extrapolation.
 - Advanced chart interactions (pinch zoom, tooltips for every point, annotations).
 - Server sync/cross-device historical merge.
@@ -23,6 +28,7 @@ A single “current profile” score is useful but incomplete. Trend visuals mak
 ## Multi-model execution strategy
 
 > **Before starting this iteration**, read these workflow documents:
+>
 > - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
 > - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
 > - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
@@ -30,18 +36,20 @@ A single “current profile” score is useful but incomplete. Trend visuals mak
 
 ### Model routing for this iteration
 
-| Sub-task | Model | Rationale |
-|---|---|---|
-| Sparkline/chart layout and window control design | **Gemini** | Visual/spatial reasoning for trend visualization |
-| Produce Codex-ready brief for chart component wrapper | **Gemini** | Layout specification |
-| Implement snapshot query, transform utilities, chart wrapper | **Codex** | Primary implementation |
-| Add window switch control and memoized rendering | **Codex** | UI state management and performance |
-| Add deterministic tests for transforms and fallback states | **Codex** | Test authoring |
+| Sub-task                                                     | Model      | Rationale                                        |
+| ------------------------------------------------------------ | ---------- | ------------------------------------------------ |
+| Sparkline/chart layout and window control design             | **Gemini** | Visual/spatial reasoning for trend visualization |
+| Produce Codex-ready brief for chart component wrapper        | **Gemini** | Layout specification                             |
+| Implement snapshot query, transform utilities, chart wrapper | **Codex**  | Primary implementation                           |
+| Add window switch control and memoized rendering             | **Codex**  | UI state management and performance              |
+| Add deterministic tests for transforms and fallback states   | **Codex**  | Test authoring                                   |
 
 ### Parallel run opportunity
+
 - Run **Gemini** (chart layout + component hierarchy) and **Codex** (snapshot query/transform layer) in parallel. Merge before building the visual chart component.
 
 ## Product/engineering requirements
+
 - **Deterministic rendering:** same snapshot inputs must produce identical plotted series.
 - **Stable ordering:** theme/category ordering must be deterministic (tie-break rules documented).
 - **Resilient UX:** no crash or malformed chart for missing/null/partial payload fields.
@@ -51,28 +59,35 @@ A single “current profile” score is useful but incomplete. Trend visuals mak
 ## Data/contracts and integration points
 
 ### Expected snapshot input contract
+
 Each `profile_snapshots` record should provide or derive:
+
 - `createdAt` (ISO UTC)
 - `snapshotDateLocal` (optional helper date)
 - `profileVersion`
 - `payloadJson` containing aggregate theme/category scores
 
 ### Suggested transformation contract
+
 Implement a pure transformer, e.g.:
+
 - `buildTrendSeries(snapshots, options): TrendSeriesResult`
 
 Where `TrendSeriesResult` includes:
+
 - `window: '7D' | '30D' | 'ALL'`
 - `pointsByTheme: Record<ThemeKey, Array<{ t: string; value: number }>>`
 - `xDomain`, `yDomain` (if needed by chart)
 - `metadata` (snapshot count, sparse indicators)
 
 ### Selector/query boundaries
+
 - Keep DB query logic in repository/DAO layer.
 - Keep shape normalization + sorting in selector/utils layer.
 - Keep rendering concerns in UI component layer.
 
 ## Recommended implementation approach
+
 1. **Define UI/UX states first**
    - Empty state, minimal state (1 point), and normal trend state.
 2. **Add snapshot query selector(s)**
@@ -89,6 +104,7 @@ Where `TrendSeriesResult` includes:
    - Cover sparse data, ordering, window filtering, and fallback states.
 
 ## Implementation checklist
+
 - [ ] Add/confirm typed DTO for reading `profile_snapshots` trend fields.
 - [ ] Implement repository query: recent snapshots ordered by time.
 - [ ] Add pure utility to parse/validate `payloadJson` into typed aggregates.
@@ -101,11 +117,13 @@ Where `TrendSeriesResult` includes:
 - [ ] Add UI/component tests for window switching and fallback rendering.
 
 ## Deliverables
+
 - Profile screen includes an over-time trend section backed by snapshots.
 - Deterministic selectors/utilities for building chart series.
 - Test coverage for edge cases and regressions.
 
 ## Acceptance criteria
+
 - Users can view trend direction over `7D`, `30D`, and `ALL` windows.
 - Trend section renders correctly with 0, 1, 2, and many snapshots.
 - No crashes from malformed or partially missing snapshot payload fields.
@@ -113,13 +131,16 @@ Where `TrendSeriesResult` includes:
 - Lint/type checks and trend-related tests pass.
 
 ## Definition-of-done evidence
+
 Include in PR artifacts/notes:
+
 - Screenshot(s) or screen recording of trend section in at least two windows.
 - Example transformed series JSON for one theme.
 - Test output for trend selector + component tests.
 - Brief note on performance guardrails used (memoization/selective re-rendering).
 
 ## Concrete testing requirements
+
 - **Selector/transform tests**
   - Chronological sorting works with out-of-order snapshot rows.
   - Window filtering includes/excludes correct points at boundaries.
@@ -134,7 +155,9 @@ Include in PR artifacts/notes:
   - Snapshot schema version mismatch is handled gracefully.
 
 ## File-location hints (repo navigation)
+
 Likely implementation points:
+
 - Profile screen/container module (existing profile UI)
 - Snapshot repository/DAO (`profile_snapshots` query utilities)
 - Selector/transform utility module for profile aggregates
@@ -143,6 +166,7 @@ Likely implementation points:
 - Test files near selectors/components/profile screen
 
 Useful search strings:
+
 - `profile_snapshots`
 - `Profile`
 - `snapshotDateLocal`
@@ -155,12 +179,14 @@ Useful search strings:
 ## Resources when stuck
 
 ### YouTube tutorials
+
 - React Native charts overview (library comparisons): https://www.youtube.com/results?search_query=react+native+chart+library+comparison
 - Building sparklines/line charts in React Native: https://www.youtube.com/results?search_query=react+native+sparkline+line+chart+tutorial
 - Data visualization design basics (mobile): https://www.youtube.com/results?search_query=mobile+data+visualization+best+practices
 - Memoization/performance in React: https://www.youtube.com/results?search_query=react+memo+usememo+performance+tutorial
 
 ### Official documentation
+
 - React Native docs: https://reactnative.dev/docs/getting-started
 - Expo docs: https://docs.expo.dev/
 - React docs (state, rendering, memoization): https://react.dev/learn
@@ -171,18 +197,21 @@ Useful search strings:
 - React Native Testing Library: https://callstack.github.io/react-native-testing-library/
 
 ### Step-by-step guides / blogs
+
 - Datawrapper Academy (chart type + readability guidance): https://academy.datawrapper.de/
 - Observable Plot docs (clear encoding principles transferable to RN charts): https://observablehq.com/plot/
 - React docs on choosing memoization points: https://react.dev/reference/react/useMemo
 - A11y project (color/contrast principles for charts): https://www.a11yproject.com/
 
 ### Books
-- *Storytelling with Data* (chart clarity and trend communication): https://www.storytellingwithdata.com/books
-- *Designing Interfaces* (UI state handling patterns): https://www.oreilly.com/library/view/designing-interfaces-3rd/9781492051954/
-- *Refactoring UI* (practical visual hierarchy/legibility): https://www.refactoringui.com/book
-- *Designing Data-Intensive Applications* (data correctness mindset): https://dataintensive.net/
+
+- _Storytelling with Data_ (chart clarity and trend communication): https://www.storytellingwithdata.com/books
+- _Designing Interfaces_ (UI state handling patterns): https://www.oreilly.com/library/view/designing-interfaces-3rd/9781492051954/
+- _Refactoring UI_ (practical visual hierarchy/legibility): https://www.refactoringui.com/book
+- _Designing Data-Intensive Applications_ (data correctness mindset): https://dataintensive.net/
 
 ### GitHub repositories
+
 - react-native-svg (foundation used by many chart libs): https://github.com/software-mansion/react-native-svg
 - react-native-gifted-charts: https://github.com/Abhinandan-Kushwaha/react-native-gifted-charts
 - react-native-chart-kit: https://github.com/indiespirit/react-native-chart-kit
@@ -190,6 +219,7 @@ Useful search strings:
 - Expo examples: https://github.com/expo/examples
 
 ### Stack Overflow tags
+
 - `react-native`: https://stackoverflow.com/questions/tagged/react-native
 - `expo`: https://stackoverflow.com/questions/tagged/expo
 - `data-visualization`: https://stackoverflow.com/questions/tagged/data-visualization
@@ -198,6 +228,7 @@ Useful search strings:
 - `jestjs`: https://stackoverflow.com/questions/tagged/jestjs
 
 ### Discussion boards / communities
+
 - Expo forums: https://forums.expo.dev/
 - React Native discussions/proposals: https://github.com/react-native-community/discussions-and-proposals
 - Reactiflux Discord: https://www.reactiflux.com/
@@ -205,10 +236,12 @@ Useful search strings:
 - DEV Community React Native tag: https://dev.to/t/reactnative
 
 ## Validation commands
+
 - `npm run typecheck`
 - `npm run lint`
 - `npm test -- profile-trends`
 - `npm test -- profile-selectors`
 
 ## Notes for next iteration
+
 Iteration 20 (Library screen v1) can reuse trend selector patterns for stable sorting and lightweight, memoized list derivations.

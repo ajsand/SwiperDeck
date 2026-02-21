@@ -1,13 +1,17 @@
 # Iteration 21: Build Settings data controls
 
 ## Objective
+
 Build production-ready **Settings → Data Controls** flows for:
+
 1. **Export local app data to JSON** (user-owned backup / portability).
 2. **Clear all local data** with explicit destructive confirmation.
 3. **Privacy + About** screens that clearly explain local-first behavior.
 
 ## Why this matters
+
 This iteration closes critical app-store and user-trust requirements:
+
 - Users must be able to access and export their own data.
 - Users must be able to permanently delete local data.
 - Users need plain-language disclosure about what is stored locally vs optionally sent to cloud features.
@@ -17,6 +21,7 @@ These requirements map directly to the original product principles in `CLAUDE.md
 ## Scope
 
 ### In scope
+
 - Implement Settings entry points for:
   - **Export Data (JSON)**
   - **Clear Local Data**
@@ -30,6 +35,7 @@ These requirements map directly to the original product principles in `CLAUDE.md
 - Privacy/About screens should be static, versioned app content.
 
 ### Out of scope
+
 - Cloud account deletion (no account system in local-first baseline).
 - Remote backup restore flows.
 - Legal-policy hosting backend.
@@ -37,6 +43,7 @@ These requirements map directly to the original product principles in `CLAUDE.md
 ## Multi-model execution strategy
 
 > **Before starting this iteration**, read these workflow documents:
+>
 > - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
 > - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
 > - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
@@ -44,15 +51,16 @@ These requirements map directly to the original product principles in `CLAUDE.md
 
 ### Model routing for this iteration
 
-| Sub-task | Model | Rationale |
-|---|---|---|
-| Implement JSON export service and file sharing | **Codex** | Data export is core implementation |
-| Implement destructive clear-data flow with confirmation UX | **Codex** | DB wipe + UI flow implementation |
-| Build Privacy and About static content screens | **Codex** | Screen creation |
-| Review privacy copy and data handling compliance | **Claude** | Spec enforcement for CLAUDE.md privacy principles |
-| Review export payload shape for completeness | **Claude** | Verify all required tables are included |
+| Sub-task                                                   | Model      | Rationale                                         |
+| ---------------------------------------------------------- | ---------- | ------------------------------------------------- |
+| Implement JSON export service and file sharing             | **Codex**  | Data export is core implementation                |
+| Implement destructive clear-data flow with confirmation UX | **Codex**  | DB wipe + UI flow implementation                  |
+| Build Privacy and About static content screens             | **Codex**  | Screen creation                                   |
+| Review privacy copy and data handling compliance           | **Claude** | Spec enforcement for CLAUDE.md privacy principles |
+| Review export payload shape for completeness               | **Claude** | Verify all required tables are included           |
 
 ### Notes
+
 - This is a **Codex-primary** iteration. Gemini is not needed (settings screens are straightforward layout).
 - Claude should review the privacy/about content to ensure it accurately describes local-first behavior per `CLAUDE.md` Section 10.
 
@@ -61,6 +69,7 @@ These requirements map directly to the original product principles in `CLAUDE.md
 ## Repository context for the coding agent
 
 Before implementing, review these areas to stay aligned with existing architecture:
+
 - `CLAUDE.md` sections on Settings, data model, local-first constraints, and privacy expectations.
 - Existing SQLite migrations, repositories/services, and utility patterns used in prior iterations.
 - Existing navigation layout for the Settings tab and nested stack/screens.
@@ -72,6 +81,7 @@ If existing tables differ from planning docs, **export what actually exists in t
 ## Implementation checklist (detailed)
 
 ### 1) Export JSON flow
+
 - [ ] Add `exportUserDataToJson()` service with explicit table allowlist.
 - [ ] Include export metadata envelope:
   - `schemaVersion`
@@ -87,6 +97,7 @@ If existing tables differ from planning docs, **export what actually exists in t
   - empty DB behavior
 
 ### 2) Clear local data flow (destructive)
+
 - [ ] Add **Danger Zone** section in Settings.
 - [ ] Implement two-step confirmation UX (modal + final confirm action).
 - [ ] Execute DB wipe in transaction:
@@ -101,6 +112,7 @@ If existing tables differ from planning docs, **export what actually exists in t
   - reset is not triggered accidentally
 
 ### 3) Privacy + About content screens
+
 - [ ] Create static content screen(s) linked from Settings.
 - [ ] Include explicit sections:
   - what data is stored locally
@@ -115,6 +127,7 @@ If existing tables differ from planning docs, **export what actually exists in t
 ## Data contract guidance
 
 ### Suggested export payload shape
+
 ```json
 {
   "meta": {
@@ -134,7 +147,9 @@ If existing tables differ from planning docs, **export what actually exists in t
 ```
 
 ### Minimum tables to include
+
 At minimum include local preference/history/profile state (based on implemented schema):
+
 - `swipe_sessions`
 - `swipe_events`
 - `taste_tag_scores`
@@ -147,6 +162,7 @@ Include `catalog_entities` only if product intent is full offline portability an
 ---
 
 ## Acceptance criteria
+
 1. User can export local data from Settings and receives a valid JSON file with expected tables/fields.
 2. User can clear local data only after explicit destructive confirmation.
 3. After reset, app returns to clean usable state without crashes or stale in-memory state.
@@ -156,6 +172,7 @@ Include `catalog_entities` only if product intent is full offline portability an
 ---
 
 ## Validation commands
+
 - `npm run lint`
 - `npm run typecheck`
 - `npm test -- settings-data-controls`
@@ -169,16 +186,19 @@ If tests do not yet exist, add focused tests for exporter/reset behavior in this
 ## Troubleshooting playbook (when agent gets stuck)
 
 ### Common issue: SQLite FK errors during wipe
+
 - Ensure deletion order respects FK constraints.
 - Prefer transactional execution and fail-fast rollback.
 - Verify pragma settings and migration assumptions.
 
 ### Common issue: share/export fails on one platform
+
 - Validate file path and URI scheme required by Expo APIs.
 - Confirm platform permissions/availability of file-sharing module.
 - Add graceful fallback (save locally + copy path).
 
 ### Common issue: stale UI after reset
+
 - Invalidate query caches/selectors.
 - Reinitialize state containers after wipe.
 - Re-run app bootstrap data load pipeline.
@@ -190,6 +210,7 @@ If tests do not yet exist, add focused tests for exporter/reset behavior in this
 Use these in order: official docs first, then implementation examples, then community Q&A.
 
 ### Official documentation (highest priority)
+
 1. Expo SQLite docs (schema, transactions, async access patterns):
    - https://docs.expo.dev/versions/latest/sdk/sqlite/
 2. Expo FileSystem docs (write/read/export files):
@@ -204,6 +225,7 @@ Use these in order: official docs first, then implementation examples, then comm
    - https://reactnative.dev/docs/accessibility
 
 ### Step-by-step guides / practical tutorials
+
 1. Expo guide patterns for file handling and document export flows:
    - https://docs.expo.dev/guides/
 2. React Navigation / settings-screen UX patterns (if router interop needed):
@@ -212,6 +234,7 @@ Use these in order: official docs first, then implementation examples, then comm
    - https://mas.owasp.org/
 
 ### YouTube references (implementation walkthroughs)
+
 1. Search target: “Expo SQLite tutorial”, “Expo FileSystem tutorial”, “Expo Sharing tutorial”.
    - https://www.youtube.com/results?search_query=expo+sqlite+tutorial
    - https://www.youtube.com/results?search_query=expo+filesystem+tutorial
@@ -220,6 +243,7 @@ Use these in order: official docs first, then implementation examples, then comm
    - https://www.youtube.com/results?search_query=react+native+destructive+action+confirmation
 
 ### High-signal GitHub repositories (reference implementations)
+
 1. Expo examples monorepo (canonical patterns):
    - https://github.com/expo/examples
 2. Expo Router examples:
@@ -228,6 +252,7 @@ Use these in order: official docs first, then implementation examples, then comm
    - https://github.com/topics/react-native-example
 
 ### Community troubleshooting resources
+
 1. Stack Overflow (Expo SQLite):
    - https://stackoverflow.com/questions/tagged/expo-sqlite
 2. Stack Overflow (Expo):
@@ -240,13 +265,15 @@ Use these in order: official docs first, then implementation examples, then comm
    - https://www.reactiflux.com/
 
 ### Books / long-form references
-1. *Designing Data-Intensive Applications* (Kleppmann) — data integrity, migrations, consistency mindset.
-2. *Mobile App Security* references aligned with OWASP MASVS for secure deletion/export posture.
-3. *The Pragmatic Programmer* — defensive workflows and safe refactor/testing practices.
+
+1. _Designing Data-Intensive Applications_ (Kleppmann) — data integrity, migrations, consistency mindset.
+2. _Mobile App Security_ references aligned with OWASP MASVS for secure deletion/export posture.
+3. _The Pragmatic Programmer_ — defensive workflows and safe refactor/testing practices.
 
 ---
 
 ## Definition of done
+
 - Settings includes discoverable Data Controls section.
 - Export creates valid, user-accessible JSON artifact.
 - Reset flow is clearly destructive, confirmed, and reliable.
@@ -254,4 +281,5 @@ Use these in order: official docs first, then implementation examples, then comm
 - Tests cover happy path + key failure cases for export and reset.
 
 ## Notes for next iteration
+
 Iteration 22 introduces deterministic local AI-label fallback rules; keep Settings copy compatible with that behavior (local summaries available even when cloud summary is disabled).

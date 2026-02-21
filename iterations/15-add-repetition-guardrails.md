@@ -1,10 +1,13 @@
 # Iteration 15: Add repetition guardrails
 
 ## Objective
+
 Introduce a repetition-control layer in the recommendation/deck selector so users do not see near-duplicate sequences of cards. The layer should block immediate repeats, suppress over-exposed entities/tags over a short horizon, and degrade gracefully when constraints become too strict.
 
 ## Why this matters
+
 Even strong relevance models feel “broken” if users repeatedly see the same entity or the same category cluster. Repetition guardrails improve:
+
 - perceived novelty and session quality,
 - trust in recommendation diversity,
 - engagement/retention for swipe-heavy interactions,
@@ -13,7 +16,9 @@ Even strong relevance models feel “broken” if users repeatedly see the same 
 This iteration establishes production-safe novelty constraints before later tuning/personalization controls.
 
 ## Scope
+
 ### In scope
+
 - Add recent-history tracking for served entity IDs (session-local and short rolling horizon).
 - Block immediate repeats and near-immediate repeats using configurable windows.
 - Add same-tag streak cap (or equivalent group/category cap) to avoid short-run clustering.
@@ -23,6 +28,7 @@ This iteration establishes production-safe novelty constraints before later tuni
 - Add deterministic tests that validate guardrail behavior under seeded/replayable input order.
 
 ### Out of scope
+
 - Long-term novelty modeling across weeks/months.
 - Full diversity re-ranking optimization (MMR/xQuAD) across full recommendation slate.
 - Cross-device synchronized repetition history.
@@ -31,6 +37,7 @@ This iteration establishes production-safe novelty constraints before later tuni
 ## Multi-model execution strategy
 
 > **Before starting this iteration**, read these workflow documents:
+>
 > - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
 > - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
 > - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
@@ -38,17 +45,19 @@ This iteration establishes production-safe novelty constraints before later tuni
 
 ### Model routing for this iteration
 
-| Sub-task | Model | Rationale |
-|---|---|---|
-| Implement guardrail layer (recent-history, tag streak cap, fallback) | **Codex** | Core algorithmic implementation |
-| Add telemetry fields and deterministic tests | **Codex** | Test authoring and instrumentation |
-| Review policy design for safety and fallback ordering | **Claude** | Risk assessment for guardrail behavior |
+| Sub-task                                                             | Model      | Rationale                              |
+| -------------------------------------------------------------------- | ---------- | -------------------------------------- |
+| Implement guardrail layer (recent-history, tag streak cap, fallback) | **Codex**  | Core algorithmic implementation        |
+| Add telemetry fields and deterministic tests                         | **Codex**  | Test authoring and instrumentation     |
+| Review policy design for safety and fallback ordering                | **Claude** | Risk assessment for guardrail behavior |
 
 ### Notes
+
 - This is a **Codex-primary** iteration. Claude reviews the fallback relaxation order for safety.
 - Gemini is not needed (pure algorithmic work with no UI component).
 
 ## Core guardrail concepts
+
 - **Recent entity window**: short rolling memory of recently shown entity IDs.
 - **Hard block**: immediate exclusion of candidates that violate strict repetition policy (e.g., same ID as last served, within N recent IDs).
 - **Tag streak cap**: max allowed consecutive cards sharing same primary tag/category.
@@ -56,11 +65,14 @@ This iteration establishes production-safe novelty constraints before later tuni
 - **Fallback mode**: controlled relaxation order when constraints leave no valid candidates.
 
 ## Data/contracts and integration points
+
 ### Upstream contract
+
 - Input candidates are already filtered/ranked from previous iterations (including Iteration 13/14).
 - Candidate records include stable entity ID and category/tag metadata needed by streak logic.
 
 ### Iteration 15 contract
+
 - Add/extend a guardrail entrypoint, e.g.:
   - `applyRepetitionGuardrails(rankedCandidates, recentHistory, policyConfig) -> GuardrailResult`
 - `GuardrailResult` should include:
@@ -69,11 +81,13 @@ This iteration establishes production-safe novelty constraints before later tuni
   - optional diagnostics (`candidatePoolBefore`, `candidatePoolAfter`, `relaxationStep`).
 
 ### Downstream expectations
+
 - Selector remains deterministic for identical inputs + seed/config.
 - Guardrail decisions are observable in telemetry/logging.
 - UI receives normal selected card object; guardrail internals remain transparent unless needed for debugging.
 
 ## Recommended implementation approach
+
 1. **Define policy config with safe defaults**
    - Example knobs: `recentEntityWindow`, `maxSameTagStreak`, `allowSoftPenalty`, `fallbackRelaxationOrder`.
 2. **Implement recent-history state helper**
@@ -95,6 +109,7 @@ This iteration establishes production-safe novelty constraints before later tuni
    - Seeded/replayable inputs proving same outputs under same state and config.
 
 ## Implementation checklist
+
 - [ ] Add repetition guardrail config constants with documented defaults.
 - [ ] Implement recent-history helper/store (bounded window + query APIs).
 - [ ] Add immediate-repeat hard block.
@@ -106,12 +121,14 @@ This iteration establishes production-safe novelty constraints before later tuni
 - [ ] Add unit/integration tests for deterministic and edge-case behavior.
 
 ## Deliverables
+
 - Production-ready repetition guardrail layer integrated into deck selection.
 - Configurable policy knobs for repetition window and tag streak cap.
 - Telemetry/logging fields for monitoring novelty protections.
 - Test suite covering normal, edge, and fallback scenarios.
 
 ## Acceptance criteria
+
 - Immediate entity repeats are blocked in normal operation.
 - Short-horizon repeated entities respect configured window constraints.
 - Same-tag streaks do not exceed configured cap unless explicit fallback is triggered.
@@ -119,7 +136,9 @@ This iteration establishes production-safe novelty constraints before later tuni
 - Guardrail metadata is emitted for observability and tuning.
 
 ## Definition-of-done evidence
+
 Include in PR notes or linked artifacts:
+
 - Reproduction showing immediate-repeat prevention in sequence simulation.
 - Edge-case matrix: empty pool, single candidate, all candidates recently seen, single-tag catalog.
 - Determinism proof for seeded/replayed scenario.
@@ -127,6 +146,7 @@ Include in PR notes or linked artifacts:
 - Before/after sequence example demonstrating reduced repetition clusters.
 
 ## Concrete testing requirements
+
 - **Immediate repeat test**
   - Last shown ID must not be selected next when alternatives exist.
 - **Recent window exclusion tests**
@@ -141,13 +161,16 @@ Include in PR notes or linked artifacts:
   - Simulate long sequence and assert max repeat/streak invariants.
 
 ## File-location hints (repo navigation)
+
 Likely implementation points:
+
 - recommendation/deck selection orchestration modules,
 - policy/config constants,
 - swipe/session history persistence or in-memory session state utilities,
 - recommendation-focused unit/integration test directories.
 
 Useful search strings:
+
 - `recentHistory`
 - `repetition`
 - `guardrail`
@@ -159,11 +182,13 @@ Useful search strings:
 ## Resources when stuck
 
 ### YouTube tutorials
+
 - Recommender systems diversity/novelty (search): https://www.youtube.com/results?search_query=recommender+systems+diversity+novelty
 - Multi-armed bandits for recommenders (StatQuest/search): https://www.youtube.com/results?search_query=statquest+multi+armed+bandit
 - Production recommendation system design walkthroughs: https://www.youtube.com/results?search_query=production+recommender+system+design
 
 ### Official docs
+
 - Expo docs (app/runtime constraints): https://docs.expo.dev/
 - React Native performance/runtime docs: https://reactnative.dev/docs/performance
 - TypeScript handbook (utility types, strict typing): https://www.typescriptlang.org/docs/
@@ -171,23 +196,27 @@ Useful search strings:
 - SQLite docs (if history persisted in DB): https://www.sqlite.org/docs.html
 
 ### Step-by-step guides / blogs
+
 - Recommender-system metrics: diversity/novelty/serendipity: https://eugeneyan.com/writing/serendipity-and-accuracy-in-recommender-systems/
 - Practical recommendation architecture patterns: https://netflixtechblog.com/tagged/recommendations
 - Diversity-aware recommendation overview (MMR concept): https://www.cs.cmu.edu/~jgc/publication/The_Use_MMR_Diversity_Based_LTMIR_1998.pdf
 - Building robust fallback logic in ranking systems (industry patterns): https://research.google/pubs/pub45530/
 
 ### Books
-- *Recommender Systems Handbook*: https://link.springer.com/book/10.1007/978-1-4899-7637-6
-- *Practical Recommender Systems* (Manning): https://www.manning.com/books/practical-recommender-systems
-- *Designing Data-Intensive Applications* (fallback/state patterns): https://dataintensive.net/
+
+- _Recommender Systems Handbook_: https://link.springer.com/book/10.1007/978-1-4899-7637-6
+- _Practical Recommender Systems_ (Manning): https://www.manning.com/books/practical-recommender-systems
+- _Designing Data-Intensive Applications_ (fallback/state patterns): https://dataintensive.net/
 
 ### GitHub repos
+
 - Microsoft Recommenders (evaluation + diversity examples): https://github.com/recommenders-team/recommenders
 - RecBole (ranking/diversity experimentation): https://github.com/RUCAIBox/RecBole
 - LensKit (recommendation research toolkit): https://github.com/lenskit/lkpy
 - Cornac (recommender library with evaluation focus): https://github.com/PreferredAI/cornac
 
 ### Stack Overflow tags
+
 - `recommendation-engine`: https://stackoverflow.com/questions/tagged/recommendation-engine
 - `algorithm`: https://stackoverflow.com/questions/tagged/algorithm
 - `typescript`: https://stackoverflow.com/questions/tagged/typescript
@@ -195,16 +224,19 @@ Useful search strings:
 - `sqlite`: https://stackoverflow.com/questions/tagged/sqlite
 
 ### Discussion boards
+
 - Cross Validated (recommender/diversity discussions): https://stats.stackexchange.com/questions/tagged/recommender-systems
 - Reddit r/recommendersystems: https://www.reddit.com/r/recommendersystems/
 - Reddit r/MachineLearning: https://www.reddit.com/r/MachineLearning/
 - Hacker News discussions on recommender design: https://news.ycombinator.com/
 
 ## Validation commands
+
 - `npm run typecheck`
 - `npm run lint`
 - `npm test -- repetition-guardrails`
 - `npm test -- recommendation`
 
 ## Notes for next iteration
+
 Iteration 16 (filter modal controls) should expose user-configurable diversity/repetition preferences safely, without allowing settings that fully disable anti-repeat protections in normal operation.

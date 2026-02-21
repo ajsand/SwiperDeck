@@ -1,13 +1,17 @@
 # Iteration 12: Implement cold-start candidate selector
 
 ## Objective
+
 Implement a deterministic cold-start candidate selector for users with sparse history that balances popularity and diversity across active media-type filters.
 
 ## Why this matters
+
 Cold-start quality determines first-session retention. If recommendations are only mainstream, users churn from repetitiveness; if only diverse, users may not recognize enough cards to provide signals. This selector must provide an intentional blend that is both engaging and learnable.
 
 ## Scope
+
 ### In scope
+
 - Detect cold-start state using a clear swipe-count threshold.
 - Generate candidate pool from `catalog_entities` constrained by active type filters.
 - Blend popularity-weighted sampling with diversity balancing:
@@ -18,6 +22,7 @@ Cold-start quality determines first-session retention. If recommendations are on
 - Return selector diagnostics useful for later warm-start handoff (`reason`, `bucket`, `quotaFill`).
 
 ### Out of scope
+
 - Personalized warm-start scoring formula (Iteration 13).
 - ε-greedy exploration policy (Iteration 14).
 - Long-window repetition guardrails beyond the cold-start query horizon (Iteration 15).
@@ -25,6 +30,7 @@ Cold-start quality determines first-session retention. If recommendations are on
 ## Multi-model execution strategy
 
 > **Before starting this iteration**, read these workflow documents:
+>
 > - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
 > - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
 > - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
@@ -32,19 +38,22 @@ Cold-start quality determines first-session retention. If recommendations are on
 
 ### Model routing for this iteration
 
-| Sub-task | Model | Rationale |
-|---|---|---|
-| Review algorithm design (popularity + diversity blend) | **Claude** | Verify approach aligns with CLAUDE.md Section 8.2 |
-| Produce Task Brief with threshold, quota, and sampling strategy | **Claude** | Decomposition and constraint specification |
-| Implement selector, quota allocator, weighted sampler | **Codex** | Core algorithmic implementation |
-| Add deterministic tests with seeded RNG | **Codex** | Test authoring |
+| Sub-task                                                        | Model      | Rationale                                         |
+| --------------------------------------------------------------- | ---------- | ------------------------------------------------- |
+| Review algorithm design (popularity + diversity blend)          | **Claude** | Verify approach aligns with CLAUDE.md Section 8.2 |
+| Produce Task Brief with threshold, quota, and sampling strategy | **Claude** | Decomposition and constraint specification        |
+| Implement selector, quota allocator, weighted sampler           | **Codex**  | Core algorithmic implementation                   |
+| Add deterministic tests with seeded RNG                         | **Codex**  | Test authoring                                    |
 
 ### Notes
+
 - **Claude first**: Claude should review the cold-start strategy against `CLAUDE.md` Section 8.1-8.2 and define the threshold/quota parameters before Codex implements.
 - Gemini is not needed (pure algorithmic work).
 
 ## Agent resources and navigation map
+
 ### Source-of-truth references
+
 - `CLAUDE.md` Section 1 (product principle: practical ranking behavior).
 - `CLAUDE.md` Section 8.1–8.2 (candidate pool and cold-start strategy).
 - `CLAUDE.md` Section 17 task #12 (exact backlog intent).
@@ -55,7 +64,9 @@ Cold-start quality determines first-session retention. If recommendations are on
 - `iterations/README.md` (dependency order and sequence constraints).
 
 ### Current repo implementation anchors
+
 Inspect these before implementing to avoid duplicate logic:
+
 - Catalog repository/query layer used by deck loading.
 - Existing deck candidate service (if present) and filter-state model.
 - Swipe history/recently-shown retrieval utilities.
@@ -63,7 +74,9 @@ Inspect these before implementing to avoid duplicate logic:
 - Test fixture factories for catalog entities and sessions.
 
 ### Suggested file organization
+
 Use repo conventions if paths differ:
+
 - `features/recommendation/constants/coldStartConfig.ts`
   - threshold, type quotas, popularity/diversity blend weights, default candidate limits
 - `features/recommendation/service/isColdStartUser.ts`
@@ -76,9 +89,11 @@ Use repo conventions if paths differ:
   - deterministic selection behavior, diversity, and edge cases
 
 ## External troubleshooting and learning resources
+
 Use these when implementation details are unclear.
 
 ### Official docs
+
 - Expo SQLite API: https://docs.expo.dev/versions/latest/sdk/sqlite/
 - Expo SQLite usage guide: https://docs.expo.dev/guides/using-sqlite/
 - SQLite window functions (useful for per-type quotas/ranking): https://www.sqlite.org/windowfunctions.html
@@ -87,24 +102,28 @@ Use these when implementation details are unclear.
 - TypeScript handbook (utility + generics for selector contracts): https://www.typescriptlang.org/docs/handbook/2/generics.html
 
 ### Step-by-step guides
+
 - SQL top-N-per-group approaches (for type quotas): https://www.sqlitetutorial.net/sqlite-window-functions/sqlite-row_number/
 - Weighted random sampling overview (implementable with seeded RNG): https://en.wikipedia.org/wiki/Reservoir_sampling
 - Stable sorting and comparator design in JS/TS: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
 - Deterministic tests in Jest (seed/time control): https://jestjs.io/docs/mock-functions
 
 ### YouTube
+
 - Expo channel (app data + architecture walkthroughs): https://www.youtube.com/@expo
 - Hussein Nasser (database query/consistency tradeoffs): https://www.youtube.com/@hnasr
 - ThePrimeagen / Jack Herrington content on deterministic TS architecture/testing: https://www.youtube.com/@jherr
 - Fireship SQL refreshers for fast practical query ideas: https://www.youtube.com/@Fireship
 
 ### Books / long-form references
-- *Designing Data-Intensive Applications* (sampling tradeoffs, ranking system intuition): https://dataintensive.net/
-- *Recommender Systems Handbook* (cold-start and diversity concepts): https://link.springer.com/book/10.1007/978-1-4899-7637-6
-- *Bandit Algorithms* (explore/exploit context for future iterations): https://tor-lattimore.com/downloads/book/book.pdf
+
+- _Designing Data-Intensive Applications_ (sampling tradeoffs, ranking system intuition): https://dataintensive.net/
+- _Recommender Systems Handbook_ (cold-start and diversity concepts): https://link.springer.com/book/10.1007/978-1-4899-7637-6
+- _Bandit Algorithms_ (explore/exploit context for future iterations): https://tor-lattimore.com/downloads/book/book.pdf
 - SQLite official documentation index: https://www.sqlite.org/docs.html
 
 ### GitHub repos
+
 - Expo examples (SQLite + app patterns): https://github.com/expo/examples
 - Expo `expo-sqlite` package source: https://github.com/expo/expo/tree/main/packages/expo-sqlite
 - LensKit (recommender algorithm references): https://github.com/lenskit/lkpy
@@ -112,6 +131,7 @@ Use these when implementation details are unclear.
 - Jest examples: https://github.com/jestjs/jest/tree/main/examples
 
 ### Stack Overflow / discussion boards
+
 - Stack Overflow `sqlite`: https://stackoverflow.com/questions/tagged/sqlite
 - Stack Overflow `expo-sqlite`: https://stackoverflow.com/questions/tagged/expo-sqlite
 - Stack Overflow `recommendation-engine`: https://stackoverflow.com/questions/tagged/recommendation-engine
@@ -120,6 +140,7 @@ Use these when implementation details are unclear.
 - r/recommendersystems (practical model/design discussion): https://www.reddit.com/r/recommendersystems/
 
 ## Recommended implementation approach
+
 1. **Define cold-start threshold** in config (for example: `swipeCount < 30`) and keep it tunable.
 2. **Build filtered base pool query** from `catalog_entities`:
    - include only active types
@@ -139,6 +160,7 @@ Use these when implementation details are unclear.
 6. **Return explain metadata** to help debugging and warm-start migration (`selectedBy`, `typeQuota`, `penaltiesApplied`).
 
 ## Implementation checklist
+
 - [ ] Define and export `COLD_START_THRESHOLD` and quota/sampling config constants.
 - [ ] Implement `isColdStartUser(swipeCount)` helper with unit tests at boundary values.
 - [ ] Implement candidate repository query respecting active filters and exclusion IDs.
@@ -156,11 +178,13 @@ Use these when implementation details are unclear.
 - [ ] Ensure output contract is compatible with Iteration 13 warm-ranker handoff.
 
 ## Deliverables
+
 - Cold-start selector service integrated into deck candidate pipeline.
 - Configurable cold-start threshold and diversity controls.
 - Automated deterministic tests and fixture-backed examples.
 
 ## Acceptance criteria
+
 - Users below threshold receive a mixed deck that includes popular items across active types.
 - No single type or tag dominates beyond configured caps/penalties.
 - Selector results are reproducible given same seed, filters, and exclusion inputs.
@@ -168,21 +192,24 @@ Use these when implementation details are unclear.
 - Selector interface can be reused by warm-start pipeline without breaking changes.
 
 ## Definition of done evidence
+
 - Show a worked example of input:
   - active filters,
   - exclusion list,
   - seed,
   - target size
-  and output selected entity IDs with selection reasons.
+    and output selected entity IDs with selection reasons.
 - Show deterministic test proof that two identical runs produce identical ordered output.
 - Show diversity test proof that at least `N` types appear when `N` types are enabled and catalog supports it.
 - Show edge-case proof for limited catalog pools and exclusion-heavy requests.
 
 ## Validation commands
+
 - `npm run typecheck`
 - `npm run lint`
 - `npm test -- cold-start`
 - `npm test -- recommendation`
 
 ## Notes for next iteration
+
 Iteration 13 warm-start ranking should consume this selector as fallback or blend mode. Keep scoring/explain fields explicit so handoff to personalized ranking is transparent and easy to tune.

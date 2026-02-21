@@ -1,9 +1,50 @@
 # SwiperDeck
 
-## Navigation route conventions
+A swipe-first taste profile app built with Expo (SDK 54) and React Native.
 
-- Keep tab routes under `app/(tabs)/`; Deck remains `app/(tabs)/index.tsx` as the default tab entry route.
-- Register top-level route groups in `app/_layout.tsx`: `(tabs)` for shell tabs, `details` for pushed detail screens, and `(modals)` for modal presentation.
-- Use `app/details/_layout.tsx` to define detail stack options and keep detail screens grouped under `app/details/`.
-- Use `app/(modals)/_layout.tsx` for modal stack options and place modal routes there (for example `/filter`).
-- Keep dynamic route params in filename form (for example `app/details/[id].tsx`).
+## Development
+
+### Prerequisites
+
+- Node.js (LTS)
+- npm
+
+### Setup
+
+```bash
+npm install
+```
+
+### Quality Gates
+
+Run these before committing:
+
+```bash
+npm run typecheck       # TypeScript strict check (tsc --noEmit)
+npm run lint            # ESLint via Expo (flat config, SDK 54+)
+npm run format:check    # Prettier formatting check
+```
+
+CI expects all three to exit 0.
+
+### Fixing Issues
+
+```bash
+npm run lint:fix        # Auto-fix lint errors
+npm run format          # Auto-format all files with Prettier
+```
+
+### Running the App
+
+```bash
+npm start               # Expo dev server
+npm run web             # Web
+npm run ios             # iOS simulator
+npm run android         # Android emulator
+```
+
+### Testing
+
+```bash
+npm test                # Jest test suite
+```
