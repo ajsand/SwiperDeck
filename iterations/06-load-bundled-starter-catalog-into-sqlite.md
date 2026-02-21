@@ -20,6 +20,26 @@ Deck ranking and swipe UX cannot function without a local starter dataset. Impor
 - Background scheduling or OTA catalog delivery strategy.
 - Non-SQLite persistence backends.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Implement import pipeline (parse, validate, normalize, persist) | **Codex** | Data pipeline is core implementation |
+| Wire first-run import into startup bootstrap | **Codex** | Integration with existing app lifecycle |
+| Review catalog contract alignment with CLAUDE.md Section 4 | **Claude** | Spec enforcement for entity structure |
+
+### Notes
+- This is a **Codex-primary** iteration. Gemini is not needed (no spatial/UI work).
+- Claude should verify the bundled JSON schema matches the entity structure defined in `CLAUDE.md` Section 4.1.
+
 ## Agent resources and navigation map
 ### Source-of-truth references
 - `CLAUDE.md` Section 4.2 (bundled starter catalog product intent), Section 6 (`catalog_entities` schema contract), and backlog item 6.

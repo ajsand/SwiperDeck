@@ -109,7 +109,7 @@ Validation commands:
 ## Iteration 1 Example
 
 For `01-bootstrap-app-shell`:
-- Claude plans tab + stack expectations from `CLAUDE.md` Section 5.
-- Gemini validates route structure/deep-link behavior.
+- Claude defines constraints, acceptance checks, and routes spatial planning to Gemini.
+- Gemini owns the tab + stack routing brief (including deep-link behavior).
 - Codex implements missing wiring/placeholders.
 - Claude reviews final result against acceptance criteria.

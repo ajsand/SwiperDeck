@@ -23,6 +23,26 @@ This iteration prevents data-shape drift. Without a single source of truth for d
 - Building chart/UI rendering details (Iterations 17–20).
 - Remote sync or cloud serialization contracts.
 
+## Multi-model execution strategy
+
+> **Before starting this iteration**, read these workflow documents:
+> - [`docs/MULTI_MODEL_WORKFLOW.md`](../docs/MULTI_MODEL_WORKFLOW.md) — model roles, selection rubric, task protocol
+> - [`docs/models/CLAUDE_OPUS_4_6_GUIDE.md`](../docs/models/CLAUDE_OPUS_4_6_GUIDE.md) — orchestrator/planner guide
+> - [`docs/models/GPT_5_3_CODEX_GUIDE.md`](../docs/models/GPT_5_3_CODEX_GUIDE.md) — primary implementer guide
+> - [`docs/models/GEMINI_3_1_GUIDE.md`](../docs/models/GEMINI_3_1_GUIDE.md) — spatial/layout guide
+
+### Model routing for this iteration
+
+| Sub-task | Model | Rationale |
+|---|---|---|
+| Define canonical types, enums, mappers, runtime guards | **Codex** | TypeScript type authoring is core implementation |
+| Review type completeness against Iteration 04 schema | **Claude** | Ensure no schema fields are missed in domain types |
+| Add action-to-weight constants with compile-time checks | **Codex** | Implementation with exhaustive type checking |
+
+### Notes
+- This is a **Codex-primary** iteration. Claude reviews type completeness after implementation.
+- Gemini is not needed (no spatial/UI work).
+
 ## Agent resources and navigation map
 ### Source-of-truth references
 - `CLAUDE.md` Section 6 (domain entities and schema intent).

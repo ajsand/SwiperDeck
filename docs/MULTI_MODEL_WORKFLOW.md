@@ -40,7 +40,7 @@ Tie-breakers:
 
 | Iteration Type | Recommended Model(s) |
 |---|---|
-| Navigation shell | Gemini -> Codex, Claude review |
+| Navigation shell | Claude orchestration + Gemini (spatial plan) -> Codex (implement) |
 | SQLite migrations/schema | Codex, Claude review |
 | Ranking and scoring math | Codex, Claude formula review |
 | UI cards and gestures | Codex, Gemini layout audit |
