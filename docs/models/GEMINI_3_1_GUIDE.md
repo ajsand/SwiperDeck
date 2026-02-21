@@ -35,53 +35,56 @@
 
 ```md
 Given current `app/` tree and requirements:
-1) propose route/group/layout structure
-2) explain reasoning
-3) list deep links to verify
-4) list edge cases
-5) output Codex-ready brief
+
+1. propose route/group/layout structure
+2. explain reasoning
+3. list deep links to verify
+4. list edge cases
+5. output Codex-ready brief
 ```
 
 ### Diagnose Navigation Bug
 
 ```md
 Given routes + symptom:
-1) likely root cause
-2) route resolution path
-3) Codex-ready fix brief
-4) verification steps
+
+1. likely root cause
+2. route resolution path
+3. Codex-ready fix brief
+4. verification steps
 ```
 
 ### UI Layout Critique
 
 ```md
 Given screen/component structure:
-1) spatial issues
-2) rerender/perf risks
-3) gesture conflicts
-4) accessibility concerns
-5) Codex-ready improvements
+
+1. spatial issues
+2. rerender/perf risks
+3. gesture conflicts
+4. accessibility concerns
+5. Codex-ready improvements
 ```
 
 ## Boundaries
 
-| Gemini | Codex |
-|---|---|
-| Route/layout proposals | Route/component implementation |
-| Gesture-zone mapping | Gesture handler code |
+| Gemini                     | Codex                            |
+| -------------------------- | -------------------------------- |
+| Route/layout proposals     | Route/component implementation   |
+| Gesture-zone mapping       | Gesture handler code             |
 | Chart layout specification | Chart rendering and state wiring |
-| Nav bug diagnosis | Nav bug fix |
+| Nav bug diagnosis          | Nav bug fix                      |
 
 Rule: Gemini defines the blueprint; Codex builds it.
 
 ## Failure Modes and Mitigations
 
-| Failure Mode | Mitigation |
-|---|---|
-| Overconfident API claims | Cite docs or mark "verify" |
-| Drifting into full implementation | Stop at implementation brief |
-| Ignoring current structure | Read existing `app/_layout.tsx` first |
-| Over-engineering | Prefer simplest structure that satisfies iteration |
+| Failure Mode                      | Mitigation                                         |
+| --------------------------------- | -------------------------------------------------- |
+| Overconfident API claims          | Cite docs or mark "verify"                         |
+| Drifting into full implementation | Stop at implementation brief                       |
+| Ignoring current structure        | Read existing `app/_layout.tsx` first              |
+| Over-engineering                  | Prefer simplest structure that satisfies iteration |
 
 ## Verification Checklist
 
@@ -95,6 +98,7 @@ Rule: Gemini defines the blueprint; Codex builds it.
 
 ```md
 ## Implementation Brief - <Feature>
+
 Iteration: <NN>
 What to build:
 Routing changes:

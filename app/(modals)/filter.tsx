@@ -6,8 +6,14 @@ export default function FilterModalScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Filter Modal</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <Text style={styles.subtitle}>Filter controls land here in Iteration 16.</Text>
+      <View
+        style={styles.separator}
+        lightColor="#eee"
+        darkColor="rgba(255,255,255,0.1)"
+      />
+      <Text style={styles.subtitle}>
+        Filter controls land here in Iteration 16.
+      </Text>
     </View>
   );
 }
