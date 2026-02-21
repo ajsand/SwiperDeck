@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import DeckScreen from '../app/(tabs)/deck';
+import DeckScreen from '../app/(tabs)/index';
 
 describe('DeckScreen', () => {
   it('renders correctly', () => {
