@@ -39,11 +39,12 @@
 Implement `iterations/<NN>-...md` with minimal diff.
 Honor constraints and acceptance criteria.
 Then run:
+
 - npm run typecheck
 - npm run lint
 - npm test -- <pattern>
 - npm run format -- --check
-Return files changed + rationale + results.
+  Return files changed + rationale + results.
 ```
 
 ### Fix Failing Typecheck/Tests
@@ -58,6 +59,7 @@ Re-run failing commands and report.
 
 ```md
 Refactor <target> with:
+
 - minimal diff
 - preserved public APIs
 - passing tests
@@ -94,6 +96,7 @@ Refactor <target> with:
 
 ```md
 ## Review Request - Iteration <NN>
+
 Summary:
 Files changed:
 Validation results:
