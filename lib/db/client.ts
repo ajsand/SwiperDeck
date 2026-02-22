@@ -6,7 +6,13 @@ let dbPromise: Promise<SQLiteDatabase> | null = null;
 
 export async function openDb(): Promise<SQLiteDatabase> {
   if (!dbPromise) {
-    dbPromise = openDatabaseAsync(DATABASE_NAME).catch((error) => {
+    dbPromise = (async () => {
+      const db = await openDatabaseAsync(DATABASE_NAME);
+      await db.execAsync(`
+        PRAGMA foreign_keys = ON;
+      `);
+      return db;
+    })().catch((error) => {
       dbPromise = null;
       throw error;
     });

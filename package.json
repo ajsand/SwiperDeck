@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "schema:check": "jest --runInBand __tests__/schema-check.test.ts"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

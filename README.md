@@ -23,6 +23,7 @@ Run these before committing:
 npm run typecheck       # TypeScript strict check (tsc --noEmit)
 npm run lint            # ESLint via Expo (flat config, SDK 54+)
 npm run format:check    # Prettier formatting check
+npm run schema:check    # Schema introspection + smoke CRUD verification
 ```
 
 CI expects all three to exit 0.
@@ -57,3 +58,4 @@ TasteDeck uses local SQLite via `expo-sqlite`. The database initializes automati
 - **Fresh DB for testing:** `npx expo start --clear` resets the Metro cache (delete app data on device/simulator to reset the DB).
 - **DB module lives at:** `lib/db/` (client, migrations, runner, health check, logger).
 - **To add a new migration:** follow the recipe in [`docs/db/MIGRATIONS.md`](docs/db/MIGRATIONS.md).
+- **Schema reference:** table/column/index/FK details in [`docs/db/SCHEMA.md`](docs/db/SCHEMA.md).

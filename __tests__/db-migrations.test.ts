@@ -74,13 +74,13 @@ describe('db migration runner', () => {
 
     const firstStartup = await initializeDatabase(sqliteDb);
     expect(firstStartup.ok).toBe(true);
-    expect(firstStartup.userVersion).toBe(1);
-    expect(firstStartup.targetVersion).toBe(1);
+    expect(firstStartup.userVersion).toBe(2);
+    expect(firstStartup.targetVersion).toBe(2);
 
     const secondStartup = await initializeDatabase(sqliteDb);
     expect(secondStartup.ok).toBe(true);
-    expect(secondStartup.userVersion).toBe(1);
-    expect(secondStartup.targetVersion).toBe(1);
+    expect(secondStartup.userVersion).toBe(2);
+    expect(secondStartup.targetVersion).toBe(2);
   });
 
   it('runs 001_init on first run and skips on second run', async () => {
@@ -90,18 +90,18 @@ describe('db migration runner', () => {
     const firstRun = await runMigrations(sqliteDb);
     expect(firstRun).toEqual({
       fromVersion: 0,
-      toVersion: 1,
-      appliedMigrations: 1,
+      toVersion: 2,
+      appliedMigrations: 2,
     });
 
     const secondRun = await runMigrations(sqliteDb);
     expect(secondRun).toEqual({
-      fromVersion: 1,
-      toVersion: 1,
+      fromVersion: 2,
+      toVersion: 2,
       appliedMigrations: 0,
     });
 
-    expect(db.userVersion).toBe(1);
+    expect(db.userVersion).toBe(2);
     expect(db.foreignKeysEnabled).toBe(1);
   });
 
@@ -113,8 +113,8 @@ describe('db migration runner', () => {
     const status = await healthCheck(sqliteDb);
 
     expect(status.ok).toBe(true);
-    expect(status.userVersion).toBe(1);
-    expect(status.targetVersion).toBe(1);
+    expect(status.userVersion).toBe(2);
+    expect(status.targetVersion).toBe(2);
     expect(status.foreignKeysEnabled).toBe(true);
     expect(status.journalMode).toBe('delete');
   });
