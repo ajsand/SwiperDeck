@@ -625,3 +625,285 @@ Any feature that can be done deterministically (ranking, aggregation, clustering
 ---
 
 ### End of CLAUDE.md
+
+## 18) Phase 4 Addendum (Decks + Showdown + Slider Mode)
+
+> This section is append-only guidance extending Sections 16–17. Phases 1–3 remain intact and fully supported.
+
+### 18.1 Placement in the phased build
+
+**Phase 4 (Decks + Showdown + Slider Mode):**
+
+- Add deck-aware experiences on top of the existing general/all-deck catalog flow.
+- Add in-person synchronized showdown sessions (no social graph, no chat, no accounts required).
+- Add optional slider input mode (1–10) with deterministic derived-weight mapping.
+- Add session-scoped profile computation isolated from global/all-time taste profile data.
+
+### 18.2 Goals / non-negotiables
+
+1. **No regressions to Phases 1–3**
+   - Default deck/general browsing from prior phases must continue to work even if no custom/system deck is selected.
+   - Existing ranking/profile behavior remains valid for the general/all-deck flow.
+
+2. **Deck support is additive**
+   - System-curated decks are ordered subsets from `catalog_entities`.
+   - Custom decks are local user-owned collections that may include catalog entities and optional user-created custom entities.
+
+3. **Showdown is in-person and session-scoped**
+   - Join flow is QR-first with optional short code fallback.
+   - No chat, no bios, no discovery features.
+   - Session data computes session-only profiles and does not mutate global profile by default.
+
+4. **Privacy + local-first defaults**
+   - No account required in Phase 4.
+   - Networking is only for ephemeral real-time sync transport.
+   - Cross-contamination into global profile is opt-in and disabled by default.
+
+### 18.3 User flows
+
+#### A) Create/manage a deck
+
+1. User opens Deck Management.
+2. User creates a deck (title + optional description).
+3. User adds cards from catalog search/list.
+4. User optionally creates custom cards/entities and adds them.
+5. User reorders cards (stable order index).
+6. User saves and can set deck as active for solo or showdown start.
+
+#### B) Start showdown session (host)
+
+1. Host taps “Start Showdown”.
+2. Host selects deck and settings:
+   - `secondsPerCard`
+   - `maxCards`
+   - `mode`: `synced_order` | `paced_random`
+   - input mode: `swipe_5_state` | `slider_1_10`
+3. App creates an ephemeral session and displays QR join token.
+4. Host starts session when participants are ready.
+
+#### C) Join showdown (participant)
+
+1. Participant opens join flow.
+2. Participant scans QR (or enters fallback code).
+3. Participant enters local display name (optional ephemeral alias).
+4. Participant waits in lobby until host starts.
+
+#### D) Timed card playback + response
+
+For each session card slot:
+
+1. Card is shown with countdown (`secondsPerCard`).
+2. If participant responds before timeout:
+   - record response immediately.
+3. If participant does not respond before timeout:
+   - record `timeout_skip` neutral event.
+4. Proceed to next card until `maxCards` or deck end.
+
+#### E) Session results
+
+1. Session ends for all participants.
+2. App computes per-participant **session-scoped taste profile** from session events only.
+3. Results screen shows compare/contrast summaries.
+4. Global/all-time profile remains unchanged unless explicit future opt-in action is taken.
+
+### 18.4 Data model additions (SQLite, additive migrations only)
+
+All schema changes are additive and implemented as new migrations. No destructive changes to Phase 1–3 tables.
+
+#### Deck tables
+
+- `decks`
+  - `id` (PK)
+  - `source_type` (`system` | `user`)
+  - `title`
+  - `description` (nullable)
+  - `is_archived` (default false)
+  - `created_at`, `updated_at`
+
+- `deck_cards`
+  - `deck_id` (FK -> `decks.id`)
+  - `entity_id` (nullable FK -> `catalog_entities.id`)
+  - `custom_entity_id` (nullable FK -> `custom_entities.id`)
+  - `position` (integer, stable order)
+  - `added_at`
+  - constraints: exactly one of `entity_id` or `custom_entity_id` must be non-null
+
+- `custom_entities`
+  - `id` (PK)
+  - `created_by_device` (local marker)
+  - `title`
+  - `media_type`
+  - `metadata_json` (nullable)
+  - `created_at`, `updated_at`
+
+- Optional extension: `custom_entity_tags`
+  - `custom_entity_id` + `tag`
+
+#### Showdown tables
+
+- `showdown_sessions`
+  - `id` (PK)
+  - `host_device_id`
+  - `join_code`
+  - `deck_id`
+  - `seconds_per_card`
+  - `max_cards`
+  - `mode` (`synced_order` | `paced_random`)
+  - `input_mode` (`swipe_5_state` | `slider_1_10`)
+  - `status` (`created` | `active` | `ended` | `aborted`)
+  - `started_at`, `ended_at`, `created_at`
+
+- `showdown_participants`
+  - `id` (PK)
+  - `session_id`
+  - `device_id`
+  - `display_name`
+  - `joined_at`, `left_at`
+
+- `showdown_round_cards`
+  - `session_id`
+  - `round_index`
+  - `entity_id` / `custom_entity_id`
+  - `scheduled_start_ms`
+  - `scheduled_end_ms`
+
+- `showdown_responses`
+  - `session_id`
+  - `participant_id`
+  - `round_index`
+  - `entity_id` / `custom_entity_id`
+  - `action_kind` (`swipe_action` | `slider_rating` | `timeout_skip`)
+  - `swipe_action` (nullable)
+  - `slider_value` (nullable integer 1..10)
+  - `derived_weight`
+  - `responded_at`
+  - uniqueness: (`session_id`, `participant_id`, `round_index`) for exactly one response per round
+
+#### Session profile tables (isolated from global profile)
+
+- `showdown_profile_type_scores`
+- `showdown_profile_tag_scores`
+- `showdown_profile_snapshots`
+
+Each table is keyed by `session_id` + `participant_id` (+ dimension key), and never reused as direct inputs to global/all-time profile tables.
+
+#### Index guidance
+
+- `deck_cards(deck_id, position)`
+- `showdown_responses(session_id, participant_id, round_index)` unique
+- `showdown_round_cards(session_id, round_index)`
+- `showdown_participants(session_id)`
+- `showdown_profile_* (session_id, participant_id)`
+
+### 18.5 Session-scoped scoring/profile rules
+
+1. **Session-only input set**
+   - Build profile from `showdown_responses` for that `session_id` only.
+
+2. **No global mutation by default**
+   - Phase 4 default behavior does not write session-derived values into Phase 1–3 global profile tables.
+
+3. **Isolation invariant**
+   - All showdown profile computation reads/writes namespaced `showdown_*` tables.
+
+4. **Optional future merge path**
+   - Any “apply session to global taste profile” action must be explicit, user-confirmed, and audited as separate logic.
+
+### 18.6 Input modes + mapping rules
+
+#### Swipe mode
+
+- Reuses Phase 1–3 swipe semantics and weight mapping for session scoring.
+- Compatibility adapter should avoid changing legacy weight constants.
+
+#### Slider mode (`slider_1_10`)
+
+- Scale semantics:
+  - `1` = strong negative
+  - `5` = neutral
+  - `10` = strong positive
+
+- Storage rules:
+  - Persist raw slider rating (`slider_value` integer 1..10).
+  - Persist deterministic `derived_weight` used by session scoring.
+
+- Recommended deterministic mapping (v1):
+  - `derived_weight = clamp(((slider_value - 5.5) / 4.5) * 2, -2, 2)`
+  - Keep full precision for scoring; round only for display.
+
+- Compatibility rule:
+  - Do not alter prior phases’ core action weight behavior unless routed through explicit compatibility handling.
+
+### 18.7 Networking abstraction (provider-agnostic)
+
+Phase 4 introduces a transport boundary only; implementation backend remains pluggable.
+
+```ts
+interface ISessionTransport {
+  createSession(payload: CreateSessionPayload): Promise<CreateSessionResult>;
+  joinSession(payload: JoinSessionPayload): Promise<JoinSessionResult>;
+  broadcastTick(payload: TickEvent): Promise<void>;
+  broadcastCard(payload: CardEvent): Promise<void>;
+  receiveEvents(handler: (event: SessionEvent) => void): Unsubscribe;
+  leave(payload: LeaveSessionPayload): Promise<void>;
+}
+```
+
+#### Notes
+
+- Recommended minimal backend: lightweight websocket/realtime relay.
+- Keep provider-specific details outside domain logic.
+- Domain layer consumes normalized `SessionEvent` objects only.
+
+### 18.8 Performance + reliability constraints
+
+1. **Timer drift tolerance**
+   - Keep participant render timers anchored to session schedule timestamps.
+   - Detect drift and resync on server tick boundaries.
+
+2. **Late packets / duplicates**
+   - Use sequence IDs and idempotent response writes.
+
+3. **Reconnect behavior**
+   - Participant reconnect should recover current round index and remaining time.
+   - Never create duplicate responses for same round.
+
+4. **Offline/degraded handling**
+   - If participant disconnects briefly, allow local input buffering with replay if still in active round.
+   - If unrecoverable, mark session interruption and fail gracefully.
+
+5. **UI responsiveness**
+   - Countdown + input capture must stay under frame budget on typical mid-range devices.
+
+### 18.9 Acceptance criteria + definition-of-done evidence
+
+#### Acceptance criteria
+
+- Deck creation/editing/ordering works without affecting Phase 1–3 default flow.
+- Host can start showdown with chosen deck/settings and participants can join via QR/code.
+- Each participant receives exactly one recorded response per round (explicit action or `timeout_skip`).
+- Session profiles are generated and viewable for compare/contrast.
+- Global profile remains unchanged after session unless explicit opt-in merge is invoked (not default path).
+- Slider mode stores raw value + deterministic derived weight and does not break swipe-mode scoring.
+
+#### Definition-of-done evidence
+
+- Migration docs showing additive schema only.
+- Protocol/event docs for `ISessionTransport` and session lifecycle.
+- UX specs for deck management, QR join, showdown playback, and results compare.
+- Deterministic scoring examples for swipe + slider + timeout events.
+- QA checklist coverage for drift, reconnect, timeout, and privacy boundary cases.
+
+---
+
+## 19) Iterative Backlog Addendum — Phase 4 (continue numbering)
+
+27. **Decks data model + migrations**: additive tables/indexes for `decks`, `deck_cards`, `custom_entities`, and deck membership ordering.
+28. **Deck management UI v1**: create/edit deck, add/remove/reorder cards, and choose active deck without breaking default general/all-deck flow.
+29. **Showdown protocol + transport abstraction docs**: define lifecycle events and `ISessionTransport` (provider-agnostic, no implementation coupling).
+30. **QR join flow UI spec + placeholder screen**: host QR display, participant scan/join, waiting-room/error states.
+31. **Showdown screen v1 doc plan**: timed playback state machine, per-card input capture, timeout auto-record behavior.
+32. **Session scoring + profile generation**: session-only aggregation tables/snapshots with strict isolation from global profile.
+33. **Session results compare view**: participant comparisons, top themes, similarity/contrast summaries (no social/discovery features).
+34. **Slider mode implementation plan**: 1–10 storage contract, deterministic derived-weight mapping, compatibility guardrails.
+35. **Phase 4 hardening checklist**: reconnect handling, timer drift tolerances, idempotency, privacy/data-retention edge cases.
