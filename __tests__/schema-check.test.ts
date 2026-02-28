@@ -1,4 +1,5 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
+import { actionToDbStrength, type SwipeAction } from '@/types/domain';
 
 import { runMigrations } from '../lib/db/runMigrations';
 
@@ -579,6 +580,7 @@ describe('schema introspection + smoke CRUD', () => {
     const fakeDb = new FakeSchemaSQLiteDatabase();
     const db = fakeDb as unknown as SQLiteDatabase;
     const now = Date.now();
+    const eventAction: SwipeAction = 'yes';
 
     await runMigrations(db);
 
@@ -621,8 +623,8 @@ describe('schema introspection + smoke CRUD', () => {
       'event_1',
       'session_1',
       'entity_1',
-      'yes',
-      1,
+      eventAction,
+      actionToDbStrength(eventAction),
       now + 2000,
     );
 

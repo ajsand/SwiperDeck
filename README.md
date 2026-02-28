@@ -59,3 +59,4 @@ TasteDeck uses local SQLite via `expo-sqlite`. The database initializes automati
 - **DB module lives at:** `lib/db/` (client, migrations, runner, health check, logger).
 - **To add a new migration:** follow the recipe in [`docs/db/MIGRATIONS.md`](docs/db/MIGRATIONS.md).
 - **Schema reference:** table/column/index/FK details in [`docs/db/SCHEMA.md`](docs/db/SCHEMA.md).
+- **Domain types:** canonical TypeScript models, actions, mappers in [`docs/domain/DOMAIN_TYPES.md`](docs/domain/DOMAIN_TYPES.md).

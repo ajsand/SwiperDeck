@@ -5,6 +5,7 @@ import { healthCheck, type DatabaseHealth } from './health';
 import { logDbError, logDbInfo } from './logger';
 import { runMigrations } from './runMigrations';
 
+export * from './catalogRepository';
 export * from './client';
 export * from './health';
 export * from './logger';

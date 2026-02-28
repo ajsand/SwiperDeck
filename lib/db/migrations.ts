@@ -1,4 +1,5 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
+import { ACTIONS } from '@/types/domain';
 
 export type MigrationDb = Pick<
   SQLiteDatabase,
@@ -10,6 +11,8 @@ export interface Migration {
   name: string;
   up: (db: MigrationDb) => Promise<void>;
 }
+
+const ACTION_SQL_VALUES = ACTIONS.map((action) => `'${action}'`).join(',');
 
 export const migrations: Migration[] = [
   {
@@ -62,7 +65,7 @@ export const migrations: Migration[] = [
           id TEXT PRIMARY KEY NOT NULL,
           session_id TEXT NOT NULL,
           entity_id TEXT NOT NULL,
-          action TEXT NOT NULL CHECK(action IN ('hard_no','no','skip','yes','love','respect','curious')),
+          action TEXT NOT NULL CHECK(action IN (${ACTION_SQL_VALUES})),
           strength INTEGER NOT NULL CHECK(strength BETWEEN -2 AND 2),
           created_at INTEGER NOT NULL,
           FOREIGN KEY (session_id) REFERENCES swipe_sessions(id) ON DELETE CASCADE,

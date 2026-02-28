@@ -16,7 +16,9 @@
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:www.npmjs.com)",
       "WebFetch(domain:github.com)",
-      "Bash(gh pr view:*)"
+      "Bash(gh pr view:*)",
+      "Bash(head:*)",
+      "Bash(cd \"C:/Users/PC/Desktop/SwiperDeck\" && npx tsc --noEmit 2>&1)"
     ]
   }
 }
