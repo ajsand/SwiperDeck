@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DeckStatePlaceholder keeps placeholder state matrix stable 1`] = `
+{
+  "empty": {
+    "hasRoot": true,
+    "title": "No cards found",
+  },
+  "error": {
+    "hasRoot": true,
+    "message": "Recoverable deck error.",
+    "title": "Unable to load cards",
+  },
+  "loading": {
+    "hasRoot": true,
+    "title": "Loading cards...",
+  },
+}
+`;

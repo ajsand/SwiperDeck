@@ -1,0 +1,195 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`tile token contract keeps hash-to-palette selectors stable for a known hash 1`] = `
+{
+  "accentAlpha": 0.2,
+  "colors": [
+    "#4C1D95",
+    "#312E81",
+  ],
+  "gradientDirection": "horizontal_left_right",
+  "gradientEnd": {
+    "x": 1,
+    "y": 0.5,
+  },
+  "gradientStart": {
+    "x": 0,
+    "y": 0.5,
+  },
+  "overlayStyleKey": "scrim_medium",
+  "paletteId": "indigo_dusk",
+  "paletteIndex": 0,
+  "textColor": "#FFFFFF",
+}
+`;
+
+exports[`tile token contract keeps palette contract snapshot stable 1`] = `
+[
+  {
+    "colors": [
+      "#4C1D95",
+      "#312E81",
+    ],
+    "id": "indigo_dusk",
+  },
+  {
+    "colors": [
+      "#B91C1C",
+      "#7F1D1D",
+    ],
+    "id": "crimson_sun",
+  },
+  {
+    "colors": [
+      "#065F46",
+      "#115E59",
+    ],
+    "id": "emerald_twilight",
+  },
+  {
+    "colors": [
+      "#1D4ED8",
+      "#0F766E",
+    ],
+    "id": "ocean_night",
+  },
+  {
+    "colors": [
+      "#B45309",
+      "#78350F",
+    ],
+    "id": "amber_deep",
+  },
+  {
+    "colors": [
+      "#7E22CE",
+      "#4338CA",
+    ],
+    "id": "violet_storm",
+  },
+  {
+    "colors": [
+      "#334155",
+      "#1E293B",
+    ],
+    "id": "slate_mist",
+  },
+  {
+    "colors": [
+      "#BE185D",
+      "#881337",
+    ],
+    "id": "rose_midnight",
+  },
+]
+`;
+
+exports[`tile token contract keeps token derivation snapshot matrix stable 1`] = `
+[
+  {
+    "accentAlpha": 0.2,
+    "colors": [
+      "#4C1D95",
+      "#312E81",
+    ],
+    "gradientDirection": "horizontal_left_right",
+    "gradientEnd": {
+      "x": 1,
+      "y": 0.5,
+    },
+    "gradientStart": {
+      "x": 0,
+      "y": 0.5,
+    },
+    "hash": 3144655672,
+    "overlayStyleKey": "scrim_medium",
+    "paletteId": "indigo_dusk",
+    "textColor": "#FFFFFF",
+    "tileKey": "tile:a",
+  },
+  {
+    "accentAlpha": 0.2,
+    "colors": [
+      "#B91C1C",
+      "#7F1D1D",
+    ],
+    "gradientDirection": "vertical_top_bottom",
+    "gradientEnd": {
+      "x": 0.5,
+      "y": 1,
+    },
+    "gradientStart": {
+      "x": 0.5,
+      "y": 0,
+    },
+    "hash": 3194988529,
+    "overlayStyleKey": "scrim_medium",
+    "paletteId": "crimson_sun",
+    "textColor": "#FFFFFF",
+    "tileKey": "tile:b",
+  },
+  {
+    "accentAlpha": 0.2,
+    "colors": [
+      "#B45309",
+      "#78350F",
+    ],
+    "gradientDirection": "horizontal_left_right",
+    "gradientEnd": {
+      "x": 1,
+      "y": 0.5,
+    },
+    "gradientStart": {
+      "x": 0,
+      "y": 0.5,
+    },
+    "hash": 3687060668,
+    "overlayStyleKey": "scrim_medium",
+    "paletteId": "amber_deep",
+    "textColor": "#FFFFFF",
+    "tileKey": "movie:movie-the-shawshank-redemption",
+  },
+  {
+    "accentAlpha": 0.2,
+    "colors": [
+      "#B45309",
+      "#78350F",
+    ],
+    "gradientDirection": "vertical_top_bottom",
+    "gradientEnd": {
+      "x": 0.5,
+      "y": 1,
+    },
+    "gradientStart": {
+      "x": 0.5,
+      "y": 0,
+    },
+    "hash": 1480735700,
+    "overlayStyleKey": "scrim_soft",
+    "paletteId": "amber_deep",
+    "textColor": "#FFFFFF",
+    "tileKey": "podcast:hardcore-history",
+  },
+  {
+    "accentAlpha": 0.2,
+    "colors": [
+      "#4C1D95",
+      "#312E81",
+    ],
+    "gradientDirection": "diagonal_tl_br",
+    "gradientEnd": {
+      "x": 1,
+      "y": 1,
+    },
+    "gradientStart": {
+      "x": 0,
+      "y": 0,
+    },
+    "hash": 1984463008,
+    "overlayStyleKey": "scrim_medium",
+    "paletteId": "indigo_dusk",
+    "textColor": "#FFFFFF",
+    "tileKey": "unicode:こんにちは",
+  },
+]
+`;

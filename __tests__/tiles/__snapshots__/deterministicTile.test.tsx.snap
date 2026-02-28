@@ -1,0 +1,111 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DeterministicTile contract keeps deterministic render snapshot matrix stable 1`] = `
+[
+  {
+    "gradientColors": [
+      "#B45309",
+      "#78350F",
+    ],
+    "gradientEnd": {
+      "x": 1,
+      "y": 0.5,
+    },
+    "gradientStart": {
+      "x": 0,
+      "y": 0.5,
+    },
+    "iconBadgeBackground": "rgba(255, 255, 255, 0.2)",
+    "iconName": "film-outline",
+    "id": "deck-basic-movie",
+    "subtitleText": "Frank Darabont, 1994",
+    "titleLines": 2,
+    "titleText": "The Shawshank Redemption",
+    "variant": "deck",
+  },
+  {
+    "gradientColors": [
+      "#334155",
+      "#1E293B",
+    ],
+    "gradientEnd": {
+      "x": 0,
+      "y": 1,
+    },
+    "gradientStart": {
+      "x": 1,
+      "y": 0,
+    },
+    "iconBadgeBackground": "rgba(255, 255, 255, 0.2)",
+    "iconName": "film-outline",
+    "id": "deck-missing-title-subtitle",
+    "subtitleText": null,
+    "titleLines": 2,
+    "titleText": "Untitled",
+    "variant": "deck",
+  },
+  {
+    "gradientColors": [
+      "#334155",
+      "#1E293B",
+    ],
+    "gradientEnd": {
+      "x": 0,
+      "y": 1,
+    },
+    "gradientStart": {
+      "x": 1,
+      "y": 0,
+    },
+    "iconBadgeBackground": "rgba(255, 255, 255, 0.24)",
+    "iconName": "help-circle-outline",
+    "id": "deck-unknown-type",
+    "subtitleText": null,
+    "titleLines": 2,
+    "titleText": "Unknown Entity",
+    "variant": "deck",
+  },
+  {
+    "gradientColors": [
+      "#4C1D95",
+      "#312E81",
+    ],
+    "gradientEnd": {
+      "x": 1,
+      "y": 1,
+    },
+    "gradientStart": {
+      "x": 0,
+      "y": 0,
+    },
+    "iconBadgeBackground": null,
+    "iconName": "book-outline",
+    "id": "library-unicode-long-title",
+    "subtitleText": null,
+    "titleLines": 1,
+    "titleText": "こんにちは世界これはとても長いタイトルです",
+    "variant": "library",
+  },
+  {
+    "gradientColors": [
+      "#B45309",
+      "#78350F",
+    ],
+    "gradientEnd": {
+      "x": 0.5,
+      "y": 1,
+    },
+    "gradientStart": {
+      "x": 0.5,
+      "y": 0,
+    },
+    "iconBadgeBackground": null,
+    "iconName": "mic-outline",
+    "id": "library-podcast",
+    "subtitleText": null,
+    "titleLines": 1,
+    "titleText": "Hardcore History",
+    "variant": "library",
+  },
+]
+`;

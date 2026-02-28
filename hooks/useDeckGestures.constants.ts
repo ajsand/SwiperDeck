@@ -1,0 +1,13 @@
+export const SWIPE_COMMIT_DISTANCE_RATIO = 0.28;
+export const STRONG_SWIPE_DISTANCE_RATIO = 0.5;
+export const SWIPE_COMMIT_VELOCITY = 800;
+export const HORIZONTAL_INTENT_RATIO = 1.5;
+
+export const VERTICAL_DRAG_DAMPING = 0.15;
+export const CARD_ROTATION_DEGREES = 8;
+export const SWIPE_OFFSCREEN_MULTIPLIER = 1.5;
+export const SWIPE_ANIMATION_DURATION_MS = 250;
+
+export const SNAP_BACK_DAMPING = 20;
+export const SNAP_BACK_STIFFNESS = 200;
+export const SNAP_BACK_MASS = 0.8;
