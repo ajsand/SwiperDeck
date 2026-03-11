@@ -1,6 +1,7 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 import { actionToDbStrength, type SwipeAction } from '@/types/domain';
 
+import { migrations } from '../lib/db/migrations';
 import { runMigrations } from '../lib/db/runMigrations';
 
 type SqliteMasterRow = {
@@ -40,8 +41,14 @@ type TableSchema = {
 
 const REQUIRED_TABLES = [
   'catalog_entities',
+  '__deck_content_meta',
+  'decks',
+  'deck_cards',
   'swipe_sessions',
   'swipe_events',
+  'deck_tag_scores',
+  'deck_card_affinity',
+  'deck_profile_snapshots',
   'taste_tag_scores',
   'taste_type_scores',
   'entity_affinity',
@@ -61,11 +68,50 @@ const REQUIRED_COLUMNS: Record<string, string[]> = {
     'image_url',
     'updated_at',
   ],
-  swipe_sessions: ['id', 'started_at', 'ended_at', 'filters_json'],
+  __deck_content_meta: [
+    'id',
+    'version',
+    'imported_at',
+    'deck_count',
+    'card_count',
+  ],
+  decks: [
+    'id',
+    'title',
+    'description',
+    'category',
+    'tier',
+    'card_count',
+    'compare_eligible',
+    'showdown_eligible',
+    'sensitivity',
+    'min_cards_for_profile',
+    'min_cards_for_compare',
+    'is_custom',
+    'cover_tile_key',
+    'created_at',
+    'updated_at',
+  ],
+  deck_cards: [
+    'id',
+    'deck_id',
+    'kind',
+    'title',
+    'subtitle',
+    'description_short',
+    'tags_json',
+    'popularity',
+    'tile_key',
+    'sort_order',
+    'created_at',
+    'updated_at',
+  ],
+  swipe_sessions: ['id', 'deck_id', 'started_at', 'ended_at', 'filters_json'],
   swipe_events: [
     'id',
     'session_id',
-    'entity_id',
+    'deck_id',
+    'card_id',
     'action',
     'strength',
     'created_at',
@@ -88,11 +134,22 @@ const REQUIRED_INDEXES: Record<string, string[]> = {
     'idx_catalog_entities_popularity',
     'idx_catalog_entities_title',
   ],
-  swipe_sessions: ['idx_swipe_sessions_started_at'],
+  decks: ['idx_decks_category', 'idx_decks_tier', 'idx_decks_is_custom'],
+  deck_cards: [
+    'idx_deck_cards_deck_id',
+    'idx_deck_cards_kind',
+    'idx_deck_cards_popularity',
+    'idx_deck_cards_sort_order',
+  ],
+  swipe_sessions: [
+    'idx_swipe_sessions_deck_id',
+    'idx_swipe_sessions_started_at',
+  ],
   swipe_events: [
     'idx_swipe_events_created_at',
     'idx_swipe_events_session_id',
-    'idx_swipe_events_entity_id',
+    'idx_swipe_events_deck_id',
+    'idx_swipe_events_card_id',
   ],
   taste_tag_scores: [
     'idx_taste_tag_scores_score',
@@ -107,7 +164,25 @@ const REQUIRED_INDEXES: Record<string, string[]> = {
     'idx_entity_affinity_last_updated',
   ],
   profile_snapshots: ['idx_profile_snapshots_created_at'],
+  deck_tag_scores: [
+    'idx_deck_tag_scores_deck_id',
+    'idx_deck_tag_scores_score',
+  ],
+  deck_card_affinity: [
+    'idx_deck_card_affinity_deck_id',
+    'idx_deck_card_affinity_score',
+  ],
+  deck_profile_snapshots: [
+    'idx_deck_profile_snapshots_deck_id',
+    'idx_deck_profile_snapshots_created_at',
+  ],
 };
+
+const LEGACY_LOVE_ACTION = 'love';
+const LEGACY_DEFERRED_ACTIONS = ['respect', 'curious'] as const;
+const LEGACY_DEFERRED_ACTION_SET: ReadonlySet<string> = new Set(
+  LEGACY_DEFERRED_ACTIONS,
+);
 
 class FakeSchemaSQLiteDatabase {
   userVersion = 0;
@@ -125,6 +200,21 @@ class FakeSchemaSQLiteDatabase {
 
     if (/PRAGMA\s+foreign_keys\s*=\s*ON/i.test(source)) {
       this.foreignKeysEnabled = 1;
+    }
+
+    if (/CREATE TABLE\s+swipe_events_new/i.test(source)) {
+      this.applySwipeEventsRebuildMigration(source);
+      return;
+    }
+
+    const dropTableRegex =
+      /DROP TABLE IF EXISTS\s+([A-Za-z_][A-Za-z0-9_]*)\s*;/gi;
+    let dropTableMatch: RegExpExecArray | null;
+
+    dropTableMatch = dropTableRegex.exec(source);
+    while (dropTableMatch) {
+      this.dropTable(dropTableMatch[1]);
+      dropTableMatch = dropTableRegex.exec(source);
     }
 
     const createTableRegex =
@@ -162,39 +252,55 @@ class FakeSchemaSQLiteDatabase {
     ...params: unknown[]
   ): Promise<{ changes: number; lastInsertRowId: number }> {
     const normalizedSource = source.replace(/\s+/g, ' ').trim();
-    const match = normalizedSource.match(
+    const insertMatch = normalizedSource.match(
       /^INSERT(?: OR IGNORE)? INTO ([A-Za-z_][A-Za-z0-9_]*)\s*\(([^)]+)\)\s*VALUES\s*\(([^)]+)\)$/i,
     );
 
-    if (!match) {
-      throw new Error(`Unsupported runAsync SQL: ${source}`);
-    }
-
-    const tableName = match[1];
-    const columns = match[2].split(',').map((column) => column.trim());
     const values = this.normalizeParams(params);
 
-    if (values.length !== columns.length) {
-      throw new Error(
-        `Column/value mismatch for ${tableName}. Expected ${columns.length}, got ${values.length}.`,
+    if (insertMatch) {
+      const tableName = insertMatch[1];
+      const columns = insertMatch[2].split(',').map((column) => column.trim());
+
+      if (values.length !== columns.length) {
+        throw new Error(
+          `Column/value mismatch for ${tableName}. Expected ${columns.length}, got ${values.length}.`,
+        );
+      }
+
+      const row: Record<string, unknown> = {};
+      columns.forEach((column, index) => {
+        row[column] = values[index];
+      });
+
+      const inserted = this.insertRow(
+        tableName,
+        row,
+        /INSERT OR IGNORE/i.test(source),
       );
+
+      return {
+        changes: inserted ? 1 : 0,
+        lastInsertRowId: inserted ? 1 : 0,
+      };
     }
 
-    const row: Record<string, unknown> = {};
-    columns.forEach((column, index) => {
-      row[column] = values[index];
-    });
-
-    const inserted = this.insertRow(
-      tableName,
-      row,
-      /INSERT OR IGNORE/i.test(source),
+    const deleteMatch = normalizedSource.match(
+      /^DELETE FROM ([A-Za-z_][A-Za-z0-9_]*) WHERE ([A-Za-z_][A-Za-z0-9_]*) = \?$/i,
     );
+    if (deleteMatch) {
+      const changes = this.deleteRows(
+        deleteMatch[1],
+        deleteMatch[2],
+        values[0],
+      );
+      return {
+        changes,
+        lastInsertRowId: 0,
+      };
+    }
 
-    return {
-      changes: inserted ? 1 : 0,
-      lastInsertRowId: inserted ? 1 : 0,
-    };
+    throw new Error(`Unsupported runAsync SQL: ${source}`);
   }
 
   async getAllAsync<T>(source: string): Promise<T[]> {
@@ -450,11 +556,126 @@ class FakeSchemaSQLiteDatabase {
     return true;
   }
 
+  private deleteRows(
+    tableName: string,
+    columnName: string,
+    value: unknown,
+  ): number {
+    const table = this.getTable(tableName);
+    const rowsToDelete = table.rows.filter((row) => row[columnName] === value);
+
+    rowsToDelete.forEach((row) => {
+      this.deleteRow(tableName, row);
+    });
+
+    return rowsToDelete.length;
+  }
+
+  private deleteRow(tableName: string, row: Record<string, unknown>): void {
+    const table = this.getTable(tableName);
+    if (!table.rows.includes(row)) {
+      return;
+    }
+
+    for (const [childTableName, childTable] of this.tables.entries()) {
+      const referencingForeignKeys = childTable.foreignKeys.filter(
+        (foreignKey) => foreignKey.table === tableName,
+      );
+
+      for (const foreignKey of referencingForeignKeys) {
+        const referencedValue = row[foreignKey.to];
+        const childRows = childTable.rows.filter(
+          (childRow) => childRow[foreignKey.from] === referencedValue,
+        );
+
+        if (childRows.length === 0) {
+          continue;
+        }
+
+        if (foreignKey.onDelete === 'CASCADE') {
+          childRows.forEach((childRow) => {
+            this.deleteRow(childTableName, childRow);
+          });
+          continue;
+        }
+
+        throw new Error(
+          `FOREIGN KEY constraint failed on delete: ${tableName}.${foreignKey.to} referenced by ${childTableName}.${foreignKey.from}`,
+        );
+      }
+    }
+
+    table.rows = table.rows.filter((existingRow) => existingRow !== row);
+  }
+
   private normalizeParams(params: unknown[]): unknown[] {
     if (params.length === 1 && Array.isArray(params[0])) {
       return params[0];
     }
     return params;
+  }
+
+  private applySwipeEventsRebuildMigration(source: string): void {
+    const createTableMatch = source.match(
+      /CREATE TABLE\s+swipe_events_new\s*\(([\s\S]*?)\)\s*;/i,
+    );
+
+    if (!createTableMatch) {
+      throw new Error(
+        'Expected swipe_events_new table definition in rebuild migration.',
+      );
+    }
+
+    if (this.tables.has('swipe_events_new')) {
+      this.dropTable('swipe_events_new');
+    }
+
+    this.registerTable('swipe_events_new', createTableMatch[1]);
+
+    const legacySwipeEvents = this.getTable('swipe_events').rows.map((row) => ({
+      ...row,
+      action:
+        row.action === LEGACY_LOVE_ACTION
+          ? 'strong_yes'
+          : LEGACY_DEFERRED_ACTION_SET.has(String(row.action))
+            ? 'skip'
+            : row.action,
+      strength: LEGACY_DEFERRED_ACTION_SET.has(String(row.action))
+        ? 0
+        : row.strength,
+    }));
+
+    legacySwipeEvents.forEach((row) => {
+      this.insertRow('swipe_events_new', row, false);
+    });
+
+    this.dropTable('swipe_events');
+    this.renameTable('swipe_events_new', 'swipe_events');
+    this.registerIndex('idx_swipe_events_created_at', 'swipe_events');
+    this.registerIndex('idx_swipe_events_session_id', 'swipe_events');
+    this.registerIndex('idx_swipe_events_entity_id', 'swipe_events');
+  }
+
+  private dropTable(tableName: string): void {
+    this.tables.delete(tableName);
+
+    for (const [indexName, indexMeta] of this.indexes.entries()) {
+      if (indexMeta.table === tableName) {
+        this.indexes.delete(indexName);
+      }
+    }
+  }
+
+  private renameTable(fromName: string, toName: string): void {
+    const table = this.getTable(fromName);
+    this.tables.set(toName, table);
+    this.tables.delete(fromName);
+
+    for (const indexMeta of this.indexes.values()) {
+      if (indexMeta.table === fromName) {
+        indexMeta.table = toName;
+      }
+    }
   }
 
   private getTable(tableName: string): TableSchema {
@@ -530,8 +751,13 @@ describe('schema introspection + smoke CRUD', () => {
           to: 'id',
         }),
         expect.objectContaining({
-          table: 'catalog_entities',
-          from: 'entity_id',
+          table: 'deck_cards',
+          from: 'card_id',
+          to: 'id',
+        }),
+        expect.objectContaining({
+          table: 'decks',
+          from: 'deck_id',
           to: 'id',
         }),
       ]),
@@ -543,6 +769,19 @@ describe('schema introspection + smoke CRUD', () => {
             `${foreignKey.from}->${foreignKey.table}.${foreignKey.to}`,
         )
         .join(', ')}`,
+    );
+
+    const swipeSessionForeignKeys = await db.getAllAsync<ForeignKeyRow>(
+      "PRAGMA foreign_key_list('swipe_sessions')",
+    );
+    expect(swipeSessionForeignKeys).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          table: 'decks',
+          from: 'deck_id',
+          to: 'id',
+        }),
+      ]),
     );
 
     const affinityForeignKeys = await db.getAllAsync<ForeignKeyRow>(
@@ -559,6 +798,27 @@ describe('schema introspection + smoke CRUD', () => {
     );
     console.info(
       `[schema] entity_affinity FKs: ${affinityForeignKeys
+        .map(
+          (foreignKey) =>
+            `${foreignKey.from}->${foreignKey.table}.${foreignKey.to}`,
+        )
+        .join(', ')}`,
+    );
+
+    const deckCardForeignKeys = await db.getAllAsync<ForeignKeyRow>(
+      "PRAGMA foreign_key_list('deck_cards')",
+    );
+    expect(deckCardForeignKeys).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          table: 'decks',
+          from: 'deck_id',
+          to: 'id',
+        }),
+      ]),
+    );
+    console.info(
+      `[schema] deck_cards FKs: ${deckCardForeignKeys
         .map(
           (foreignKey) =>
             `${foreignKey.from}->${foreignKey.table}.${foreignKey.to}`,
@@ -586,6 +846,65 @@ describe('schema introspection + smoke CRUD', () => {
 
     await db.runAsync(
       `
+        INSERT INTO __deck_content_meta (
+          id, version, imported_at, deck_count, card_count
+        ) VALUES (?, ?, ?, ?, ?)
+      `,
+      1,
+      1,
+      now,
+      1,
+      1,
+    );
+
+    await db.runAsync(
+      `
+        INSERT INTO decks (
+          id, title, description, category, tier, card_count, compare_eligible, showdown_eligible,
+          sensitivity, min_cards_for_profile, min_cards_for_compare, is_custom, cover_tile_key,
+          created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      'deck_1',
+      'Movies & TV',
+      'Shared taste in movies and shows.',
+      'movies_tv',
+      'tier_1',
+      1,
+      1,
+      1,
+      'standard',
+      15,
+      30,
+      0,
+      'deck:movies-tv',
+      now,
+      now,
+    );
+
+    await db.runAsync(
+      `
+        INSERT INTO deck_cards (
+          id, deck_id, kind, title, subtitle, description_short, tags_json, popularity, tile_key,
+          sort_order, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      'deck_card_1',
+      'deck_1',
+      'entity',
+      'Before Sunrise',
+      'Richard Linklater, 1995',
+      'Two strangers talk all night in Vienna.',
+      '["romance","conversation"]',
+      0.81,
+      'movie:before-sunrise',
+      1,
+      now,
+      now,
+    );
+
+    await db.runAsync(
+      `
         INSERT INTO catalog_entities (
           id, type, title, subtitle, description_short, tags_json, popularity, tile_key, image_url, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -605,10 +924,11 @@ describe('schema introspection + smoke CRUD', () => {
     await db.runAsync(
       `
         INSERT INTO swipe_sessions (
-          id, started_at, ended_at, filters_json
-        ) VALUES (?, ?, ?, ?)
+          id, deck_id, started_at, ended_at, filters_json
+        ) VALUES (?, ?, ?, ?, ?)
       `,
       'session_1',
+      'deck_1',
       now,
       now + 1000,
       '{"types":["movie"]}',
@@ -617,12 +937,13 @@ describe('schema introspection + smoke CRUD', () => {
     await db.runAsync(
       `
         INSERT INTO swipe_events (
-          id, session_id, entity_id, action, strength, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?)
+          id, session_id, deck_id, card_id, action, strength, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
       `,
       'event_1',
       'session_1',
-      'entity_1',
+      'deck_1',
+      'deck_card_1',
       eventAction,
       actionToDbStrength(eventAction),
       now + 2000,
@@ -680,6 +1001,53 @@ describe('schema introspection + smoke CRUD', () => {
       '{"summary":"example"}',
     );
 
+    await db.runAsync(
+      `
+        INSERT INTO deck_tag_scores (
+          deck_id, tag, score, pos, neg, last_updated
+        ) VALUES (?, ?, ?, ?, ?, ?)
+      `,
+      'deck_1',
+      'romance',
+      2.0,
+      2.0,
+      0,
+      now + 5000,
+    );
+
+    await db.runAsync(
+      `
+        INSERT INTO deck_card_affinity (
+          deck_id, card_id, score, pos, neg, last_updated
+        ) VALUES (?, ?, ?, ?, ?, ?)
+      `,
+      'deck_1',
+      'deck_card_1',
+      1.0,
+      1.0,
+      0,
+      now + 5000,
+    );
+
+    await db.runAsync(
+      `
+        INSERT INTO deck_profile_snapshots (
+          id, deck_id, created_at, top_tags_json, top_aversions_json, summary_json
+        ) VALUES (?, ?, ?, ?, ?, ?)
+      `,
+      'snap_deck_1_' + (now + 6000),
+      'deck_1',
+      now + 6000,
+      '[{"tag":"romance","score":2}]',
+      '[]',
+      '{"stage":"meaningful"}',
+    );
+
+    expect(await db.getAllAsync('SELECT * FROM decks')).toHaveLength(1);
+    expect(await db.getAllAsync('SELECT * FROM deck_cards')).toHaveLength(1);
+    expect(
+      await db.getAllAsync('SELECT * FROM __deck_content_meta'),
+    ).toHaveLength(1);
     expect(await db.getAllAsync('SELECT * FROM catalog_entities')).toHaveLength(
       1,
     );
@@ -699,6 +1067,47 @@ describe('schema introspection + smoke CRUD', () => {
     expect(
       await db.getAllAsync('SELECT * FROM profile_snapshots'),
     ).toHaveLength(1);
+    expect(await db.getAllAsync('SELECT * FROM deck_tag_scores')).toHaveLength(
+      1,
+    );
+    expect(
+      await db.getAllAsync('SELECT * FROM deck_card_affinity'),
+    ).toHaveLength(1);
+    expect(
+      await db.getAllAsync('SELECT * FROM deck_profile_snapshots'),
+    ).toHaveLength(1);
+
+    await db.runAsync(
+      `
+        DELETE FROM swipe_sessions
+        WHERE id = ?
+      `,
+      'session_1',
+    );
+
+    await db.runAsync(
+      `
+        DELETE FROM decks
+        WHERE id = ?
+      `,
+      'deck_1',
+    );
+
+    expect(await db.getAllAsync('SELECT * FROM decks')).toHaveLength(0);
+    expect(await db.getAllAsync('SELECT * FROM deck_cards')).toHaveLength(0);
+    expect(await db.getAllAsync('SELECT * FROM deck_tag_scores')).toHaveLength(
+      0,
+    );
+    expect(await db.getAllAsync('SELECT * FROM deck_card_affinity')).toHaveLength(
+      0,
+    );
+    expect(
+      await db.getAllAsync('SELECT * FROM deck_profile_snapshots'),
+    ).toHaveLength(0);
+    expect(await db.getAllAsync('SELECT * FROM swipe_sessions')).toHaveLength(
+      0,
+    );
+    expect(await db.getAllAsync('SELECT * FROM swipe_events')).toHaveLength(0);
 
     const foreignKeyViolations = await db.getAllAsync(
       'PRAGMA foreign_key_check',
@@ -707,5 +1116,124 @@ describe('schema introspection + smoke CRUD', () => {
 
     const rerun = await runMigrations(db);
     expect(rerun.appliedMigrations).toBe(0);
+  });
+
+  it('normalizes legacy swipe action rows during migration 004', async () => {
+    const fakeDb = new FakeSchemaSQLiteDatabase();
+    const db = fakeDb as unknown as SQLiteDatabase;
+    const now = Date.now();
+
+    for (const migration of migrations.filter(
+      (candidate) => candidate.version <= 3,
+    )) {
+      await migration.up(db);
+      await db.execAsync(`PRAGMA user_version = ${migration.version}`);
+    }
+
+    await db.runAsync(
+      `
+        INSERT INTO catalog_entities (
+          id, type, title, subtitle, description_short, tags_json, popularity, tile_key, image_url, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      'entity_legacy_1',
+      'movie',
+      'Legacy Entity',
+      'Example Subtitle',
+      'Example Description',
+      '["legacy"]',
+      0.5,
+      'tile_legacy_1',
+      null,
+      now,
+    );
+
+    await db.runAsync(
+      `
+        INSERT INTO swipe_sessions (
+          id, started_at, ended_at, filters_json
+        ) VALUES (?, ?, ?, ?)
+      `,
+      'session_legacy_1',
+      now,
+      now + 1000,
+      '{"types":["movie"]}',
+    );
+
+    await db.runAsync(
+      `
+        INSERT INTO swipe_events (
+          id, session_id, entity_id, action, strength, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?)
+      `,
+      'event_love',
+      'session_legacy_1',
+      'entity_legacy_1',
+      LEGACY_LOVE_ACTION,
+      2,
+      now + 100,
+    );
+
+    await db.runAsync(
+      `
+        INSERT INTO swipe_events (
+          id, session_id, entity_id, action, strength, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?)
+      `,
+      'event_respect',
+      'session_legacy_1',
+      'entity_legacy_1',
+      LEGACY_DEFERRED_ACTIONS[0],
+      actionToDbStrength('yes'),
+      now + 200,
+    );
+
+    await db.runAsync(
+      `
+        INSERT INTO swipe_events (
+          id, session_id, entity_id, action, strength, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?)
+      `,
+      'event_curious',
+      'session_legacy_1',
+      'entity_legacy_1',
+      LEGACY_DEFERRED_ACTIONS[1],
+      0,
+      now + 300,
+    );
+
+    const migration = migrations.find((candidate) => candidate.version === 4);
+    if (!migration) {
+      throw new Error('Expected migration 004 to exist.');
+    }
+
+    await migration.up(db);
+
+    expect(await db.getAllAsync('SELECT * FROM swipe_events')).toEqual([
+      {
+        id: 'event_love',
+        session_id: 'session_legacy_1',
+        entity_id: 'entity_legacy_1',
+        action: 'strong_yes',
+        strength: 2,
+        created_at: now + 100,
+      },
+      {
+        id: 'event_respect',
+        session_id: 'session_legacy_1',
+        entity_id: 'entity_legacy_1',
+        action: 'skip',
+        strength: 0,
+        created_at: now + 200,
+      },
+      {
+        id: 'event_curious',
+        session_id: 'session_legacy_1',
+        entity_id: 'entity_legacy_1',
+        action: 'skip',
+        strength: 0,
+        created_at: now + 300,
+      },
+    ]);
   });
 });

@@ -1,10 +1,12 @@
 import { normalizeSwipeAction, type SwipeAction } from './actions';
 import { type EntityType } from './catalog';
 import {
-  asEntityId,
+  asDeckCardId,
+  asDeckId,
   asSessionId,
   asSwipeEventId,
-  type EntityId,
+  type DeckCardId,
+  type DeckId,
   type SessionId,
   type SwipeEventId,
 } from './ids';
@@ -18,6 +20,7 @@ export interface SessionFilters extends Record<string, unknown> {
 
 export interface SwipeSessionRow {
   id: string;
+  deck_id: string;
   started_at: number;
   ended_at: number | null;
   filters_json: string;
@@ -25,6 +28,7 @@ export interface SwipeSessionRow {
 
 export interface SwipeSession {
   id: SessionId;
+  deckId: DeckId;
   startedAt: number;
   endedAt: number | null;
   filters: SessionFilters;
@@ -61,6 +65,7 @@ function normalizeSessionFilters(value: unknown): SessionFilters {
 export function rowToSwipeSession(row: SwipeSessionRow): SwipeSession {
   return {
     id: asSessionId(row.id),
+    deckId: asDeckId(row.deck_id),
     startedAt: row.started_at,
     endedAt: row.ended_at,
     filters: normalizeSessionFilters(parseRecordJson(row.filters_json, {})),
@@ -70,6 +75,7 @@ export function rowToSwipeSession(row: SwipeSessionRow): SwipeSession {
 export function swipeSessionToRow(session: SwipeSession): SwipeSessionRow {
   return {
     id: session.id,
+    deck_id: session.deckId,
     started_at: session.startedAt,
     ended_at: session.endedAt,
     filters_json: JSON.stringify(session.filters),
@@ -79,7 +85,8 @@ export function swipeSessionToRow(session: SwipeSession): SwipeSessionRow {
 export interface SwipeEventRow {
   id: string;
   session_id: string;
-  entity_id: string;
+  deck_id: string;
+  card_id: string;
   action: string;
   strength: number;
   created_at: number;
@@ -88,7 +95,8 @@ export interface SwipeEventRow {
 export interface SwipeEvent {
   id: SwipeEventId;
   sessionId: SessionId;
-  entityId: EntityId;
+  deckId: DeckId;
+  cardId: DeckCardId;
   action: SwipeAction;
   strength: number;
   createdAt: number;
@@ -98,7 +106,8 @@ export function rowToSwipeEvent(row: SwipeEventRow): SwipeEvent {
   return {
     id: asSwipeEventId(row.id),
     sessionId: asSessionId(row.session_id),
-    entityId: asEntityId(row.entity_id),
+    deckId: asDeckId(row.deck_id),
+    cardId: asDeckCardId(row.card_id),
     action: normalizeSwipeAction(row.action),
     strength: row.strength,
     createdAt: row.created_at,
@@ -109,7 +118,8 @@ export function swipeEventToRow(event: SwipeEvent): SwipeEventRow {
   return {
     id: event.id,
     session_id: event.sessionId,
-    entity_id: event.entityId,
+    deck_id: event.deckId,
+    card_id: event.cardId,
     action: event.action,
     strength: event.strength,
     created_at: event.createdAt,

@@ -3,7 +3,7 @@ import { resolveDeckSwipeAction } from '@/hooks/useDeckGestures';
 describe('resolveDeckSwipeAction', () => {
   const screenWidth = 375;
 
-  it('maps strong right swipe to love', () => {
+  it('maps strong right swipe to strong_yes', () => {
     expect(
       resolveDeckSwipeAction({
         translationX: 220,
@@ -12,7 +12,7 @@ describe('resolveDeckSwipeAction', () => {
         screenWidth,
       }),
     ).toEqual({
-      action: 'love',
+      action: 'strong_yes',
       distanceX: 220,
       velocityX: 320,
     });

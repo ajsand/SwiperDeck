@@ -27,8 +27,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Deck',
-          tabBarIcon: ({ color }) => <TabBarIcon name="clone" color={color} />,
+          title: 'Decks',
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="th-large" color={color} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -41,8 +43,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="library"
         options={{
-          title: 'Library',
-          tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
+          title: 'History',
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="clock-o" color={color} />
+          ),
         }}
       />
       <Tabs.Screen

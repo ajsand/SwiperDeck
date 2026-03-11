@@ -1,0 +1,3389 @@
+{
+  "version": 1,
+  "decks": [
+    {
+      "id": "deck_movies_tv",
+      "title": "Movies & TV",
+      "description": "From comfort rewatches to prestige TV obsessions, this deck explores the stories and screen moods you keep coming back to.",
+      "category": "movies_tv",
+      "tier": "tier_1",
+      "sensitivity": "standard",
+      "compare_eligible": true,
+      "showdown_eligible": true,
+      "min_cards_for_profile": 15,
+      "min_cards_for_compare": 30,
+      "cover_tile_key": "movies_tv:cover",
+      "cards": [
+        {
+          "id": "movies_tv_001",
+          "kind": "entity",
+          "title": "The Shawshank Redemption",
+          "subtitle": "Frank Darabont, 1994",
+          "description_short": "A prison drama built on hope, friendship, and endurance.",
+          "tags": ["drama", "classic", "cinema"],
+          "popularity": 0.98
+        },
+        {
+          "id": "movies_tv_002",
+          "kind": "entity",
+          "title": "The Office (US)",
+          "subtitle": "NBC, 2005-2013",
+          "description_short": "A cozy workplace comedy full of cringe, affection, and quotable bits.",
+          "tags": ["comedy", "binge", "classic"],
+          "popularity": 0.97
+        },
+        {
+          "id": "movies_tv_003",
+          "kind": "entity",
+          "title": "The Lord of the Rings trilogy",
+          "subtitle": "Peter Jackson, 2001-2003",
+          "description_short": "A sweeping fantasy adventure with mythic scale and sincere emotion.",
+          "tags": ["action", "classic", "cinema"],
+          "popularity": 0.96
+        },
+        {
+          "id": "movies_tv_004",
+          "kind": "entity",
+          "title": "Spirited Away",
+          "subtitle": "Hayao Miyazaki, 2001",
+          "description_short": "A dreamlike coming-of-age story with warmth, wonder, and strange magic.",
+          "tags": ["animation", "classic", "indie"],
+          "popularity": 0.95
+        },
+        {
+          "id": "movies_tv_005",
+          "kind": "entity",
+          "title": "Get Out",
+          "subtitle": "Jordan Peele, 2017",
+          "description_short": "A sharp horror film that mixes dread, satire, and social tension.",
+          "tags": ["horror", "cinema", "indie"],
+          "popularity": 0.94
+        },
+        {
+          "id": "movies_tv_006",
+          "kind": "entity",
+          "title": "Fleabag",
+          "subtitle": "BBC, 2016-2019",
+          "description_short": "A brutally funny series about grief, desire, and self-sabotage.",
+          "tags": ["comedy", "indie", "binge"],
+          "popularity": 0.93
+        },
+        {
+          "id": "movies_tv_007",
+          "kind": "entity",
+          "title": "Breaking Bad",
+          "subtitle": "AMC, 2008-2013",
+          "description_short": "A tense antihero drama about power, pride, and transformation.",
+          "tags": ["drama", "binge", "classic"],
+          "popularity": 0.92
+        },
+        {
+          "id": "movies_tv_008",
+          "kind": "entity",
+          "title": "Friends",
+          "subtitle": "NBC, 1994-2004",
+          "description_short": "A comfort-watch sitcom centered on friendship, routines, and romance.",
+          "tags": ["comedy", "classic", "binge"],
+          "popularity": 0.91
+        },
+        {
+          "id": "movies_tv_009",
+          "kind": "entity",
+          "title": "Parasite",
+          "subtitle": "Bong Joon-ho, 2019",
+          "description_short": "A thrilling class satire that shifts from funny to devastating.",
+          "tags": ["drama", "indie", "cinema"],
+          "popularity": 0.89
+        },
+        {
+          "id": "movies_tv_010",
+          "kind": "entity",
+          "title": "The Bear",
+          "subtitle": "FX, 2022-",
+          "description_short": "An intense workplace dramedy about pressure, grief, and family.",
+          "tags": ["drama", "comedy", "binge"],
+          "popularity": 0.88
+        },
+        {
+          "id": "movies_tv_011",
+          "kind": "entity",
+          "title": "Black Mirror",
+          "subtitle": "Channel 4 / Netflix, 2011-",
+          "description_short": "A dark anthology about technology, fear, and human weakness.",
+          "tags": ["scifi", "drama", "binge"],
+          "popularity": 0.86
+        },
+        {
+          "id": "movies_tv_012",
+          "kind": "entity",
+          "title": "Pride & Prejudice",
+          "subtitle": "Joe Wright, 2005",
+          "description_short": "A romantic period drama about pride, timing, and emotional restraint.",
+          "tags": ["romance", "classic", "cinema"],
+          "popularity": 0.84
+        },
+        {
+          "id": "movies_tv_013",
+          "kind": "entity",
+          "title": "Derry Girls",
+          "subtitle": "Channel 4, 2018-2022",
+          "description_short": "A chaotic teen comedy that turns nostalgia into something warm and sharp.",
+          "tags": ["comedy", "classic", "binge"],
+          "popularity": 0.82
+        },
+        {
+          "id": "movies_tv_014",
+          "kind": "entity",
+          "title": "Interstellar",
+          "subtitle": "Christopher Nolan, 2014",
+          "description_short": "A big, emotional sci-fi film about love, sacrifice, and time.",
+          "tags": ["scifi", "cinema", "action"],
+          "popularity": 0.8
+        },
+        {
+          "id": "movies_tv_015",
+          "kind": "entity",
+          "title": "Knives Out",
+          "subtitle": "Rian Johnson, 2019",
+          "description_short": "A playful murder mystery that balances wit, pace, and style.",
+          "tags": ["comedy", "cinema", "classic"],
+          "popularity": 0.78
+        },
+        {
+          "id": "movies_tv_016",
+          "kind": "entity",
+          "title": "The Great British Bake Off",
+          "subtitle": "BBC / Channel 4, 2010-",
+          "description_short": "A soothing competition show built on kindness, pressure, and cake.",
+          "tags": ["comedy", "binge", "classic"],
+          "popularity": 0.76
+        },
+        {
+          "id": "movies_tv_017",
+          "kind": "entity",
+          "title": "The Last of Us",
+          "subtitle": "HBO, 2023-",
+          "description_short": "A survival drama that mixes violence with grief, tenderness, and fear.",
+          "tags": ["drama", "horror", "binge"],
+          "popularity": 0.74
+        },
+        {
+          "id": "movies_tv_018",
+          "kind": "entity",
+          "title": "Abbott Elementary",
+          "subtitle": "ABC, 2021-",
+          "description_short": "A bright workplace comedy with heart, hustle, and affection.",
+          "tags": ["comedy", "binge", "classic"],
+          "popularity": 0.72
+        },
+        {
+          "id": "movies_tv_019",
+          "kind": "entity",
+          "title": "The Good Place",
+          "subtitle": "NBC, 2016-2020",
+          "description_short": "A philosophical comedy about ethics, friendship, and second chances.",
+          "tags": ["comedy", "scifi", "binge"],
+          "popularity": 0.7
+        },
+        {
+          "id": "movies_tv_020",
+          "kind": "entity",
+          "title": "Severance",
+          "subtitle": "Apple TV+, 2022-",
+          "description_short": "A stylish corporate thriller about identity, memory, and control.",
+          "tags": ["scifi", "drama", "binge"],
+          "popularity": 0.68
+        },
+        {
+          "id": "movies_tv_021",
+          "kind": "entity",
+          "title": "Planet Earth",
+          "subtitle": "BBC, 2006",
+          "description_short": "A gorgeous documentary series that makes the natural world feel huge and intimate.",
+          "tags": ["documentary", "classic", "cinema"],
+          "popularity": 0.64
+        },
+        {
+          "id": "movies_tv_022",
+          "kind": "entity",
+          "title": "Succession",
+          "subtitle": "HBO, 2018-2023",
+          "description_short": "A vicious family drama where cruelty and comedy live side by side.",
+          "tags": ["drama", "comedy", "binge"],
+          "popularity": 0.6
+        },
+        {
+          "id": "movies_tv_023",
+          "kind": "entity",
+          "title": "When Harry Met Sally",
+          "subtitle": "Rob Reiner, 1989",
+          "description_short": "A classic romantic comedy about timing, friendship, and emotional honesty.",
+          "tags": ["romance", "classic", "cinema"],
+          "popularity": 0.56
+        },
+        {
+          "id": "movies_tv_024",
+          "kind": "entity",
+          "title": "Mad Max: Fury Road",
+          "subtitle": "George Miller, 2015",
+          "description_short": "A relentless action film that feels both brutal and strangely elegant.",
+          "tags": ["action", "cinema", "scifi"],
+          "popularity": 0.52
+        },
+        {
+          "id": "movies_tv_025",
+          "kind": "entity",
+          "title": "Studio Ghibli",
+          "subtitle": "Animation studio",
+          "description_short": "A whole visual world associated with tenderness, imagination, and melancholy.",
+          "tags": ["animation", "indie", "classic"],
+          "popularity": 0.48
+        },
+        {
+          "id": "movies_tv_026",
+          "kind": "entity",
+          "title": "The Princess Bride",
+          "subtitle": "Rob Reiner, 1987",
+          "description_short": "A playful fairy tale that stays earnest without losing its charm.",
+          "tags": ["romance", "comedy", "classic"],
+          "popularity": 0.42
+        },
+        {
+          "id": "movies_tv_027",
+          "kind": "entity",
+          "title": "The West Wing",
+          "subtitle": "NBC, 1999-2006",
+          "description_short": "An idealistic political drama driven by fast dialogue and moral urgency.",
+          "tags": ["drama", "classic", "binge"],
+          "popularity": 0.34
+        },
+        {
+          "id": "movies_tv_028",
+          "kind": "entity",
+          "title": "Free Solo",
+          "subtitle": "Jimmy Chin and Elizabeth Chai Vasarhelyi, 2018",
+          "description_short": "A nerve-shredding documentary about risk, obsession, and mastery.",
+          "tags": ["documentary", "action", "cinema"],
+          "popularity": 0.26
+        },
+        {
+          "id": "movies_tv_029",
+          "kind": "statement",
+          "title": "I'd rather rewatch a favorite than try something new",
+          "description_short": "Shows whether comfort and familiarity usually beat novelty for you.",
+          "tags": ["classic", "binge", "cinema"],
+          "popularity": 0.74
+        },
+        {
+          "id": "movies_tv_030",
+          "kind": "statement",
+          "title": "I care more about writing than special effects",
+          "description_short": "Highlights whether story craft matters more than spectacle.",
+          "tags": ["drama", "indie", "cinema"],
+          "popularity": 0.68
+        },
+        {
+          "id": "movies_tv_031",
+          "kind": "statement",
+          "title": "I usually want subtitles, even when the audio is in English",
+          "description_short": "Reveals how much clarity and detail shape the viewing experience for you.",
+          "tags": ["binge", "cinema", "documentary"],
+          "popularity": 0.62
+        },
+        {
+          "id": "movies_tv_032",
+          "kind": "statement",
+          "title": "I'll watch something scary if the plot feels worth it",
+          "description_short": "Separates interest in suspense from interest in pure comfort viewing.",
+          "tags": ["horror", "drama", "scifi"],
+          "popularity": 0.58
+        },
+        {
+          "id": "movies_tv_033",
+          "kind": "statement",
+          "title": "My mood matters more than the reviews when I choose what to watch",
+          "description_short": "Shows whether mood-fit beats consensus when you pick a title.",
+          "tags": ["drama", "comedy", "binge"],
+          "popularity": 0.54
+        },
+        {
+          "id": "movies_tv_034",
+          "kind": "statement",
+          "title": "I'd rather watch at home than go to a theater",
+          "description_short": "Reveals whether convenience and coziness beat the big-screen ritual for you.",
+          "tags": ["cinema", "classic", "binge"],
+          "popularity": 0.48
+        },
+        {
+          "id": "movies_tv_035",
+          "kind": "statement",
+          "title": "I love talking about a movie right after it ends",
+          "description_short": "Captures whether post-watch conversation is part of the fun for you.",
+          "tags": ["cinema", "drama", "indie"],
+          "popularity": 0.42
+        },
+        {
+          "id": "movies_tv_036",
+          "kind": "statement",
+          "title": "I'm more likely to binge a whole season than watch one episode a week",
+          "description_short": "Shows whether you prefer immersion over slow pacing.",
+          "tags": ["binge", "comedy", "drama"],
+          "popularity": 0.36
+        },
+        {
+          "id": "movies_tv_037",
+          "kind": "statement",
+          "title": "If a show has too many seasons, I hesitate to start it",
+          "description_short": "Reveals whether commitment fatigue affects your picks.",
+          "tags": ["binge", "classic", "drama"],
+          "popularity": 0.3
+        },
+        {
+          "id": "movies_tv_038",
+          "kind": "statement",
+          "title": "I prefer slow, character-driven stories over twisty plots",
+          "description_short": "Highlights whether emotional texture matters more than surprise.",
+          "tags": ["drama", "indie", "classic"],
+          "popularity": 0.24
+        },
+        {
+          "id": "movies_tv_039",
+          "kind": "statement",
+          "title": "Spoilers genuinely ruin the experience for me",
+          "description_short": "Shows how much suspense and discovery matter to your enjoyment.",
+          "tags": ["cinema", "binge", "scifi"],
+          "popularity": 0.2
+        },
+        {
+          "id": "movies_tv_040",
+          "kind": "statement",
+          "title": "On most nights, I'd choose a cozy comedy over an intense prestige drama",
+          "description_short": "Separates comfort viewing from heavier emotional challenge.",
+          "tags": ["comedy", "binge", "classic"],
+          "popularity": 0.16
+        }
+      ]
+    },
+    {
+      "id": "deck_music",
+      "title": "Music",
+      "description": "The sounds you replay, chase, and share can reveal rhythm, nostalgia, emotional openness, and energy.",
+      "category": "music",
+      "tier": "tier_1",
+      "sensitivity": "standard",
+      "compare_eligible": true,
+      "showdown_eligible": true,
+      "min_cards_for_profile": 15,
+      "min_cards_for_compare": 30,
+      "cover_tile_key": "music:cover",
+      "cards": [
+        {
+          "id": "music_001",
+          "kind": "entity",
+          "title": "Beyoncé",
+          "description_short": "Big-stage pop power, precision, and emotional confidence.",
+          "tags": ["pop", "rnb", "live-music"],
+          "popularity": 0.98
+        },
+        {
+          "id": "music_002",
+          "kind": "entity",
+          "title": "Taylor Swift",
+          "description_short": "A songwriter whose catalog invites loyalty, memory, and debate.",
+          "tags": ["pop", "karaoke", "discovery"],
+          "popularity": 0.97
+        },
+        {
+          "id": "music_003",
+          "kind": "entity",
+          "title": "Kendrick Lamar",
+          "description_short": "Dense, ambitious hip-hop with storytelling, vulnerability, and edge.",
+          "tags": ["hiphop", "discovery", "live-music"],
+          "popularity": 0.96
+        },
+        {
+          "id": "music_004",
+          "kind": "entity",
+          "title": "Fleetwood Mac",
+          "description_short": "Classic rock full of tension, hooks, and emotional spillover.",
+          "tags": ["rock", "live-music", "discovery"],
+          "popularity": 0.95
+        },
+        {
+          "id": "music_005",
+          "kind": "entity",
+          "title": "Frank Ocean",
+          "description_short": "Soft-focus R&B that rewards emotional attention and repeat listens.",
+          "tags": ["rnb", "indie", "discovery"],
+          "popularity": 0.94
+        },
+        {
+          "id": "music_006",
+          "kind": "entity",
+          "title": "Daft Punk",
+          "description_short": "Electronic music with sleek nostalgia, joy, and immaculate rhythm.",
+          "tags": ["electronic", "pop", "discovery"],
+          "popularity": 0.93
+        },
+        {
+          "id": "music_007",
+          "kind": "entity",
+          "title": "Dolly Parton",
+          "description_short": "Country storytelling with charm, wit, and emotional clarity.",
+          "tags": ["country", "karaoke", "live-music"],
+          "popularity": 0.91
+        },
+        {
+          "id": "music_008",
+          "kind": "entity",
+          "title": "Nina Simone",
+          "description_short": "A singular voice where jazz, soul, and ache meet each other.",
+          "tags": ["jazz", "rnb", "live-music"],
+          "popularity": 0.89
+        },
+        {
+          "id": "music_009",
+          "kind": "entity",
+          "title": "Bad Bunny",
+          "description_short": "Global pop energy with confidence, rhythm, and movement.",
+          "tags": ["pop", "hiphop", "discovery"],
+          "popularity": 0.88
+        },
+        {
+          "id": "music_010",
+          "kind": "entity",
+          "title": "Phoebe Bridgers",
+          "description_short": "Indie songwriting that turns dry wit and sadness into intimacy.",
+          "tags": ["indie", "rock", "discovery"],
+          "popularity": 0.86
+        },
+        {
+          "id": "music_011",
+          "kind": "entity",
+          "title": "Random Access Memories",
+          "subtitle": "Daft Punk, 2013",
+          "description_short": "A glossy album made for headphones, dancing, and sonic detail.",
+          "tags": ["electronic", "pop", "discovery"],
+          "popularity": 0.84
+        },
+        {
+          "id": "music_012",
+          "kind": "entity",
+          "title": "Rumours",
+          "subtitle": "Fleetwood Mac, 1977",
+          "description_short": "An iconic album where perfect songs barely contain messy feelings.",
+          "tags": ["rock", "pop", "live-music"],
+          "popularity": 0.82
+        },
+        {
+          "id": "music_013",
+          "kind": "entity",
+          "title": "To Pimp a Butterfly",
+          "subtitle": "Kendrick Lamar, 2015",
+          "description_short": "A maximal, political, deeply personal hip-hop landmark.",
+          "tags": ["hiphop", "jazz", "discovery"],
+          "popularity": 0.8
+        },
+        {
+          "id": "music_014",
+          "kind": "entity",
+          "title": "Golden Hour",
+          "subtitle": "Kacey Musgraves, 2018",
+          "description_short": "A warm country-pop album built for softness, glow, and ease.",
+          "tags": ["country", "pop", "discovery"],
+          "popularity": 0.78
+        },
+        {
+          "id": "music_015",
+          "kind": "entity",
+          "title": "The Miseducation of Lauryn Hill",
+          "subtitle": "Lauryn Hill, 1998",
+          "description_short": "A soulful record that mixes confidence, heartbreak, and vision.",
+          "tags": ["hiphop", "rnb", "discovery"],
+          "popularity": 0.76
+        },
+        {
+          "id": "music_016",
+          "kind": "entity",
+          "title": "In Rainbows",
+          "subtitle": "Radiohead, 2007",
+          "description_short": "A restless rock album that feels intimate, strange, and alive.",
+          "tags": ["rock", "indie", "discovery"],
+          "popularity": 0.74
+        },
+        {
+          "id": "music_017",
+          "kind": "entity",
+          "title": "Brandi Carlile",
+          "description_short": "Big-hearted songwriting with grit, warmth, and live appeal.",
+          "tags": ["country", "indie", "live-music"],
+          "popularity": 0.72
+        },
+        {
+          "id": "music_018",
+          "kind": "entity",
+          "title": "House music",
+          "description_short": "Rhythm-first electronic music made for release, repetition, and movement.",
+          "tags": ["electronic", "discovery", "live-music"],
+          "popularity": 0.7
+        },
+        {
+          "id": "music_019",
+          "kind": "entity",
+          "title": "Jazz standards",
+          "description_short": "A shared songbook where interpretation matters as much as melody.",
+          "tags": ["jazz", "classical", "discovery"],
+          "popularity": 0.66
+        },
+        {
+          "id": "music_020",
+          "kind": "entity",
+          "title": "SZA",
+          "description_short": "Modern R&B full of confession, edge, and melodic drift.",
+          "tags": ["rnb", "pop", "discovery"],
+          "popularity": 0.62
+        },
+        {
+          "id": "music_021",
+          "kind": "entity",
+          "title": "Bon Iver",
+          "description_short": "Layered indie music that feels reflective, cold-weather, and transportive.",
+          "tags": ["indie", "electronic", "discovery"],
+          "popularity": 0.54
+        },
+        {
+          "id": "music_022",
+          "kind": "entity",
+          "title": "Tiny Desk concerts",
+          "description_short": "Intimate performances that reveal how much an artist can really do live.",
+          "tags": ["live-music", "indie", "discovery"],
+          "popularity": 0.44
+        },
+        {
+          "id": "music_023",
+          "kind": "entity",
+          "title": "Karaoke nights",
+          "description_short": "A social music ritual where confidence and chaos usually meet.",
+          "tags": ["karaoke", "pop", "live-music"],
+          "popularity": 0.34
+        },
+        {
+          "id": "music_024",
+          "kind": "entity",
+          "title": "Vinyl listening",
+          "description_short": "A slower ritual where sequencing and attention feel part of the point.",
+          "tags": ["rock", "jazz", "classical"],
+          "popularity": 0.24
+        },
+        {
+          "id": "music_025",
+          "kind": "statement",
+          "title": "I sing in the car even when I don't know all the words",
+          "description_short": "Shows whether music is something you feel physically, not just listen to.",
+          "tags": ["karaoke", "pop", "discovery"],
+          "popularity": 0.74
+        },
+        {
+          "id": "music_026",
+          "kind": "statement",
+          "title": "Lyrics matter more to me than production",
+          "description_short": "Highlights whether you connect through words before sound design.",
+          "tags": ["discovery", "indie", "rnb"],
+          "popularity": 0.7
+        },
+        {
+          "id": "music_027",
+          "kind": "statement",
+          "title": "I like having music on while I cook, clean, or reset my space",
+          "description_short": "Reveals whether sound is woven into your ordinary routines.",
+          "tags": ["discovery", "pop", "electronic"],
+          "popularity": 0.66
+        },
+        {
+          "id": "music_028",
+          "kind": "statement",
+          "title": "I'd rather listen to a full album than a shuffled playlist",
+          "description_short": "Shows whether sequencing and intent matter to your listening experience.",
+          "tags": ["discovery", "rock", "indie"],
+          "popularity": 0.62
+        },
+        {
+          "id": "music_029",
+          "kind": "statement",
+          "title": "Live shows make me appreciate an artist more",
+          "description_short": "Separates headphone love from performance love.",
+          "tags": ["live-music", "discovery", "rock"],
+          "popularity": 0.58
+        },
+        {
+          "id": "music_030",
+          "kind": "statement",
+          "title": "I enjoy finding new music more than replaying old favorites",
+          "description_short": "Captures whether novelty or familiarity usually drives your listening.",
+          "tags": ["discovery", "indie", "pop"],
+          "popularity": 0.54
+        },
+        {
+          "id": "music_031",
+          "kind": "statement",
+          "title": "I make playlists for very specific moods",
+          "description_short": "Shows whether music is part of how you manage energy and feeling.",
+          "tags": ["discovery", "electronic", "pop"],
+          "popularity": 0.5
+        },
+        {
+          "id": "music_032",
+          "kind": "statement",
+          "title": "I'm happy to let someone else control the road-trip playlist",
+          "description_short": "Reveals how protective or flexible you are around shared listening.",
+          "tags": ["discovery", "rock", "pop"],
+          "popularity": 0.46
+        },
+        {
+          "id": "music_033",
+          "kind": "statement",
+          "title": "I notice bass lines and production details more than most people do",
+          "description_short": "Highlights whether your ear goes to texture, layering, and rhythm first.",
+          "tags": ["electronic", "hiphop", "rnb"],
+          "popularity": 0.42
+        },
+        {
+          "id": "music_034",
+          "kind": "statement",
+          "title": "Calming music usually wins over hype music at home",
+          "description_short": "Shows whether your default listening style is soothing or energizing.",
+          "tags": ["classical", "jazz", "rnb"],
+          "popularity": 0.36
+        },
+        {
+          "id": "music_035",
+          "kind": "statement",
+          "title": "I love a good karaoke night even if my voice is questionable",
+          "description_short": "Captures whether music feels participatory and social for you.",
+          "tags": ["karaoke", "pop", "country"],
+          "popularity": 0.3
+        },
+        {
+          "id": "music_036",
+          "kind": "statement",
+          "title": "I usually know within 30 seconds whether a song is for me",
+          "description_short": "Reveals whether your taste feels immediate or slower to unfold.",
+          "tags": ["discovery", "pop", "electronic"],
+          "popularity": 0.24
+        },
+        {
+          "id": "music_037",
+          "kind": "statement",
+          "title": "I prefer intimate venues over giant arenas",
+          "description_short": "Shows whether closeness and detail beat scale and spectacle for you.",
+          "tags": ["live-music", "indie", "jazz"],
+          "popularity": 0.2
+        },
+        {
+          "id": "music_038",
+          "kind": "statement",
+          "title": "I can enjoy a genre even when I know almost nothing about it",
+          "description_short": "Measures openness more than expertise.",
+          "tags": ["discovery", "jazz", "classical"],
+          "popularity": 0.18
+        },
+        {
+          "id": "music_039",
+          "kind": "statement",
+          "title": "Silence is better than music I don't like",
+          "description_short": "Separates flexible listeners from people with stronger sonic boundaries.",
+          "tags": ["discovery", "rock", "pop"],
+          "popularity": 0.14
+        },
+        {
+          "id": "music_040",
+          "kind": "statement",
+          "title": "Songs get tied to specific people and seasons in my memory",
+          "description_short": "Shows whether music acts like an emotional time capsule for you.",
+          "tags": ["discovery", "rnb", "pop"],
+          "popularity": 0.1
+        }
+      ]
+    },
+    {
+      "id": "deck_food_drinks",
+      "title": "Food & Drinks",
+      "description": "From weeknight comfort meals to adventurous nights out, this deck maps how you eat, host, and indulge.",
+      "category": "food_drinks",
+      "tier": "tier_1",
+      "sensitivity": "standard",
+      "compare_eligible": true,
+      "showdown_eligible": true,
+      "min_cards_for_profile": 15,
+      "min_cards_for_compare": 30,
+      "cover_tile_key": "food_drinks:cover",
+      "cards": [
+        {
+          "id": "food_drinks_001",
+          "kind": "entity",
+          "title": "Sushi",
+          "description_short": "A precise, beloved staple for people who like clean flavors and ritual.",
+          "tags": ["adventure-eating", "dining-out", "health"],
+          "popularity": 0.98
+        },
+        {
+          "id": "food_drinks_002",
+          "kind": "entity",
+          "title": "Tacos",
+          "description_short": "A flexible comfort food that works equally well messy, casual, and celebratory.",
+          "tags": ["comfort-food", "dining-out", "adventure-eating"],
+          "popularity": 0.97
+        },
+        {
+          "id": "food_drinks_003",
+          "kind": "entity",
+          "title": "Ramen",
+          "description_short": "A cozy bowl that can feel both restorative and indulgent.",
+          "tags": ["comfort-food", "dining-out", "spicy"],
+          "popularity": 0.95
+        },
+        {
+          "id": "food_drinks_004",
+          "kind": "entity",
+          "title": "Thai curry",
+          "description_short": "A dish that balances spice, richness, herbs, and comfort.",
+          "tags": ["spicy", "dining-out", "adventure-eating"],
+          "popularity": 0.93
+        },
+        {
+          "id": "food_drinks_005",
+          "kind": "entity",
+          "title": "Fresh pasta",
+          "description_short": "Soft, rich, and handmade-feeling food that invites slowing down.",
+          "tags": ["cooking", "dining-out", "comfort-food"],
+          "popularity": 0.91
+        },
+        {
+          "id": "food_drinks_006",
+          "kind": "entity",
+          "title": "Espresso",
+          "description_short": "A concentrated ritual for people who care how their day starts.",
+          "tags": ["coffee", "drinks", "health"],
+          "popularity": 0.89
+        },
+        {
+          "id": "food_drinks_007",
+          "kind": "entity",
+          "title": "Dim sum",
+          "description_short": "A shared-table meal that rewards variety, curiosity, and conversation.",
+          "tags": ["dining-out", "adventure-eating", "comfort-food"],
+          "popularity": 0.87
+        },
+        {
+          "id": "food_drinks_008",
+          "kind": "entity",
+          "title": "Brunch",
+          "description_short": "A social meal where food, coffee, and lingering all matter.",
+          "tags": ["coffee", "sweets", "dining-out"],
+          "popularity": 0.86
+        },
+        {
+          "id": "food_drinks_009",
+          "kind": "entity",
+          "title": "Hot pot",
+          "description_short": "A communal meal where the experience is almost as important as the flavor.",
+          "tags": ["spicy", "dining-out", "adventure-eating"],
+          "popularity": 0.84
+        },
+        {
+          "id": "food_drinks_010",
+          "kind": "entity",
+          "title": "Mediterranean mezze",
+          "description_short": "A table of bright, shareable food built for lingering.",
+          "tags": ["health", "dining-out", "vegetarian"],
+          "popularity": 0.82
+        },
+        {
+          "id": "food_drinks_011",
+          "kind": "entity",
+          "title": "Barbecue",
+          "description_short": "Deeply savory food with patience, smoke, and appetite baked in.",
+          "tags": ["comfort-food", "spicy", "dining-out"],
+          "popularity": 0.8
+        },
+        {
+          "id": "food_drinks_012",
+          "kind": "entity",
+          "title": "Gelato",
+          "description_short": "Dessert that feels both indulgent and a little romantic.",
+          "tags": ["sweets", "dining-out", "comfort-food"],
+          "popularity": 0.78
+        },
+        {
+          "id": "food_drinks_013",
+          "kind": "entity",
+          "title": "Farmers markets",
+          "description_short": "A food ritual built around seasonality, ingredients, and wandering.",
+          "tags": ["cooking", "health", "vegetarian"],
+          "popularity": 0.76
+        },
+        {
+          "id": "food_drinks_014",
+          "kind": "entity",
+          "title": "Natural wine",
+          "description_short": "A drink choice that can signal curiosity, taste, or a little chaos.",
+          "tags": ["drinks", "dining-out", "adventure-eating"],
+          "popularity": 0.72
+        },
+        {
+          "id": "food_drinks_015",
+          "kind": "entity",
+          "title": "Pho",
+          "description_short": "A brothy comfort meal that feels light and restorative at once.",
+          "tags": ["comfort-food", "health", "dining-out"],
+          "popularity": 0.68
+        },
+        {
+          "id": "food_drinks_016",
+          "kind": "entity",
+          "title": "Shakshuka",
+          "description_short": "A bright, spiced dish that feels generous and casual.",
+          "tags": ["cooking", "spicy", "vegetarian"],
+          "popularity": 0.62
+        },
+        {
+          "id": "food_drinks_017",
+          "kind": "entity",
+          "title": "Craft beer",
+          "description_short": "A hobby-adjacent drink choice that can be playful, nerdy, or ritualistic.",
+          "tags": ["drinks", "dining-out", "comfort-food"],
+          "popularity": 0.54
+        },
+        {
+          "id": "food_drinks_018",
+          "kind": "entity",
+          "title": "Pastries",
+          "description_short": "A small luxury that often turns coffee into a real event.",
+          "tags": ["sweets", "coffee", "comfort-food"],
+          "popularity": 0.46
+        },
+        {
+          "id": "food_drinks_019",
+          "kind": "entity",
+          "title": "Vegetarian tasting menus",
+          "description_short": "A food experience built on restraint, creativity, and surprise.",
+          "tags": ["vegetarian", "adventure-eating", "dining-out"],
+          "popularity": 0.36
+        },
+        {
+          "id": "food_drinks_020",
+          "kind": "entity",
+          "title": "Breakfast burritos",
+          "description_short": "Hearty, portable comfort food with very little pretense.",
+          "tags": ["comfort-food", "spicy", "dining-out"],
+          "popularity": 0.28
+        },
+        {
+          "id": "food_drinks_021",
+          "kind": "statement",
+          "title": "I'd rather cook at home than go out for dinner",
+          "description_short": "Shows whether effort and intimacy matter more than convenience for you.",
+          "tags": ["cooking", "health", "comfort-food"],
+          "popularity": 0.76
+        },
+        {
+          "id": "food_drinks_022",
+          "kind": "statement",
+          "title": "I'm open to trying almost anything once",
+          "description_short": "Captures whether curiosity beats caution at the table.",
+          "tags": ["adventure-eating", "dining-out", "spicy"],
+          "popularity": 0.72
+        },
+        {
+          "id": "food_drinks_023",
+          "kind": "statement",
+          "title": "I care more about the company than the restaurant",
+          "description_short": "Reveals whether the setting or the shared energy matters more to you.",
+          "tags": ["dining-out", "comfort-food", "drinks"],
+          "popularity": 0.68
+        },
+        {
+          "id": "food_drinks_024",
+          "kind": "statement",
+          "title": "I take my coffee routine a little too seriously",
+          "description_short": "Shows whether daily ritual matters as much as the flavor itself.",
+          "tags": ["coffee", "drinks", "health"],
+          "popularity": 0.64
+        },
+        {
+          "id": "food_drinks_025",
+          "kind": "statement",
+          "title": "Dessert can completely change my opinion of a meal",
+          "description_short": "Separates savory-first people from people who always leave room for sweetness.",
+          "tags": ["sweets", "dining-out", "comfort-food"],
+          "popularity": 0.6
+        },
+        {
+          "id": "food_drinks_026",
+          "kind": "statement",
+          "title": "I like splitting plates so I can try more things",
+          "description_short": "Captures whether variety and sampling are part of how you enjoy food.",
+          "tags": ["dining-out", "adventure-eating", "comfort-food"],
+          "popularity": 0.56
+        },
+        {
+          "id": "food_drinks_027",
+          "kind": "statement",
+          "title": "I crave spicy food more than sweet food",
+          "description_short": "Shows where intensity usually wins for you.",
+          "tags": ["spicy", "adventure-eating", "comfort-food"],
+          "popularity": 0.52
+        },
+        {
+          "id": "food_drinks_028",
+          "kind": "statement",
+          "title": "I enjoy hosting people for a home-cooked meal",
+          "description_short": "Reveals whether food is part of how you care for people.",
+          "tags": ["cooking", "comfort-food", "drinks"],
+          "popularity": 0.48
+        },
+        {
+          "id": "food_drinks_029",
+          "kind": "statement",
+          "title": "I'd rather have one great cocktail than three average ones",
+          "description_short": "Shows whether quality beats quantity when you order drinks.",
+          "tags": ["drinks", "dining-out", "adventure-eating"],
+          "popularity": 0.44
+        },
+        {
+          "id": "food_drinks_030",
+          "kind": "statement",
+          "title": "Breakfast food works for me at any hour",
+          "description_short": "Captures whether certain foods feel timelessly comforting to you.",
+          "tags": ["comfort-food", "coffee", "sweets"],
+          "popularity": 0.4
+        },
+        {
+          "id": "food_drinks_031",
+          "kind": "statement",
+          "title": "I notice when a place nails the small details like sauces or bread",
+          "description_short": "Reveals how much craft and care shape your experience of a meal.",
+          "tags": ["dining-out", "cooking", "comfort-food"],
+          "popularity": 0.36
+        },
+        {
+          "id": "food_drinks_032",
+          "kind": "statement",
+          "title": "I can be convinced to leave the house for exceptional food",
+          "description_short": "Shows whether a meal can be an event in its own right for you.",
+          "tags": ["dining-out", "adventure-eating", "drinks"],
+          "popularity": 0.32
+        },
+        {
+          "id": "food_drinks_033",
+          "kind": "statement",
+          "title": "I like keeping a few reliable comfort meals in rotation",
+          "description_short": "Captures whether repetition feels grounding instead of boring to you.",
+          "tags": ["comfort-food", "cooking", "health"],
+          "popularity": 0.28
+        },
+        {
+          "id": "food_drinks_034",
+          "kind": "statement",
+          "title": "I'm the person who reads the full menu before arriving",
+          "description_short": "Shows whether anticipation and planning are part of the fun for you.",
+          "tags": ["dining-out", "adventure-eating", "drinks"],
+          "popularity": 0.24
+        },
+        {
+          "id": "food_drinks_035",
+          "kind": "statement",
+          "title": "I usually prefer food that feels fresh and light over rich and heavy",
+          "description_short": "Highlights how much energy and balance shape your taste.",
+          "tags": ["health", "vegetarian", "dining-out"],
+          "popularity": 0.2
+        },
+        {
+          "id": "food_drinks_036",
+          "kind": "statement",
+          "title": "I enjoy cooking for other people more than cooking just for myself",
+          "description_short": "Reveals whether food feels relational, not just functional, for you.",
+          "tags": ["cooking", "comfort-food", "health"],
+          "popularity": 0.18
+        },
+        {
+          "id": "food_drinks_037",
+          "kind": "statement",
+          "title": "I'll travel across town for a dish I really love",
+          "description_short": "Shows whether food can be worth effort, ritual, and a little inconvenience.",
+          "tags": ["dining-out", "adventure-eating", "comfort-food"],
+          "popularity": 0.16
+        },
+        {
+          "id": "food_drinks_038",
+          "kind": "statement",
+          "title": "I like pairing food with a specific drink instead of ordering randomly",
+          "description_short": "Captures whether the full table experience matters to you.",
+          "tags": ["drinks", "dining-out", "coffee"],
+          "popularity": 0.14
+        },
+        {
+          "id": "food_drinks_039",
+          "kind": "statement",
+          "title": "I want to know the best thing on the menu before I order",
+          "description_short": "Reveals whether you like guidance or would rather discover something yourself.",
+          "tags": ["dining-out", "adventure-eating", "comfort-food"],
+          "popularity": 0.12
+        },
+        {
+          "id": "food_drinks_040",
+          "kind": "statement",
+          "title": "A relaxed neighborhood spot beats a flashy restaurant for me",
+          "description_short": "Shows whether ease and atmosphere matter more than prestige for you.",
+          "tags": ["dining-out", "comfort-food", "drinks"],
+          "popularity": 0.1
+        }
+      ]
+    },
+    {
+      "id": "deck_travel",
+      "title": "Travel",
+      "description": "Whether you plan every detail or chase the unexpected, this deck explores how you like to move through the world.",
+      "category": "travel",
+      "tier": "tier_1",
+      "sensitivity": "standard",
+      "compare_eligible": true,
+      "showdown_eligible": true,
+      "min_cards_for_profile": 15,
+      "min_cards_for_compare": 30,
+      "cover_tile_key": "travel:cover",
+      "cards": [
+        {
+          "id": "travel_001",
+          "kind": "entity",
+          "title": "Road trips",
+          "description_short": "A travel style built on playlists, detours, and the open-ended middle.",
+          "tags": ["adventure", "spontaneous", "nature"],
+          "popularity": 0.96
+        },
+        {
+          "id": "travel_002",
+          "kind": "entity",
+          "title": "Backpacking",
+          "description_short": "Budget travel that values freedom, stories, and low-friction movement.",
+          "tags": ["budget", "adventure", "solo"],
+          "popularity": 0.94
+        },
+        {
+          "id": "travel_003",
+          "kind": "entity",
+          "title": "Beach resorts",
+          "description_short": "A trip shape centered on downtime, sun, and uncomplicated pleasure.",
+          "tags": ["relaxation", "luxury", "beach"],
+          "popularity": 0.92
+        },
+        {
+          "id": "travel_004",
+          "kind": "entity",
+          "title": "National parks",
+          "description_short": "Travel that prioritizes awe, scale, and physical landscape.",
+          "tags": ["nature", "mountains", "adventure"],
+          "popularity": 0.9
+        },
+        {
+          "id": "travel_005",
+          "kind": "entity",
+          "title": "City breaks",
+          "description_short": "Short, energizing trips built around neighborhoods, food, and pace.",
+          "tags": ["city", "culture", "spontaneous"],
+          "popularity": 0.88
+        },
+        {
+          "id": "travel_006",
+          "kind": "entity",
+          "title": "Boutique hotels",
+          "description_short": "Places where design, atmosphere, and detail are part of the trip.",
+          "tags": ["luxury", "city", "culture"],
+          "popularity": 0.86
+        },
+        {
+          "id": "travel_007",
+          "kind": "entity",
+          "title": "All-inclusive resorts",
+          "description_short": "A simple travel mode where rest wins over logistics.",
+          "tags": ["relaxation", "beach", "luxury"],
+          "popularity": 0.84
+        },
+        {
+          "id": "travel_008",
+          "kind": "entity",
+          "title": "Train travel through Europe",
+          "description_short": "A romantic, slower-paced way to move that makes transit part of the experience.",
+          "tags": ["culture", "city", "planning"],
+          "popularity": 0.82
+        },
+        {
+          "id": "travel_009",
+          "kind": "entity",
+          "title": "Camping trips",
+          "description_short": "Nature-heavy travel that asks for flexibility and a tolerance for discomfort.",
+          "tags": ["nature", "budget", "adventure"],
+          "popularity": 0.8
+        },
+        {
+          "id": "travel_010",
+          "kind": "entity",
+          "title": "Tokyo",
+          "description_short": "A city trip that rewards appetite, curiosity, and alertness.",
+          "tags": ["culture", "city", "planning"],
+          "popularity": 0.78
+        },
+        {
+          "id": "travel_011",
+          "kind": "entity",
+          "title": "Iceland",
+          "description_short": "A landscape-first destination where nature often feels like the main character.",
+          "tags": ["nature", "mountains", "adventure"],
+          "popularity": 0.76
+        },
+        {
+          "id": "travel_012",
+          "kind": "entity",
+          "title": "Museum-heavy itineraries",
+          "description_short": "Trips structured around depth, context, and taking your time.",
+          "tags": ["culture", "city", "planning"],
+          "popularity": 0.72
+        },
+        {
+          "id": "travel_013",
+          "kind": "entity",
+          "title": "Weekend cabin getaways",
+          "description_short": "Travel that trades novelty for reset, warmth, and a smaller rhythm.",
+          "tags": ["relaxation", "nature", "mountains"],
+          "popularity": 0.68
+        },
+        {
+          "id": "travel_014",
+          "kind": "entity",
+          "title": "Hostels",
+          "description_short": "Shared-budget travel where spontaneity and social energy are built in.",
+          "tags": ["budget", "solo", "spontaneous"],
+          "popularity": 0.58
+        },
+        {
+          "id": "travel_015",
+          "kind": "entity",
+          "title": "Scenic coastal drives",
+          "description_short": "Travel that values movement, views, and rhythm more than checklists.",
+          "tags": ["nature", "beach", "spontaneous"],
+          "popularity": 0.46
+        },
+        {
+          "id": "travel_016",
+          "kind": "entity",
+          "title": "Food tours",
+          "description_short": "Trips shaped through appetite, local context, and social discovery.",
+          "tags": ["culture", "city", "planning"],
+          "popularity": 0.34
+        },
+        {
+          "id": "travel_017",
+          "kind": "statement",
+          "title": "I plan almost every detail before I travel",
+          "description_short": "Shows whether preparation helps you relax or limits the fun.",
+          "tags": ["planning", "city", "culture"],
+          "popularity": 0.74
+        },
+        {
+          "id": "travel_018",
+          "kind": "statement",
+          "title": "I'd rather explore somewhere nearby than take a long flight",
+          "description_short": "Reveals whether distance matters less than the feeling of getting away.",
+          "tags": ["spontaneous", "budget", "nature"],
+          "popularity": 0.72
+        },
+        {
+          "id": "travel_019",
+          "kind": "statement",
+          "title": "I like having a loose plan and room to improvise",
+          "description_short": "Captures how much spontaneity you want inside a trip.",
+          "tags": ["spontaneous", "planning", "culture"],
+          "popularity": 0.7
+        },
+        {
+          "id": "travel_020",
+          "kind": "statement",
+          "title": "I can handle discomfort if the experience feels worth it",
+          "description_short": "Shows whether payoff beats ease for you when you travel.",
+          "tags": ["adventure", "budget", "nature"],
+          "popularity": 0.68
+        },
+        {
+          "id": "travel_021",
+          "kind": "statement",
+          "title": "I care more about the neighborhood than the hotel itself",
+          "description_short": "Reveals whether immersion matters more than polish for you.",
+          "tags": ["city", "culture", "budget"],
+          "popularity": 0.64
+        },
+        {
+          "id": "travel_022",
+          "kind": "statement",
+          "title": "I pack light even if it means repeating outfits",
+          "description_short": "Captures whether mobility and ease matter more than options.",
+          "tags": ["budget", "solo", "spontaneous"],
+          "popularity": 0.6
+        },
+        {
+          "id": "travel_023",
+          "kind": "statement",
+          "title": "I need downtime built into a trip or I burn out",
+          "description_short": "Shows whether recovery time is part of the ideal itinerary for you.",
+          "tags": ["relaxation", "planning", "luxury"],
+          "popularity": 0.58
+        },
+        {
+          "id": "travel_024",
+          "kind": "statement",
+          "title": "I enjoy getting a little lost in a new place",
+          "description_short": "Reveals whether uncertainty feels exciting or stressful to you.",
+          "tags": ["spontaneous", "city", "culture"],
+          "popularity": 0.56
+        },
+        {
+          "id": "travel_025",
+          "kind": "statement",
+          "title": "I prefer one longer trip over several short ones",
+          "description_short": "Separates depth seekers from people who love quick bursts of novelty.",
+          "tags": ["planning", "luxury", "relaxation"],
+          "popularity": 0.52
+        },
+        {
+          "id": "travel_026",
+          "kind": "statement",
+          "title": "I'd wake up early for a view even on vacation",
+          "description_short": "Shows whether experience beats comfort first thing in the morning.",
+          "tags": ["adventure", "mountains", "nature"],
+          "popularity": 0.48
+        },
+        {
+          "id": "travel_027",
+          "kind": "statement",
+          "title": "I love traveling with someone who can share the planning",
+          "description_short": "Reveals how collaborative you want trip logistics to feel.",
+          "tags": ["planning", "culture", "city"],
+          "popularity": 0.44
+        },
+        {
+          "id": "travel_028",
+          "kind": "statement",
+          "title": "I usually remember the meals and conversations more than the landmarks",
+          "description_short": "Highlights whether emotional texture matters more than the checklist.",
+          "tags": ["culture", "city", "relaxation"],
+          "popularity": 0.4
+        },
+        {
+          "id": "travel_029",
+          "kind": "statement",
+          "title": "I prefer private rooms over dorm-style stays",
+          "description_short": "Shows where privacy sits in your comfort hierarchy.",
+          "tags": ["luxury", "solo", "relaxation"],
+          "popularity": 0.36
+        },
+        {
+          "id": "travel_030",
+          "kind": "statement",
+          "title": "I can be very happy on a low-budget trip if the energy is right",
+          "description_short": "Reveals whether mood and company beat polish for you.",
+          "tags": ["budget", "spontaneous", "solo"],
+          "popularity": 0.34
+        },
+        {
+          "id": "travel_031",
+          "kind": "statement",
+          "title": "I enjoy revisiting places I already love",
+          "description_short": "Captures whether familiarity deepens travel instead of making it smaller.",
+          "tags": ["relaxation", "culture", "city"],
+          "popularity": 0.3
+        },
+        {
+          "id": "travel_032",
+          "kind": "statement",
+          "title": "I like trips that mix structure with one adventurous wildcard",
+          "description_short": "Shows whether your sweet spot is balance rather than extremes.",
+          "tags": ["planning", "spontaneous", "adventure"],
+          "popularity": 0.28
+        },
+        {
+          "id": "travel_033",
+          "kind": "statement",
+          "title": "Nature excites me more than nightlife when I travel",
+          "description_short": "Separates scenery-driven trips from social-scene travel.",
+          "tags": ["nature", "mountains", "relaxation"],
+          "popularity": 0.24
+        },
+        {
+          "id": "travel_034",
+          "kind": "statement",
+          "title": "I'd rather rent a car than rely fully on public transit",
+          "description_short": "Reveals whether autonomy matters more than local flow for you.",
+          "tags": ["spontaneous", "adventure", "budget"],
+          "popularity": 0.22
+        },
+        {
+          "id": "travel_035",
+          "kind": "statement",
+          "title": "I care more about how a trip feels than how it photographs",
+          "description_short": "Shows whether memory, ease, and meaning beat presentation for you.",
+          "tags": ["relaxation", "culture", "nature"],
+          "popularity": 0.2
+        },
+        {
+          "id": "travel_036",
+          "kind": "statement",
+          "title": "I like building a travel day around one standout experience",
+          "description_short": "Highlights whether focus feels better than trying to do everything.",
+          "tags": ["culture", "planning", "city"],
+          "popularity": 0.18
+        },
+        {
+          "id": "travel_037",
+          "kind": "statement",
+          "title": "I'm comfortable taking a solo day even when I'm traveling with someone",
+          "description_short": "Reveals how much independence you like woven into shared travel.",
+          "tags": ["solo", "relaxation", "culture"],
+          "popularity": 0.16
+        },
+        {
+          "id": "travel_038",
+          "kind": "statement",
+          "title": "I prefer destinations with personality over ones that feel polished",
+          "description_short": "Separates charm seekers from perfection seekers.",
+          "tags": ["culture", "city", "budget"],
+          "popularity": 0.14
+        },
+        {
+          "id": "travel_039",
+          "kind": "statement",
+          "title": "I don't need luxury, but I do need a clean place to sleep",
+          "description_short": "Shows where your comfort floor lives, even when you're flexible elsewhere.",
+          "tags": ["budget", "relaxation", "solo"],
+          "popularity": 0.12
+        },
+        {
+          "id": "travel_040",
+          "kind": "statement",
+          "title": "A good itinerary excites me more than airport shopping ever will",
+          "description_short": "Captures whether the trip itself begins in planning for you.",
+          "tags": ["planning", "city", "culture"],
+          "popularity": 0.1
+        }
+      ]
+    },
+    {
+      "id": "deck_lifestyle",
+      "title": "Lifestyle & Routines",
+      "description": "This deck looks at the routines, rhythms, and habits that make daily life feel good to you.",
+      "category": "lifestyle",
+      "tier": "tier_1",
+      "sensitivity": "standard",
+      "compare_eligible": true,
+      "showdown_eligible": true,
+      "min_cards_for_profile": 15,
+      "min_cards_for_compare": 30,
+      "cover_tile_key": "lifestyle:cover",
+      "cards": [
+        {
+          "id": "lifestyle_001",
+          "kind": "entity",
+          "title": "Morning walks",
+          "description_short": "A gentle routine that starts the day with movement and mental space.",
+          "tags": ["morning", "relaxation", "habits"],
+          "popularity": 0.9
+        },
+        {
+          "id": "lifestyle_002",
+          "kind": "entity",
+          "title": "Strength training",
+          "description_short": "A structured habit that can feel grounding, energizing, and practical.",
+          "tags": ["fitness", "energy", "habits"],
+          "popularity": 0.88
+        },
+        {
+          "id": "lifestyle_003",
+          "kind": "entity",
+          "title": "Yoga classes",
+          "description_short": "Movement that blends physical effort with recovery and quiet attention.",
+          "tags": ["fitness", "relaxation", "balance"],
+          "popularity": 0.84
+        },
+        {
+          "id": "lifestyle_004",
+          "kind": "entity",
+          "title": "Sunday reset routines",
+          "description_short": "Weekly rituals built around order, preparation, and feeling ready again.",
+          "tags": ["organization", "productivity", "habits"],
+          "popularity": 0.8
+        },
+        {
+          "id": "lifestyle_005",
+          "kind": "entity",
+          "title": "Run clubs",
+          "description_short": "A habit that combines movement, routine, and a little social accountability.",
+          "tags": ["fitness", "morning", "energy"],
+          "popularity": 0.72
+        },
+        {
+          "id": "lifestyle_006",
+          "kind": "entity",
+          "title": "Crossword puzzles",
+          "description_short": "A small ritual for people who like quiet focus and incremental progress.",
+          "tags": ["evening", "relaxation", "habits"],
+          "popularity": 0.56
+        },
+        {
+          "id": "lifestyle_007",
+          "kind": "statement",
+          "title": "I'm an early bird on most days",
+          "description_short": "Shows whether your natural rhythm leans toward mornings.",
+          "tags": ["morning", "energy", "habits"],
+          "popularity": 0.82
+        },
+        {
+          "id": "lifestyle_008",
+          "kind": "statement",
+          "title": "I need quiet time before I feel social",
+          "description_short": "Reveals whether your day starts best with a little space.",
+          "tags": ["morning", "balance", "relaxation"],
+          "popularity": 0.8
+        },
+        {
+          "id": "lifestyle_009",
+          "kind": "statement",
+          "title": "A few steady routines make my week feel better",
+          "description_short": "Captures whether consistency helps you feel more like yourself.",
+          "tags": ["habits", "organization", "balance"],
+          "popularity": 0.78
+        },
+        {
+          "id": "lifestyle_010",
+          "kind": "statement",
+          "title": "I feel noticeably better when my space is tidy",
+          "description_short": "Shows how much order affects your mood and focus.",
+          "tags": ["productivity", "organization", "balance"],
+          "popularity": 0.76
+        },
+        {
+          "id": "lifestyle_011",
+          "kind": "statement",
+          "title": "I usually have more energy in the morning than at night",
+          "description_short": "Separates people who front-load their day from people who ramp up later.",
+          "tags": ["morning", "energy", "productivity"],
+          "popularity": 0.74
+        },
+        {
+          "id": "lifestyle_012",
+          "kind": "statement",
+          "title": "I need alone time to recharge after a busy stretch",
+          "description_short": "Reveals whether solitude feels like maintenance, not avoidance, for you.",
+          "tags": ["relaxation", "balance", "evening"],
+          "popularity": 0.72
+        },
+        {
+          "id": "lifestyle_013",
+          "kind": "statement",
+          "title": "Exercise is one of the ways I manage stress",
+          "description_short": "Shows whether movement is tied to emotional regulation for you.",
+          "tags": ["fitness", "balance", "energy"],
+          "popularity": 0.7
+        },
+        {
+          "id": "lifestyle_014",
+          "kind": "statement",
+          "title": "A calm night in usually sounds better than a packed schedule",
+          "description_short": "Captures whether rest feels restorative or boring to you.",
+          "tags": ["evening", "relaxation", "balance"],
+          "popularity": 0.68
+        },
+        {
+          "id": "lifestyle_015",
+          "kind": "statement",
+          "title": "I use a calendar or list to keep my life together",
+          "description_short": "Reveals whether external systems help you feel steady and capable.",
+          "tags": ["organization", "productivity", "habits"],
+          "popularity": 0.66
+        },
+        {
+          "id": "lifestyle_016",
+          "kind": "statement",
+          "title": "Small habits work better for me than big resolutions",
+          "description_short": "Shows whether you trust consistency over intensity.",
+          "tags": ["habits", "productivity", "balance"],
+          "popularity": 0.64
+        },
+        {
+          "id": "lifestyle_017",
+          "kind": "statement",
+          "title": "I'd rather have a comfortable home than an impressive one",
+          "description_short": "Highlights whether daily ease matters more than aesthetics or performance.",
+          "tags": ["relaxation", "organization", "balance"],
+          "popularity": 0.62
+        },
+        {
+          "id": "lifestyle_018",
+          "kind": "statement",
+          "title": "I can be spontaneous, but I like knowing the basics of a plan",
+          "description_short": "Captures whether structure helps spontaneity feel easier for you.",
+          "tags": ["spontaneity", "organization", "balance"],
+          "popularity": 0.6
+        },
+        {
+          "id": "lifestyle_019",
+          "kind": "statement",
+          "title": "I get irritable when I'm overscheduled",
+          "description_short": "Reveals whether margin is emotionally important to your routine.",
+          "tags": ["productivity", "balance", "relaxation"],
+          "popularity": 0.58
+        },
+        {
+          "id": "lifestyle_020",
+          "kind": "statement",
+          "title": "Slow mornings feel luxurious to me",
+          "description_short": "Shows whether gentleness is part of your ideal rhythm.",
+          "tags": ["morning", "relaxation", "balance"],
+          "popularity": 0.56
+        },
+        {
+          "id": "lifestyle_021",
+          "kind": "statement",
+          "title": "I almost always feel better after a workout, even if I resisted starting",
+          "description_short": "Captures whether effort reliably turns into energy for you.",
+          "tags": ["fitness", "energy", "habits"],
+          "popularity": 0.52
+        },
+        {
+          "id": "lifestyle_022",
+          "kind": "statement",
+          "title": "I would rather do chores steadily than let them pile up",
+          "description_short": "Shows whether maintenance feels easier when it's ordinary.",
+          "tags": ["organization", "productivity", "habits"],
+          "popularity": 0.48
+        },
+        {
+          "id": "lifestyle_023",
+          "kind": "statement",
+          "title": "I often need transition time after work before doing anything else",
+          "description_short": "Reveals whether your energy shifts need space instead of speed.",
+          "tags": ["evening", "relaxation", "balance"],
+          "popularity": 0.44
+        },
+        {
+          "id": "lifestyle_024",
+          "kind": "statement",
+          "title": "I like hobbies that help me lose track of time",
+          "description_short": "Shows whether absorption and presence matter in how you recharge.",
+          "tags": ["relaxation", "habits", "balance"],
+          "popularity": 0.4
+        },
+        {
+          "id": "lifestyle_025",
+          "kind": "statement",
+          "title": "A few dependable meals, shows, or rituals help me feel grounded",
+          "description_short": "Captures whether repetition can feel secure instead of stale.",
+          "tags": ["habits", "balance", "evening"],
+          "popularity": 0.36
+        },
+        {
+          "id": "lifestyle_026",
+          "kind": "statement",
+          "title": "I feel better when at least one productive thing is planned for the day",
+          "description_short": "Shows whether momentum matters to your sense of ease.",
+          "tags": ["productivity", "organization", "morning"],
+          "popularity": 0.32
+        },
+        {
+          "id": "lifestyle_027",
+          "kind": "statement",
+          "title": "I can adapt to chaos, but I don't enjoy living in it",
+          "description_short": "Reveals whether flexibility and preference are different things for you.",
+          "tags": ["organization", "balance", "productivity"],
+          "popularity": 0.3
+        },
+        {
+          "id": "lifestyle_028",
+          "kind": "statement",
+          "title": "I try to schedule rest instead of just hoping for it",
+          "description_short": "Shows whether recovery needs intention to actually happen for you.",
+          "tags": ["relaxation", "balance", "productivity"],
+          "popularity": 0.28
+        },
+        {
+          "id": "lifestyle_029",
+          "kind": "statement",
+          "title": "I like feeling physically active even if it isn't in a gym",
+          "description_short": "Captures whether movement matters more than format for you.",
+          "tags": ["fitness", "energy", "spontaneity"],
+          "popularity": 0.24
+        },
+        {
+          "id": "lifestyle_030",
+          "kind": "statement",
+          "title": "I usually know quickly when my routine is slipping",
+          "description_short": "Reveals how aware you are of your own rhythm and maintenance.",
+          "tags": ["habits", "productivity", "organization"],
+          "popularity": 0.22
+        },
+        {
+          "id": "lifestyle_031",
+          "kind": "statement",
+          "title": "I prefer realistic self-improvement over dramatic life overhauls",
+          "description_short": "Shows whether sustainable change matters more than reinvention.",
+          "tags": ["balance", "habits", "productivity"],
+          "popularity": 0.2
+        },
+        {
+          "id": "lifestyle_032",
+          "kind": "statement",
+          "title": "I like a mix of dependable rituals and occasional novelty",
+          "description_short": "Captures whether balance feels better than either extreme.",
+          "tags": ["spontaneity", "habits", "balance"],
+          "popularity": 0.18
+        },
+        {
+          "id": "lifestyle_033",
+          "kind": "statement",
+          "title": "I'm more likely to reflect at night than first thing in the morning",
+          "description_short": "Shows when self-awareness tends to open up for you.",
+          "tags": ["evening", "relaxation", "habits"],
+          "popularity": 0.16
+        },
+        {
+          "id": "lifestyle_034",
+          "kind": "statement",
+          "title": "I try to protect my sleep when life gets busy",
+          "description_short": "Reveals whether rest is a priority or a casualty when things speed up.",
+          "tags": ["evening", "balance", "energy"],
+          "popularity": 0.14
+        },
+        {
+          "id": "lifestyle_035",
+          "kind": "statement",
+          "title": "Consistency matters more to me than intensity in most areas of life",
+          "description_short": "Captures how you think about momentum, sustainability, and identity.",
+          "tags": ["habits", "balance", "productivity"],
+          "popularity": 0.12
+        },
+        {
+          "id": "lifestyle_036",
+          "kind": "statement",
+          "title": "I feel proud when I follow through on small promises to myself",
+          "description_short": "Shows whether internal trust is built through ordinary follow-through for you.",
+          "tags": ["habits", "productivity", "balance"],
+          "popularity": 0.1
+        },
+        {
+          "id": "lifestyle_037",
+          "kind": "statement",
+          "title": "I like days that have structure without feeling rigid",
+          "description_short": "Reveals whether freedom inside a frame is your ideal pace.",
+          "tags": ["organization", "spontaneity", "balance"],
+          "popularity": 0.08
+        },
+        {
+          "id": "lifestyle_038",
+          "kind": "statement",
+          "title": "I notice quickly when my energy is out of sync with my schedule",
+          "description_short": "Captures whether you track your own rhythms in a practical way.",
+          "tags": ["energy", "balance", "productivity"],
+          "popularity": 0.07
+        },
+        {
+          "id": "lifestyle_039",
+          "kind": "statement",
+          "title": "I'd rather improve one habit at a time than change everything at once",
+          "description_short": "Shows whether patience feels wiser than urgency to you.",
+          "tags": ["habits", "balance", "productivity"],
+          "popularity": 0.06
+        },
+        {
+          "id": "lifestyle_040",
+          "kind": "statement",
+          "title": "I feel most like myself when my week has a healthy rhythm",
+          "description_short": "Reveals how tied your identity is to pace, energy, and steady patterns.",
+          "tags": ["balance", "habits", "energy"],
+          "popularity": 0.05
+        }
+      ]
+    },
+    {
+      "id": "deck_social_habits",
+      "title": "Social Habits",
+      "description": "From quiet dinners to crowded nights out, this deck explores how you spend your social energy.",
+      "category": "social_habits",
+      "tier": "tier_1",
+      "sensitivity": "standard",
+      "compare_eligible": true,
+      "showdown_eligible": true,
+      "min_cards_for_profile": 15,
+      "min_cards_for_compare": 30,
+      "cover_tile_key": "social_habits:cover",
+      "cards": [
+        {
+          "id": "social_habits_001",
+          "kind": "entity",
+          "title": "Game nights",
+          "description_short": "A social setting where activity keeps the energy playful and easy.",
+          "tags": ["small-group", "lighthearted", "hosting"],
+          "popularity": 0.88
+        },
+        {
+          "id": "social_habits_002",
+          "kind": "entity",
+          "title": "Dinner parties",
+          "description_short": "A slower hang built on food, flow, and conversation.",
+          "tags": ["hosting", "small-group", "deep-talks"],
+          "popularity": 0.84
+        },
+        {
+          "id": "social_habits_003",
+          "kind": "entity",
+          "title": "Karaoke nights",
+          "description_short": "A louder social setting where performance and silliness are part of the point.",
+          "tags": ["going-out", "large-group", "lighthearted"],
+          "popularity": 0.76
+        },
+        {
+          "id": "social_habits_004",
+          "kind": "entity",
+          "title": "Rooftop bars",
+          "description_short": "A social scene that can feel breezy, performative, or energizing depending on the crowd.",
+          "tags": ["going-out", "large-group", "networking"],
+          "popularity": 0.68
+        },
+        {
+          "id": "social_habits_005",
+          "kind": "statement",
+          "title": "I prefer small gatherings over big parties",
+          "description_short": "Shows whether your social sweet spot is intimacy or scale.",
+          "tags": ["introvert", "small-group", "boundaries"],
+          "popularity": 0.82
+        },
+        {
+          "id": "social_habits_006",
+          "kind": "statement",
+          "title": "I'm usually the one who keeps the group chat alive",
+          "description_short": "Reveals whether you naturally sustain group energy between plans.",
+          "tags": ["extrovert", "lighthearted", "networking"],
+          "popularity": 0.8
+        },
+        {
+          "id": "social_habits_007",
+          "kind": "statement",
+          "title": "I'd rather have one great conversation than a dozen shallow ones",
+          "description_short": "Captures whether depth matters more than variety for you socially.",
+          "tags": ["deep-talks", "small-group", "introvert"],
+          "popularity": 0.78
+        },
+        {
+          "id": "social_habits_008",
+          "kind": "statement",
+          "title": "I need recovery time after a busy social weekend",
+          "description_short": "Shows whether connection costs energy as much as it gives it.",
+          "tags": ["boundaries", "introvert", "small-group"],
+          "popularity": 0.76
+        },
+        {
+          "id": "social_habits_009",
+          "kind": "statement",
+          "title": "I like being invited even if I'm not sure I'll say yes",
+          "description_short": "Reveals whether inclusion matters more than certainty for you.",
+          "tags": ["boundaries", "introvert", "lighthearted"],
+          "popularity": 0.74
+        },
+        {
+          "id": "social_habits_010",
+          "kind": "statement",
+          "title": "I'm comfortable introducing people who don't know each other",
+          "description_short": "Shows whether you naturally take on connector energy in a room.",
+          "tags": ["networking", "extrovert", "hosting"],
+          "popularity": 0.72
+        },
+        {
+          "id": "social_habits_011",
+          "kind": "statement",
+          "title": "I'd rather host at home than fight for a table somewhere",
+          "description_short": "Captures whether control and comfort beat public energy for you.",
+          "tags": ["hosting", "small-group", "going-out"],
+          "popularity": 0.7
+        },
+        {
+          "id": "social_habits_012",
+          "kind": "statement",
+          "title": "I leave events earlier than most people",
+          "description_short": "Reveals whether your social battery has a cleaner stop point than most.",
+          "tags": ["boundaries", "introvert", "going-out"],
+          "popularity": 0.68
+        },
+        {
+          "id": "social_habits_013",
+          "kind": "statement",
+          "title": "I warm up slowly in new groups",
+          "description_short": "Shows whether comfort takes time before your personality fully appears.",
+          "tags": ["introvert", "boundaries", "networking"],
+          "popularity": 0.66
+        },
+        {
+          "id": "social_habits_014",
+          "kind": "statement",
+          "title": "I enjoy playful banter more than loud chaos",
+          "description_short": "Separates social playfulness from sensory overwhelm.",
+          "tags": ["lighthearted", "small-group", "introvert"],
+          "popularity": 0.64
+        },
+        {
+          "id": "social_habits_015",
+          "kind": "statement",
+          "title": "I'm the friend who checks whether everyone got home safe",
+          "description_short": "Reveals whether caretaking is part of how you show up socially.",
+          "tags": ["hosting", "boundaries", "extrovert"],
+          "popularity": 0.62
+        },
+        {
+          "id": "social_habits_016",
+          "kind": "statement",
+          "title": "I do better socially when I know at least one person well",
+          "description_short": "Shows whether anchor relationships make bigger settings easier for you.",
+          "tags": ["small-group", "introvert", "boundaries"],
+          "popularity": 0.6
+        },
+        {
+          "id": "social_habits_017",
+          "kind": "statement",
+          "title": "I like plans that have a clear start and end time",
+          "description_short": "Captures whether social structure feels relieving instead of restrictive.",
+          "tags": ["boundaries", "small-group", "going-out"],
+          "popularity": 0.58
+        },
+        {
+          "id": "social_habits_018",
+          "kind": "statement",
+          "title": "I enjoy meeting new people, but only in manageable doses",
+          "description_short": "Reveals whether novelty feels good until it starts draining you.",
+          "tags": ["networking", "extrovert", "boundaries"],
+          "popularity": 0.56
+        },
+        {
+          "id": "social_habits_019",
+          "kind": "statement",
+          "title": "I can hold my own at a party, but it's not where I feel most myself",
+          "description_short": "Separates capability from preference in social settings.",
+          "tags": ["large-group", "going-out", "introvert"],
+          "popularity": 0.52
+        },
+        {
+          "id": "social_habits_020",
+          "kind": "statement",
+          "title": "I appreciate friends who understand that a canceled plan isn't personal",
+          "description_short": "Shows whether flexibility feels like care to you.",
+          "tags": ["boundaries", "introvert", "lighthearted"],
+          "popularity": 0.48
+        },
+        {
+          "id": "social_habits_021",
+          "kind": "statement",
+          "title": "I like a social setting more when there's an activity built in",
+          "description_short": "Reveals whether structured fun makes connection easier for you.",
+          "tags": ["lighthearted", "small-group", "going-out"],
+          "popularity": 0.44
+        },
+        {
+          "id": "social_habits_022",
+          "kind": "statement",
+          "title": "I notice when one person in a group is being left out",
+          "description_short": "Captures whether you track social temperature and inclusion closely.",
+          "tags": ["hosting", "boundaries", "deep-talks"],
+          "popularity": 0.4
+        },
+        {
+          "id": "social_habits_023",
+          "kind": "statement",
+          "title": "I'm more likely to make plans if they involve food or a walk",
+          "description_short": "Shows whether simple, low-pressure plans are your easiest yes.",
+          "tags": ["small-group", "lighthearted", "boundaries"],
+          "popularity": 0.36
+        },
+        {
+          "id": "social_habits_024",
+          "kind": "statement",
+          "title": "I prefer one-on-one texting over constantly posting in a group chat",
+          "description_short": "Reveals whether intimacy feels more natural than broadcast-style connection.",
+          "tags": ["introvert", "boundaries", "deep-talks"],
+          "popularity": 0.32
+        },
+        {
+          "id": "social_habits_025",
+          "kind": "statement",
+          "title": "I enjoy being silly with people once I feel comfortable",
+          "description_short": "Shows how playfulness changes once trust is in the room.",
+          "tags": ["lighthearted", "small-group", "introvert"],
+          "popularity": 0.28
+        },
+        {
+          "id": "social_habits_026",
+          "kind": "statement",
+          "title": "I can be friendly without wanting instant closeness",
+          "description_short": "Captures whether warmth and distance can comfortably coexist for you.",
+          "tags": ["boundaries", "networking", "introvert"],
+          "popularity": 0.24
+        },
+        {
+          "id": "social_habits_027",
+          "kind": "statement",
+          "title": "I usually need context before I can enjoy a big event",
+          "description_short": "Reveals whether social ease rises when the structure is clearer.",
+          "tags": ["networking", "large-group", "boundaries"],
+          "popularity": 0.2
+        },
+        {
+          "id": "social_habits_028",
+          "kind": "statement",
+          "title": "I like being the person who makes others feel welcome",
+          "description_short": "Shows whether hospitality feels energizing, not just dutiful, for you.",
+          "tags": ["hosting", "extrovert", "boundaries"],
+          "popularity": 0.18
+        },
+        {
+          "id": "social_habits_029",
+          "kind": "statement",
+          "title": "I'd rather catch up with two close friends than attend a huge event",
+          "description_short": "Separates meaningful closeness from social scale.",
+          "tags": ["small-group", "deep-talks", "introvert"],
+          "popularity": 0.16
+        },
+        {
+          "id": "social_habits_030",
+          "kind": "statement",
+          "title": "I'm okay saying no when my social battery is done",
+          "description_short": "Reveals whether limits are easy or hard for you to name.",
+          "tags": ["boundaries", "introvert", "going-out"],
+          "popularity": 0.14
+        },
+        {
+          "id": "social_habits_031",
+          "kind": "statement",
+          "title": "I can handle small talk, but I don't want to stay there forever",
+          "description_short": "Shows whether surface-level ease is enough or just a bridge for you.",
+          "tags": ["deep-talks", "networking", "introvert"],
+          "popularity": 0.12
+        },
+        {
+          "id": "social_habits_032",
+          "kind": "statement",
+          "title": "I like friends who can laugh together without constant performance",
+          "description_short": "Captures whether ease matters more than spectacle in shared fun.",
+          "tags": ["lighthearted", "deep-talks", "small-group"],
+          "popularity": 0.11
+        },
+        {
+          "id": "social_habits_033",
+          "kind": "statement",
+          "title": "I don't need to be out every weekend to feel connected",
+          "description_short": "Reveals whether frequency matters less than quality of contact for you.",
+          "tags": ["boundaries", "introvert", "small-group"],
+          "popularity": 0.1
+        },
+        {
+          "id": "social_habits_034",
+          "kind": "statement",
+          "title": "I enjoy a little chaos if the people feel safe",
+          "description_short": "Shows whether trust changes your appetite for louder energy.",
+          "tags": ["going-out", "lighthearted", "large-group"],
+          "popularity": 0.09
+        },
+        {
+          "id": "social_habits_035",
+          "kind": "statement",
+          "title": "I tend to remember how people made the room feel",
+          "description_short": "Captures whether emotional atmosphere sticks with you more than details.",
+          "tags": ["hosting", "deep-talks", "networking"],
+          "popularity": 0.08
+        },
+        {
+          "id": "social_habits_036",
+          "kind": "statement",
+          "title": "I appreciate direct communication more than guessing games",
+          "description_short": "Shows whether clarity matters especially in social dynamics for you.",
+          "tags": ["boundaries", "deep-talks", "small-group"],
+          "popularity": 0.07
+        },
+        {
+          "id": "social_habits_037",
+          "kind": "statement",
+          "title": "I like events that leave room to wander between conversations",
+          "description_short": "Reveals whether flexible social flow feels better than fixed intensity.",
+          "tags": ["networking", "large-group", "lighthearted"],
+          "popularity": 0.06
+        },
+        {
+          "id": "social_habits_038",
+          "kind": "statement",
+          "title": "I care more about emotional ease than social status in a room",
+          "description_short": "Shows what you scan for first when you enter a space with other people.",
+          "tags": ["boundaries", "deep-talks", "introvert"],
+          "popularity": 0.05
+        },
+        {
+          "id": "social_habits_039",
+          "kind": "statement",
+          "title": "I'm happiest when plans feel intentional, not obligatory",
+          "description_short": "Captures whether choice and meaning matter more than just showing up.",
+          "tags": ["boundaries", "small-group", "deep-talks"],
+          "popularity": 0.04
+        },
+        {
+          "id": "social_habits_040",
+          "kind": "statement",
+          "title": "I value friends who can do deep talk and nonsense in the same night",
+          "description_short": "Shows whether emotional depth and lightness both matter for chemistry.",
+          "tags": ["deep-talks", "lighthearted", "small-group"],
+          "popularity": 0.03
+        }
+      ]
+    },
+    {
+      "id": "deck_humor",
+      "title": "Humor",
+      "description": "The jokes you love and the way you laugh can reveal a lot about chemistry, comfort, and timing.",
+      "category": "humor",
+      "tier": "tier_1",
+      "sensitivity": "standard",
+      "compare_eligible": true,
+      "showdown_eligible": true,
+      "min_cards_for_profile": 15,
+      "min_cards_for_compare": 30,
+      "cover_tile_key": "humor:cover",
+      "cards": [
+        {
+          "id": "humor_001",
+          "kind": "entity",
+          "title": "The Office",
+          "description_short": "A comedy benchmark for people who love awkward timing and tiny reactions.",
+          "tags": ["witty", "observational", "self-deprecating"],
+          "popularity": 0.94
+        },
+        {
+          "id": "humor_002",
+          "kind": "entity",
+          "title": "Parks and Recreation",
+          "description_short": "Warm, optimistic comedy that still knows how to land a joke.",
+          "tags": ["observational", "witty", "self-deprecating"],
+          "popularity": 0.92
+        },
+        {
+          "id": "humor_003",
+          "kind": "entity",
+          "title": "Brooklyn Nine-Nine",
+          "description_short": "Fast, playful humor with a little absurdity and a lot of affection.",
+          "tags": ["witty", "absurd", "physical"],
+          "popularity": 0.9
+        },
+        {
+          "id": "humor_004",
+          "kind": "entity",
+          "title": "Derry Girls",
+          "description_short": "Chaos, speed, and emotional warmth wrapped in sharp comedy.",
+          "tags": ["observational", "absurd", "witty"],
+          "popularity": 0.88
+        },
+        {
+          "id": "humor_005",
+          "kind": "entity",
+          "title": "John Mulaney",
+          "description_short": "Story-driven stand-up where specificity turns into something universal.",
+          "tags": ["observational", "self-deprecating", "witty"],
+          "popularity": 0.86
+        },
+        {
+          "id": "humor_006",
+          "kind": "entity",
+          "title": "Key & Peele",
+          "description_short": "Sketch comedy that swings between clever, physical, and surreal.",
+          "tags": ["absurd", "physical", "witty"],
+          "popularity": 0.84
+        },
+        {
+          "id": "humor_007",
+          "kind": "entity",
+          "title": "Schitt's Creek",
+          "description_short": "Dry comedy that becomes unexpectedly tender over time.",
+          "tags": ["dry", "observational", "witty"],
+          "popularity": 0.82
+        },
+        {
+          "id": "humor_008",
+          "kind": "entity",
+          "title": "I Think You Should Leave",
+          "description_short": "An absurdist comedy built for people who like discomfort pushed just a bit too far.",
+          "tags": ["absurd", "dark", "physical"],
+          "popularity": 0.8
+        },
+        {
+          "id": "humor_009",
+          "kind": "entity",
+          "title": "Taskmaster",
+          "description_short": "Playful competition where silliness and wit matter more than winning.",
+          "tags": ["absurd", "witty", "physical"],
+          "popularity": 0.78
+        },
+        {
+          "id": "humor_010",
+          "kind": "entity",
+          "title": "Nathan For You",
+          "description_short": "A dry, strange comedy that gets funnier the more serious it looks.",
+          "tags": ["dry", "absurd", "observational"],
+          "popularity": 0.76
+        },
+        {
+          "id": "humor_011",
+          "kind": "entity",
+          "title": "Fleabag",
+          "description_short": "Comedy that weaponizes self-awareness, timing, and emotional mess.",
+          "tags": ["dry", "self-deprecating", "witty"],
+          "popularity": 0.74
+        },
+        {
+          "id": "humor_012",
+          "kind": "entity",
+          "title": "Hot Fuzz",
+          "description_short": "A densely packed movie that keeps rewarding attention and rewatching.",
+          "tags": ["dry", "absurd", "physical"],
+          "popularity": 0.72
+        },
+        {
+          "id": "humor_013",
+          "kind": "entity",
+          "title": "The Good Place",
+          "description_short": "A rare comedy where philosophy and punchlines actually help each other.",
+          "tags": ["witty", "observational", "absurd"],
+          "popularity": 0.68
+        },
+        {
+          "id": "humor_014",
+          "kind": "entity",
+          "title": "Tig Notaro",
+          "description_short": "Low-key stand-up where understatement becomes part of the joke.",
+          "tags": ["dry", "observational", "self-deprecating"],
+          "popularity": 0.62
+        },
+        {
+          "id": "humor_015",
+          "kind": "entity",
+          "title": "New Girl",
+          "description_short": "Character comedy that stays light without feeling empty.",
+          "tags": ["observational", "physical", "witty"],
+          "popularity": 0.56
+        },
+        {
+          "id": "humor_016",
+          "kind": "entity",
+          "title": "The Onion",
+          "description_short": "Deadpan satire that only works when the delivery never blinks.",
+          "tags": ["dry", "observational", "absurd"],
+          "popularity": 0.48
+        },
+        {
+          "id": "humor_017",
+          "kind": "entity",
+          "title": "Bob's Burgers",
+          "description_short": "A gentle, slightly weird show that loves wordplay and family chaos.",
+          "tags": ["absurd", "punny", "self-deprecating"],
+          "popularity": 0.4
+        },
+        {
+          "id": "humor_018",
+          "kind": "entity",
+          "title": "What We Do in the Shadows",
+          "description_short": "Deadpan supernatural comedy that stays funny by staying committed to the bit.",
+          "tags": ["dry", "absurd", "dark"],
+          "popularity": 0.32
+        },
+        {
+          "id": "humor_019",
+          "kind": "entity",
+          "title": "Abbott Elementary",
+          "description_short": "Humor rooted in character affection and little moments of recognition.",
+          "tags": ["observational", "witty", "self-deprecating"],
+          "popularity": 0.24
+        },
+        {
+          "id": "humor_020",
+          "kind": "entity",
+          "title": "Paddington 2",
+          "description_short": "A sweet comedy that uses physical bits without losing emotional warmth.",
+          "tags": ["physical", "absurd", "witty"],
+          "popularity": 0.18
+        },
+        {
+          "id": "humor_021",
+          "kind": "statement",
+          "title": "I appreciate dark humor when it's clever, not cruel",
+          "description_short": "Shows where your line is between bold and mean.",
+          "tags": ["dark", "witty", "dry"],
+          "popularity": 0.56
+        },
+        {
+          "id": "humor_022",
+          "kind": "statement",
+          "title": "I use humor to diffuse tension when things get awkward",
+          "description_short": "Reveals whether jokes feel like comfort, defense, or both for you.",
+          "tags": ["self-deprecating", "witty", "observational"],
+          "popularity": 0.54
+        },
+        {
+          "id": "humor_023",
+          "kind": "statement",
+          "title": "I love a well-timed deadpan response",
+          "description_short": "Captures whether restraint makes comedy sharper for you.",
+          "tags": ["dry", "witty", "observational"],
+          "popularity": 0.52
+        },
+        {
+          "id": "humor_024",
+          "kind": "statement",
+          "title": "Puns annoy me until they make me laugh",
+          "description_short": "Shows whether you resist or surrender to wordplay.",
+          "tags": ["punny", "dry", "absurd"],
+          "popularity": 0.48
+        },
+        {
+          "id": "humor_025",
+          "kind": "statement",
+          "title": "I'm more likely to laugh at something absurd than something polished",
+          "description_short": "Reveals whether surprise beats craft for you in the moment.",
+          "tags": ["absurd", "physical", "witty"],
+          "popularity": 0.44
+        },
+        {
+          "id": "humor_026",
+          "kind": "statement",
+          "title": "I like humor that feels a little too specific",
+          "description_short": "Captures whether oddly precise jokes make you feel seen.",
+          "tags": ["observational", "witty", "dry"],
+          "popularity": 0.4
+        },
+        {
+          "id": "humor_027",
+          "kind": "statement",
+          "title": "I don't fully trust people who can't laugh at themselves",
+          "description_short": "Shows whether self-awareness and playfulness feel linked for you.",
+          "tags": ["self-deprecating", "observational", "witty"],
+          "popularity": 0.36
+        },
+        {
+          "id": "humor_028",
+          "kind": "statement",
+          "title": "Sarcasm works for me if it feels affectionate",
+          "description_short": "Reveals whether sharpness is fun or tiring depending on tone.",
+          "tags": ["sarcasm", "witty", "dry"],
+          "popularity": 0.32
+        },
+        {
+          "id": "humor_029",
+          "kind": "statement",
+          "title": "I'm easily won over by physical comedy",
+          "description_short": "Shows whether a great visual bit can override almost anything else.",
+          "tags": ["physical", "absurd", "slapstick"],
+          "popularity": 0.28
+        },
+        {
+          "id": "humor_030",
+          "kind": "statement",
+          "title": "I'd rather laugh with someone than laugh at someone",
+          "description_short": "Captures whether warmth changes what feels funny to you.",
+          "tags": ["self-deprecating", "observational", "witty"],
+          "popularity": 0.24
+        },
+        {
+          "id": "humor_031",
+          "kind": "statement",
+          "title": "I like jokes that reward paying attention",
+          "description_short": "Reveals whether layered humor feels more satisfying than obvious humor.",
+          "tags": ["witty", "dry", "observational"],
+          "popularity": 0.22
+        },
+        {
+          "id": "humor_032",
+          "kind": "statement",
+          "title": "I can enjoy very silly humor if the commitment is real",
+          "description_short": "Shows whether sincerity inside nonsense works for you.",
+          "tags": ["absurd", "physical", "punny"],
+          "popularity": 0.2
+        },
+        {
+          "id": "humor_033",
+          "kind": "statement",
+          "title": "I notice when humor is hiding discomfort",
+          "description_short": "Captures whether you hear the subtext under the laugh.",
+          "tags": ["dark", "self-deprecating", "observational"],
+          "popularity": 0.18
+        },
+        {
+          "id": "humor_034",
+          "kind": "statement",
+          "title": "I like people who can keep a straight face while saying something ridiculous",
+          "description_short": "Shows whether surprise and control are part of what makes you laugh.",
+          "tags": ["dry", "absurd", "witty"],
+          "popularity": 0.16
+        },
+        {
+          "id": "humor_035",
+          "kind": "statement",
+          "title": "I laugh hardest in intimate settings, not when I'm trying to perform wit",
+          "description_short": "Reveals whether ease matters more than audience in your humor.",
+          "tags": ["self-deprecating", "dry", "observational"],
+          "popularity": 0.14
+        },
+        {
+          "id": "humor_036",
+          "kind": "statement",
+          "title": "I bond fastest with people who make me laugh unexpectedly",
+          "description_short": "Captures whether surprise feels like chemistry for you.",
+          "tags": ["absurd", "observational", "witty"],
+          "popularity": 0.12
+        },
+        {
+          "id": "humor_037",
+          "kind": "statement",
+          "title": "I enjoy humor that's a little weird but not mean",
+          "description_short": "Shows where your line is between strange and hostile.",
+          "tags": ["absurd", "dry", "dark"],
+          "popularity": 0.1
+        },
+        {
+          "id": "humor_038",
+          "kind": "statement",
+          "title": "I can appreciate a brutal one-liner if everyone feels safe",
+          "description_short": "Reveals whether context changes how sharp humor lands for you.",
+          "tags": ["sarcasm", "dry", "witty"],
+          "popularity": 0.08
+        },
+        {
+          "id": "humor_039",
+          "kind": "statement",
+          "title": "I love when a joke sounds casual but lands perfectly",
+          "description_short": "Captures whether subtle delivery matters as much as the joke itself.",
+          "tags": ["observational", "witty", "dry"],
+          "popularity": 0.06
+        },
+        {
+          "id": "humor_040",
+          "kind": "statement",
+          "title": "I probably use humor as a love language more than I admit",
+          "description_short": "Shows whether joking feels like one of your easiest forms of affection.",
+          "tags": ["self-deprecating", "witty", "absurd"],
+          "popularity": 0.05
+        }
+      ]
+    },
+    {
+      "id": "deck_relationship_preferences",
+      "title": "Relationship Preferences",
+      "description": "This deck explores the habits, boundaries, and forms of closeness you want in a relationship.",
+      "category": "relationship_preferences",
+      "tier": "tier_1",
+      "sensitivity": "standard",
+      "compare_eligible": true,
+      "showdown_eligible": false,
+      "min_cards_for_profile": 15,
+      "min_cards_for_compare": 30,
+      "cover_tile_key": "relationship_preferences:cover",
+      "cards": [
+        {
+          "id": "relationship_preferences_001",
+          "kind": "entity",
+          "title": "Weekly date nights",
+          "description_short": "A ritual of intentional time that makes the relationship feel actively chosen.",
+          "tags": ["quality-time", "growth", "affection"],
+          "popularity": 0.84
+        },
+        {
+          "id": "relationship_preferences_002",
+          "kind": "entity",
+          "title": "Good morning texts",
+          "description_short": "A tiny contact point that can feel sweet, grounding, or excessive.",
+          "tags": ["communication", "affection", "trust"],
+          "popularity": 0.8
+        },
+        {
+          "id": "relationship_preferences_003",
+          "kind": "statement",
+          "title": "Quality time matters more to me than grand gestures",
+          "description_short": "Shows whether ordinary closeness beats occasional spectacle for you.",
+          "tags": ["quality-time", "affection", "trust"],
+          "popularity": 0.8
+        },
+        {
+          "id": "relationship_preferences_004",
+          "kind": "statement",
+          "title": "I need honest feedback even when it's hard to hear",
+          "description_short": "Reveals whether truth feels more loving than comfort for you.",
+          "tags": ["honesty", "communication", "growth"],
+          "popularity": 0.78
+        },
+        {
+          "id": "relationship_preferences_005",
+          "kind": "statement",
+          "title": "Physical touch matters a lot to me",
+          "description_short": "Captures how much affection needs a physical dimension to feel complete.",
+          "tags": ["affection", "trust", "support"],
+          "popularity": 0.76
+        },
+        {
+          "id": "relationship_preferences_006",
+          "kind": "statement",
+          "title": "I want a relationship where both people still have independent lives",
+          "description_short": "Shows whether closeness and individuality need to coexist clearly for you.",
+          "tags": ["independence", "boundaries", "growth"],
+          "popularity": 0.74
+        },
+        {
+          "id": "relationship_preferences_007",
+          "kind": "statement",
+          "title": "I feel safest when expectations are stated clearly",
+          "description_short": "Reveals whether ambiguity feels romantic or stressful to you.",
+          "tags": ["communication", "trust", "boundaries"],
+          "popularity": 0.72
+        },
+        {
+          "id": "relationship_preferences_008",
+          "kind": "statement",
+          "title": "Consistency matters more to me than intensity",
+          "description_short": "Captures whether steadiness feels more meaningful than peaks and valleys.",
+          "tags": ["trust", "support", "honesty"],
+          "popularity": 0.7
+        },
+        {
+          "id": "relationship_preferences_009",
+          "kind": "statement",
+          "title": "I'd rather talk through tension than pretend it isn't there",
+          "description_short": "Shows whether avoidance feels calmer or more costly to you.",
+          "tags": ["conflict", "communication", "honesty"],
+          "popularity": 0.68
+        },
+        {
+          "id": "relationship_preferences_010",
+          "kind": "statement",
+          "title": "I appreciate affection that feels natural, not performative",
+          "description_short": "Reveals whether sincerity matters more than volume in care.",
+          "tags": ["affection", "honesty", "trust"],
+          "popularity": 0.66
+        },
+        {
+          "id": "relationship_preferences_011",
+          "kind": "statement",
+          "title": "I need a partner who can apologize without getting defensive",
+          "description_short": "Captures whether accountability feels essential to safety for you.",
+          "tags": ["conflict", "growth", "honesty"],
+          "popularity": 0.64
+        },
+        {
+          "id": "relationship_preferences_012",
+          "kind": "statement",
+          "title": "I like checking in after conflict instead of just moving on",
+          "description_short": "Shows whether repair needs follow-through for you to trust it.",
+          "tags": ["communication", "conflict", "support"],
+          "popularity": 0.62
+        },
+        {
+          "id": "relationship_preferences_013",
+          "kind": "statement",
+          "title": "I want a relationship where both people cheer for each other's growth",
+          "description_short": "Reveals whether mutual expansion matters as much as mutual comfort to you.",
+          "tags": ["growth", "support", "independence"],
+          "popularity": 0.6
+        },
+        {
+          "id": "relationship_preferences_014",
+          "kind": "statement",
+          "title": "I need some alone time even in a close relationship",
+          "description_short": "Captures whether breathing room feels regulating instead of distant.",
+          "tags": ["independence", "boundaries", "trust"],
+          "popularity": 0.58
+        },
+        {
+          "id": "relationship_preferences_015",
+          "kind": "statement",
+          "title": "I feel loved when someone remembers the small things about me",
+          "description_short": "Shows whether attention to detail reads as care for you.",
+          "tags": ["affection", "support", "trust"],
+          "popularity": 0.56
+        },
+        {
+          "id": "relationship_preferences_016",
+          "kind": "statement",
+          "title": "I prefer direct conversations over passive hints",
+          "description_short": "Reveals whether clarity matters more than soft delivery for you.",
+          "tags": ["communication", "honesty", "conflict"],
+          "popularity": 0.54
+        },
+        {
+          "id": "relationship_preferences_017",
+          "kind": "statement",
+          "title": "I don't need constant contact, but I do need reliability",
+          "description_short": "Captures whether steadiness feels different from frequency for you.",
+          "tags": ["trust", "boundaries", "independence"],
+          "popularity": 0.52
+        },
+        {
+          "id": "relationship_preferences_018",
+          "kind": "statement",
+          "title": "I value emotional safety over being constantly impressed",
+          "description_short": "Shows whether security feels more romantic than intensity to you.",
+          "tags": ["trust", "support", "honesty"],
+          "popularity": 0.5
+        },
+        {
+          "id": "relationship_preferences_019",
+          "kind": "statement",
+          "title": "I want affection to feel reciprocal, not one-sided",
+          "description_short": "Reveals whether balance is part of what makes closeness feel real.",
+          "tags": ["affection", "support", "boundaries"],
+          "popularity": 0.48
+        },
+        {
+          "id": "relationship_preferences_020",
+          "kind": "statement",
+          "title": "Conflict can be healthy if both people stay respectful",
+          "description_short": "Captures whether disagreement feels threatening or potentially useful to you.",
+          "tags": ["conflict", "growth", "communication"],
+          "popularity": 0.46
+        },
+        {
+          "id": "relationship_preferences_021",
+          "kind": "statement",
+          "title": "I notice quickly when someone avoids uncomfortable conversations",
+          "description_short": "Shows how much emotional avoidance stands out to you.",
+          "tags": ["communication", "honesty", "conflict"],
+          "popularity": 0.44
+        },
+        {
+          "id": "relationship_preferences_022",
+          "kind": "statement",
+          "title": "I want a partner who can be playful and serious with me",
+          "description_short": "Reveals whether range matters more than a single strong mode of closeness.",
+          "tags": ["affection", "communication", "support"],
+          "popularity": 0.42
+        },
+        {
+          "id": "relationship_preferences_023",
+          "kind": "statement",
+          "title": "Shared routines can make a relationship feel more grounded",
+          "description_short": "Captures whether small repeated rituals deepen intimacy for you.",
+          "tags": ["quality-time", "trust", "support"],
+          "popularity": 0.4
+        },
+        {
+          "id": "relationship_preferences_024",
+          "kind": "statement",
+          "title": "I care less about perfect chemistry than about how we repair after friction",
+          "description_short": "Shows whether durability matters more than immediate ease for you.",
+          "tags": ["conflict", "trust", "growth"],
+          "popularity": 0.38
+        },
+        {
+          "id": "relationship_preferences_025",
+          "kind": "statement",
+          "title": "I appreciate reassurance, but I don't want to rely on it for every doubt",
+          "description_short": "Reveals how you balance comfort with self-trust.",
+          "tags": ["trust", "affection", "independence"],
+          "popularity": 0.36
+        },
+        {
+          "id": "relationship_preferences_026",
+          "kind": "statement",
+          "title": "I want both people to have room for changing goals and identities",
+          "description_short": "Captures whether flexibility feels like growth or instability to you.",
+          "tags": ["growth", "independence", "support"],
+          "popularity": 0.34
+        },
+        {
+          "id": "relationship_preferences_027",
+          "kind": "statement",
+          "title": "Being chosen openly matters more to me than vague mixed signals",
+          "description_short": "Shows whether certainty reads as care for you.",
+          "tags": ["honesty", "trust", "boundaries"],
+          "popularity": 0.32
+        },
+        {
+          "id": "relationship_preferences_028",
+          "kind": "statement",
+          "title": "I like relationships where support feels practical, not just verbal",
+          "description_short": "Reveals whether effort is clearest when it becomes action for you.",
+          "tags": ["support", "communication", "trust"],
+          "popularity": 0.3
+        },
+        {
+          "id": "relationship_preferences_029",
+          "kind": "statement",
+          "title": "I value a partner who can tell the truth kindly",
+          "description_short": "Captures whether honesty and gentleness need to travel together for you.",
+          "tags": ["honesty", "communication", "affection"],
+          "popularity": 0.28
+        },
+        {
+          "id": "relationship_preferences_030",
+          "kind": "statement",
+          "title": "Emotional steadiness attracts me more than emotional chaos",
+          "description_short": "Shows whether calm feels compelling or dull to you.",
+          "tags": ["trust", "boundaries", "support"],
+          "popularity": 0.26
+        },
+        {
+          "id": "relationship_preferences_031",
+          "kind": "statement",
+          "title": "I like affection that shows up in everyday habits, not only big moments",
+          "description_short": "Reveals whether care feels most real when it is ordinary and repeated.",
+          "tags": ["affection", "quality-time", "support"],
+          "popularity": 0.24
+        },
+        {
+          "id": "relationship_preferences_032",
+          "kind": "statement",
+          "title": "I don't expect perfect agreement, but I do expect respect",
+          "description_short": "Captures whether difference feels manageable when tone stays clean.",
+          "tags": ["conflict", "honesty", "boundaries"],
+          "popularity": 0.22
+        },
+        {
+          "id": "relationship_preferences_033",
+          "kind": "statement",
+          "title": "I want both closeness and breathing room",
+          "description_short": "Shows whether intimacy and independence feel equally important to you.",
+          "tags": ["independence", "affection", "boundaries"],
+          "popularity": 0.2
+        },
+        {
+          "id": "relationship_preferences_034",
+          "kind": "statement",
+          "title": "I appreciate people who can name what they need without punishment",
+          "description_short": "Reveals whether emotional clarity feels safe and attractive to you.",
+          "tags": ["communication", "honesty", "boundaries"],
+          "popularity": 0.18
+        },
+        {
+          "id": "relationship_preferences_035",
+          "kind": "statement",
+          "title": "Trust grows faster for me when actions match words",
+          "description_short": "Captures whether consistency is the quickest route to closeness for you.",
+          "tags": ["trust", "honesty", "support"],
+          "popularity": 0.16
+        },
+        {
+          "id": "relationship_preferences_036",
+          "kind": "statement",
+          "title": "I want a relationship that feels like a team without losing individuality",
+          "description_short": "Shows whether partnership and autonomy both need visible room in your life.",
+          "tags": ["support", "independence", "growth"],
+          "popularity": 0.14
+        },
+        {
+          "id": "relationship_preferences_037",
+          "kind": "statement",
+          "title": "I care about how we disagree as much as how we get along",
+          "description_short": "Reveals whether process matters as much as compatibility for you.",
+          "tags": ["conflict", "communication", "trust"],
+          "popularity": 0.12
+        },
+        {
+          "id": "relationship_preferences_038",
+          "kind": "statement",
+          "title": "I'd rather build something steady than chase something dramatic",
+          "description_short": "Captures whether consistency feels more romantic than volatility.",
+          "tags": ["trust", "growth", "boundaries"],
+          "popularity": 0.1
+        },
+        {
+          "id": "relationship_preferences_039",
+          "kind": "statement",
+          "title": "I appreciate warmth, but I also need room to be honest",
+          "description_short": "Shows whether softness and truth have to coexist for you to stay open.",
+          "tags": ["affection", "honesty", "communication"],
+          "popularity": 0.08
+        },
+        {
+          "id": "relationship_preferences_040",
+          "kind": "statement",
+          "title": "A relationship feels strongest to me when both people feel free and committed",
+          "description_short": "Reveals whether security and choice are both part of your ideal bond.",
+          "tags": ["independence", "trust", "growth"],
+          "popularity": 0.06
+        }
+      ]
+    },
+    {
+      "id": "deck_values",
+      "title": "Values",
+      "description": "From honesty to ambition to compassion, this deck explores what feels non-negotiable in how you live.",
+      "category": "values",
+      "tier": "tier_1",
+      "sensitivity": "standard",
+      "compare_eligible": true,
+      "showdown_eligible": false,
+      "min_cards_for_profile": 15,
+      "min_cards_for_compare": 30,
+      "cover_tile_key": "values:cover",
+      "cards": [
+        {
+          "id": "values_001",
+          "kind": "statement",
+          "title": "Honesty matters more to me than being liked",
+          "description_short": "Shows whether truth feels worth social discomfort to you.",
+          "tags": ["honesty", "growth", "justice"],
+          "popularity": 0.82
+        },
+        {
+          "id": "values_002",
+          "kind": "statement",
+          "title": "Loyalty means a lot to me, especially when life gets messy",
+          "description_short": "Reveals whether steadiness under stress feels deeply important to you.",
+          "tags": ["loyalty", "compassion", "stability"],
+          "popularity": 0.8
+        },
+        {
+          "id": "values_003",
+          "kind": "statement",
+          "title": "I admire ambition when it's paired with kindness",
+          "description_short": "Captures whether drive needs softness to feel admirable to you.",
+          "tags": ["ambition", "growth", "compassion"],
+          "popularity": 0.78
+        },
+        {
+          "id": "values_004",
+          "kind": "statement",
+          "title": "Family can mean chosen people, not only relatives",
+          "description_short": "Shows how expansively you define belonging and loyalty.",
+          "tags": ["family", "freedom", "compassion"],
+          "popularity": 0.76
+        },
+        {
+          "id": "values_005",
+          "kind": "statement",
+          "title": "Freedom matters to me more than fitting into a script",
+          "description_short": "Reveals how strongly autonomy shapes your decisions.",
+          "tags": ["freedom", "progress", "growth"],
+          "popularity": 0.74
+        },
+        {
+          "id": "values_006",
+          "kind": "statement",
+          "title": "Creativity feels essential, not optional",
+          "description_short": "Shows whether making or imagining things feels central to your life.",
+          "tags": ["creativity", "growth", "freedom"],
+          "popularity": 0.72
+        },
+        {
+          "id": "values_007",
+          "kind": "statement",
+          "title": "Fairness is more important to me than convenience",
+          "description_short": "Captures whether principle should still matter when it is inconvenient.",
+          "tags": ["justice", "honesty", "progress"],
+          "popularity": 0.7
+        },
+        {
+          "id": "values_008",
+          "kind": "statement",
+          "title": "I believe people can change if they're willing to do the work",
+          "description_short": "Reveals whether you see growth as real, limited, or unlikely.",
+          "tags": ["growth", "compassion", "progress"],
+          "popularity": 0.68
+        },
+        {
+          "id": "values_009",
+          "kind": "statement",
+          "title": "Stability is underrated and deeply attractive to me",
+          "description_short": "Shows whether steadiness feels inspiring rather than boring to you.",
+          "tags": ["stability", "loyalty", "family"],
+          "popularity": 0.66
+        },
+        {
+          "id": "values_010",
+          "kind": "statement",
+          "title": "Compassion matters most when it's inconvenient",
+          "description_short": "Captures whether values only count when they cost something.",
+          "tags": ["compassion", "justice", "honesty"],
+          "popularity": 0.64
+        },
+        {
+          "id": "values_011",
+          "kind": "statement",
+          "title": "Some traditions are worth keeping if they still serve people",
+          "description_short": "Reveals whether tradition feels grounding, restrictive, or both.",
+          "tags": ["tradition", "family", "stability"],
+          "popularity": 0.62
+        },
+        {
+          "id": "values_012",
+          "kind": "statement",
+          "title": "Progress means little to me if it costs basic humanity",
+          "description_short": "Shows how you balance optimism with moral limits.",
+          "tags": ["progress", "compassion", "justice"],
+          "popularity": 0.6
+        },
+        {
+          "id": "values_013",
+          "kind": "statement",
+          "title": "I respect people who hold strong values without acting superior",
+          "description_short": "Captures whether humility matters as much as conviction to you.",
+          "tags": ["honesty", "compassion", "growth"],
+          "popularity": 0.58
+        },
+        {
+          "id": "values_014",
+          "kind": "statement",
+          "title": "I care more about integrity than image",
+          "description_short": "Reveals whether private character matters more than public impression.",
+          "tags": ["honesty", "loyalty", "stability"],
+          "popularity": 0.56
+        },
+        {
+          "id": "values_015",
+          "kind": "statement",
+          "title": "Ambition is healthiest when it leaves room for relationships",
+          "description_short": "Shows how you think success should relate to the rest of life.",
+          "tags": ["ambition", "family", "growth"],
+          "popularity": 0.54
+        },
+        {
+          "id": "values_016",
+          "kind": "statement",
+          "title": "I'd rather be around someone dependable than impressive",
+          "description_short": "Captures whether reliability feels more meaningful than charisma to you.",
+          "tags": ["stability", "loyalty", "compassion"],
+          "popularity": 0.52
+        },
+        {
+          "id": "values_017",
+          "kind": "statement",
+          "title": "Personal freedom matters, but so does responsibility",
+          "description_short": "Reveals whether freedom feels incomplete without accountability.",
+          "tags": ["freedom", "justice", "honesty"],
+          "popularity": 0.5
+        },
+        {
+          "id": "values_018",
+          "kind": "statement",
+          "title": "I pay attention to how people treat service workers and strangers",
+          "description_short": "Shows whether everyday fairness feels more revealing than grand statements.",
+          "tags": ["justice", "compassion", "honesty"],
+          "popularity": 0.48
+        },
+        {
+          "id": "values_019",
+          "kind": "statement",
+          "title": "I'm drawn to people who can admit when they were wrong",
+          "description_short": "Captures whether humility is part of what earns your respect.",
+          "tags": ["honesty", "growth", "progress"],
+          "popularity": 0.46
+        },
+        {
+          "id": "values_020",
+          "kind": "statement",
+          "title": "Kindness tells me more about a person than charm does",
+          "description_short": "Reveals whether warmth feels more trustworthy than polish for you.",
+          "tags": ["compassion", "honesty", "loyalty"],
+          "popularity": 0.44
+        },
+        {
+          "id": "values_021",
+          "kind": "statement",
+          "title": "I feel best when my values show up in small daily choices",
+          "description_short": "Shows whether principles feel most real in ordinary life for you.",
+          "tags": ["growth", "stability", "honesty"],
+          "popularity": 0.42
+        },
+        {
+          "id": "values_022",
+          "kind": "statement",
+          "title": "I think boundaries can be a form of compassion",
+          "description_short": "Captures whether protection and care feel compatible to you.",
+          "tags": ["freedom", "compassion", "stability"],
+          "popularity": 0.4
+        },
+        {
+          "id": "values_023",
+          "kind": "statement",
+          "title": "I'm skeptical of ambition that requires constant self-abandonment",
+          "description_short": "Reveals whether success should still leave room for a whole life.",
+          "tags": ["ambition", "freedom", "stability"],
+          "popularity": 0.38
+        },
+        {
+          "id": "values_024",
+          "kind": "statement",
+          "title": "I value people who can stay soft without becoming passive",
+          "description_short": "Shows whether tenderness and strength need to coexist for you.",
+          "tags": ["compassion", "justice", "growth"],
+          "popularity": 0.36
+        },
+        {
+          "id": "values_025",
+          "kind": "statement",
+          "title": "Tradition feels meaningful when it creates belonging, not pressure",
+          "description_short": "Captures what makes inherited rituals feel alive instead of heavy.",
+          "tags": ["tradition", "family", "compassion"],
+          "popularity": 0.34
+        },
+        {
+          "id": "values_026",
+          "kind": "statement",
+          "title": "Progress should make ordinary life better, not just louder",
+          "description_short": "Reveals whether your politics of improvement are practical, symbolic, or both.",
+          "tags": ["progress", "justice", "stability"],
+          "popularity": 0.32
+        },
+        {
+          "id": "values_027",
+          "kind": "statement",
+          "title": "I care about whether someone is fair when nobody is watching",
+          "description_short": "Shows whether quiet integrity matters more than declared principle to you.",
+          "tags": ["justice", "honesty", "loyalty"],
+          "popularity": 0.3
+        },
+        {
+          "id": "values_028",
+          "kind": "statement",
+          "title": "Creativity is one of the ways I understand who I am",
+          "description_short": "Captures whether expression feels like identity rather than decoration.",
+          "tags": ["creativity", "growth", "freedom"],
+          "popularity": 0.28
+        },
+        {
+          "id": "values_029",
+          "kind": "statement",
+          "title": "I value steadiness more as I get older",
+          "description_short": "Reveals whether your priorities are moving toward calm or staying open-ended.",
+          "tags": ["stability", "growth", "compassion"],
+          "popularity": 0.26
+        },
+        {
+          "id": "values_030",
+          "kind": "statement",
+          "title": "Loyalty without honesty isn't enough for me",
+          "description_short": "Shows whether allegiance still needs truth to feel real to you.",
+          "tags": ["loyalty", "honesty", "compassion"],
+          "popularity": 0.24
+        },
+        {
+          "id": "values_031",
+          "kind": "statement",
+          "title": "People reveal their values through what they protect",
+          "description_short": "Captures whether attention, resources, and defense say more than language to you.",
+          "tags": ["family", "justice", "honesty"],
+          "popularity": 0.22
+        },
+        {
+          "id": "values_032",
+          "kind": "statement",
+          "title": "I don't need everyone to agree with me, but I do need respect",
+          "description_short": "Reveals how much difference you can tolerate when the tone stays clean.",
+          "tags": ["honesty", "compassion", "freedom"],
+          "popularity": 0.2
+        },
+        {
+          "id": "values_033",
+          "kind": "statement",
+          "title": "I trust slow growth more than dramatic reinvention",
+          "description_short": "Shows whether your faith sits more with steady effort than huge pivots.",
+          "tags": ["growth", "stability", "progress"],
+          "popularity": 0.18
+        },
+        {
+          "id": "values_034",
+          "kind": "statement",
+          "title": "Mercy and accountability can exist together",
+          "description_short": "Captures whether your moral world leaves room for nuance under pressure.",
+          "tags": ["justice", "compassion", "honesty"],
+          "popularity": 0.16
+        },
+        {
+          "id": "values_035",
+          "kind": "statement",
+          "title": "I admire people who can be ambitious without becoming rigid",
+          "description_short": "Shows whether adaptability matters inside excellence for you.",
+          "tags": ["ambition", "growth", "creativity"],
+          "popularity": 0.14
+        },
+        {
+          "id": "values_036",
+          "kind": "statement",
+          "title": "Security matters to me, but I never want it to become fear",
+          "description_short": "Reveals how you think about safety without shrinking your life.",
+          "tags": ["stability", "freedom", "progress"],
+          "popularity": 0.12
+        },
+        {
+          "id": "values_037",
+          "kind": "statement",
+          "title": "Family loyalty shouldn't excuse harmful behavior",
+          "description_short": "Captures whether closeness ever outweighs accountability for you.",
+          "tags": ["family", "justice", "honesty"],
+          "popularity": 0.1
+        },
+        {
+          "id": "values_038",
+          "kind": "statement",
+          "title": "I like values that make life feel bigger, not smaller",
+          "description_short": "Shows whether your principles expand possibility or mainly create limits.",
+          "tags": ["freedom", "creativity", "progress"],
+          "popularity": 0.08
+        },
+        {
+          "id": "values_039",
+          "kind": "statement",
+          "title": "Compassion without boundaries turns into resentment",
+          "description_short": "Reveals whether you believe care needs shape to stay healthy.",
+          "tags": ["compassion", "freedom", "stability"],
+          "popularity": 0.06
+        },
+        {
+          "id": "values_040",
+          "kind": "statement",
+          "title": "The people I trust most are consistent in public and private",
+          "description_short": "Shows whether coherence matters more than charm in your moral read of people.",
+          "tags": ["honesty", "loyalty", "stability"],
+          "popularity": 0.04
+        }
+      ]
+    },
+    {
+      "id": "deck_communication_style",
+      "title": "Communication Style",
+      "description": "This deck explores how you listen, process, clarify, and say what you mean.",
+      "category": "communication_style",
+      "tier": "tier_1",
+      "sensitivity": "standard",
+      "compare_eligible": true,
+      "showdown_eligible": true,
+      "min_cards_for_profile": 15,
+      "min_cards_for_compare": 30,
+      "cover_tile_key": "communication_style:cover",
+      "cards": [
+        {
+          "id": "communication_style_001",
+          "kind": "entity",
+          "title": "Voice notes",
+          "description_short": "A communication mode that sits somewhere between texting and calling.",
+          "tags": ["texting", "calling", "listening"],
+          "popularity": 0.82
+        },
+        {
+          "id": "communication_style_002",
+          "kind": "entity",
+          "title": "Long walks for serious talks",
+          "description_short": "A setting where movement can make vulnerability feel more possible.",
+          "tags": ["face-to-face", "vulnerability", "processing"],
+          "popularity": 0.78
+        },
+        {
+          "id": "communication_style_003",
+          "kind": "statement",
+          "title": "I prefer texting for everyday check-ins",
+          "description_short": "Shows whether low-pressure written contact feels most natural to you.",
+          "tags": ["texting", "direct", "listening"],
+          "popularity": 0.8
+        },
+        {
+          "id": "communication_style_004",
+          "kind": "statement",
+          "title": "If something matters, I'd rather talk face to face",
+          "description_short": "Reveals whether depth requires presence for you.",
+          "tags": ["face-to-face", "listening", "direct"],
+          "popularity": 0.78
+        },
+        {
+          "id": "communication_style_005",
+          "kind": "statement",
+          "title": "I need time to process before I respond in a hard conversation",
+          "description_short": "Captures whether speed makes you clearer or less honest.",
+          "tags": ["processing", "vulnerability", "listening"],
+          "popularity": 0.76
+        },
+        {
+          "id": "communication_style_006",
+          "kind": "statement",
+          "title": "I say what I mean pretty directly",
+          "description_short": "Shows whether clarity and bluntness are close neighbors for you or not.",
+          "tags": ["direct", "assertive", "debate"],
+          "popularity": 0.74
+        },
+        {
+          "id": "communication_style_007",
+          "kind": "statement",
+          "title": "I appreciate people who ask clarifying questions instead of guessing",
+          "description_short": "Reveals whether curiosity feels more loving than assumption to you.",
+          "tags": ["listening", "empathy", "vulnerability"],
+          "popularity": 0.72
+        },
+        {
+          "id": "communication_style_008",
+          "kind": "statement",
+          "title": "Tone matters to me almost as much as content",
+          "description_short": "Shows whether delivery changes the entire meaning of what gets said for you.",
+          "tags": ["empathy", "listening", "direct"],
+          "popularity": 0.7
+        },
+        {
+          "id": "communication_style_009",
+          "kind": "statement",
+          "title": "I'm usually more thoughtful in writing than in the moment",
+          "description_short": "Captures whether distance helps your real thoughts come into focus.",
+          "tags": ["texting", "processing", "vulnerability"],
+          "popularity": 0.68
+        },
+        {
+          "id": "communication_style_010",
+          "kind": "statement",
+          "title": "I'd rather address tension early than let it simmer",
+          "description_short": "Reveals whether discomfort feels better to face now or later.",
+          "tags": ["assertive", "direct", "debate"],
+          "popularity": 0.66
+        },
+        {
+          "id": "communication_style_011",
+          "kind": "statement",
+          "title": "I listen for what someone means, not only what they say",
+          "description_short": "Shows whether subtext feels as important as the words themselves.",
+          "tags": ["listening", "empathy", "processing"],
+          "popularity": 0.64
+        },
+        {
+          "id": "communication_style_012",
+          "kind": "statement",
+          "title": "I can go quiet when I'm overwhelmed, even if I still care",
+          "description_short": "Captures whether retreat is about indifference or overload for you.",
+          "tags": ["processing", "passive", "vulnerability"],
+          "popularity": 0.62
+        },
+        {
+          "id": "communication_style_013",
+          "kind": "statement",
+          "title": "I value people who can be direct without being harsh",
+          "description_short": "Reveals whether honesty and gentleness need to coexist for you.",
+          "tags": ["direct", "empathy", "assertive"],
+          "popularity": 0.6
+        },
+        {
+          "id": "communication_style_014",
+          "kind": "statement",
+          "title": "I don't love phone calls without warning",
+          "description_short": "Shows whether surprise access feels intimate or intrusive to you.",
+          "tags": ["calling", "processing", "vulnerability"],
+          "popularity": 0.58
+        },
+        {
+          "id": "communication_style_015",
+          "kind": "statement",
+          "title": "I usually know when a conversation needs softness instead of solutions",
+          "description_short": "Captures whether emotional timing comes naturally to you.",
+          "tags": ["empathy", "listening", "vulnerability"],
+          "popularity": 0.56
+        },
+        {
+          "id": "communication_style_016",
+          "kind": "statement",
+          "title": "I want hard conversations to feel collaborative, not adversarial",
+          "description_short": "Reveals whether disagreement feels safest when it still feels like a team effort.",
+          "tags": ["debate", "empathy", "listening"],
+          "popularity": 0.54
+        },
+        {
+          "id": "communication_style_017",
+          "kind": "statement",
+          "title": "I communicate best when I feel like there's enough time to think",
+          "description_short": "Shows whether pace changes your clarity and honesty.",
+          "tags": ["processing", "face-to-face", "listening"],
+          "popularity": 0.52
+        },
+        {
+          "id": "communication_style_018",
+          "kind": "statement",
+          "title": "I don't mind disagreement if the respect stays intact",
+          "description_short": "Captures whether conflict feels energizing, neutral, or draining to you.",
+          "tags": ["debate", "assertive", "empathy"],
+          "popularity": 0.5
+        },
+        {
+          "id": "communication_style_019",
+          "kind": "statement",
+          "title": "I can be very candid once I feel safe",
+          "description_short": "Shows whether trust changes how direct you allow yourself to be.",
+          "tags": ["vulnerability", "direct", "listening"],
+          "popularity": 0.48
+        },
+        {
+          "id": "communication_style_020",
+          "kind": "statement",
+          "title": "I notice quickly when someone is only waiting for their turn to speak",
+          "description_short": "Reveals how sensitive you are to the difference between hearing and listening.",
+          "tags": ["listening", "empathy", "passive"],
+          "popularity": 0.46
+        },
+        {
+          "id": "communication_style_021",
+          "kind": "statement",
+          "title": "I prefer one honest conversation over a week of weird energy",
+          "description_short": "Captures whether ambiguity feels manageable or exhausting to you.",
+          "tags": ["direct", "assertive", "vulnerability"],
+          "popularity": 0.44
+        },
+        {
+          "id": "communication_style_022",
+          "kind": "statement",
+          "title": "I like when someone can summarize what they heard before reacting",
+          "description_short": "Shows whether feeling understood is a core part of feeling safe for you.",
+          "tags": ["listening", "empathy", "face-to-face"],
+          "popularity": 0.42
+        },
+        {
+          "id": "communication_style_023",
+          "kind": "statement",
+          "title": "I soften my message when I'm worried my honesty will land badly",
+          "description_short": "Reveals whether care changes how directly you speak.",
+          "tags": ["indirect", "empathy", "passive"],
+          "popularity": 0.4
+        },
+        {
+          "id": "communication_style_024",
+          "kind": "statement",
+          "title": "I appreciate direct questions more than vague fishing",
+          "description_short": "Captures whether explicitness feels more respectful than subtle probing for you.",
+          "tags": ["direct", "assertive", "processing"],
+          "popularity": 0.38
+        },
+        {
+          "id": "communication_style_025",
+          "kind": "statement",
+          "title": "I need room to change my mind mid-conversation",
+          "description_short": "Shows whether you think aloud or arrive with a finished answer.",
+          "tags": ["processing", "vulnerability", "listening"],
+          "popularity": 0.36
+        },
+        {
+          "id": "communication_style_026",
+          "kind": "statement",
+          "title": "If a topic is emotional, I want less performance and more honesty",
+          "description_short": "Reveals whether sincerity matters more than perfect wording for you.",
+          "tags": ["vulnerability", "empathy", "face-to-face"],
+          "popularity": 0.34
+        },
+        {
+          "id": "communication_style_027",
+          "kind": "statement",
+          "title": "I'm comfortable saying, 'I need a minute to think'",
+          "description_short": "Shows whether you can name your process in real time.",
+          "tags": ["processing", "assertive", "vulnerability"],
+          "popularity": 0.32
+        },
+        {
+          "id": "communication_style_028",
+          "kind": "statement",
+          "title": "I care about whether someone can receive feedback without immediately debating it",
+          "description_short": "Captures how important receptivity feels to you in hard conversations.",
+          "tags": ["listening", "debate", "empathy"],
+          "popularity": 0.3
+        },
+        {
+          "id": "communication_style_029",
+          "kind": "statement",
+          "title": "I like people who can be playful and sincere in the same conversation",
+          "description_short": "Reveals whether range feels like safety and chemistry to you.",
+          "tags": ["vulnerability", "empathy", "direct"],
+          "popularity": 0.28
+        },
+        {
+          "id": "communication_style_030",
+          "kind": "statement",
+          "title": "I prefer a calm text over a dramatic paragraph",
+          "description_short": "Shows whether regulation matters more than volume in written conflict for you.",
+          "tags": ["texting", "processing", "empathy"],
+          "popularity": 0.26
+        },
+        {
+          "id": "communication_style_031",
+          "kind": "statement",
+          "title": "I'm more open when someone makes it clear they're trying to understand",
+          "description_short": "Captures how much intention changes your willingness to share.",
+          "tags": ["listening", "empathy", "vulnerability"],
+          "popularity": 0.24
+        },
+        {
+          "id": "communication_style_032",
+          "kind": "statement",
+          "title": "I don't need perfect wording; I need real intent",
+          "description_short": "Reveals whether sincerity outranks polish for you.",
+          "tags": ["direct", "vulnerability", "listening"],
+          "popularity": 0.22
+        },
+        {
+          "id": "communication_style_033",
+          "kind": "statement",
+          "title": "I can be indirect when I'm unsure how my honesty will land",
+          "description_short": "Shows whether caution or clarity wins when the stakes feel high.",
+          "tags": ["indirect", "processing", "vulnerability"],
+          "popularity": 0.2
+        },
+        {
+          "id": "communication_style_034",
+          "kind": "statement",
+          "title": "I appreciate people who can ask for reassurance clearly",
+          "description_short": "Captures whether emotional needs feel easier to meet when they are named plainly.",
+          "tags": ["vulnerability", "assertive", "empathy"],
+          "popularity": 0.18
+        },
+        {
+          "id": "communication_style_035",
+          "kind": "statement",
+          "title": "I notice subtext, but I don't want to rely on it",
+          "description_short": "Shows whether you want clarity even when you can read between the lines.",
+          "tags": ["listening", "processing", "empathy"],
+          "popularity": 0.16
+        },
+        {
+          "id": "communication_style_036",
+          "kind": "statement",
+          "title": "I feel closer to people who can stay curious in disagreement",
+          "description_short": "Reveals whether curiosity changes how safe conflict feels to you.",
+          "tags": ["debate", "empathy", "listening"],
+          "popularity": 0.14
+        },
+        {
+          "id": "communication_style_037",
+          "kind": "statement",
+          "title": "I'd rather repair a misunderstanding than pretend it didn't happen",
+          "description_short": "Shows whether closure matters enough for you to re-open discomfort.",
+          "tags": ["direct", "face-to-face", "assertive"],
+          "popularity": 0.12
+        },
+        {
+          "id": "communication_style_038",
+          "kind": "statement",
+          "title": "I need communication that feels grounded, not frantic",
+          "description_short": "Captures whether regulation changes how much you can hear and say.",
+          "tags": ["processing", "empathy", "direct"],
+          "popularity": 0.1
+        },
+        {
+          "id": "communication_style_039",
+          "kind": "statement",
+          "title": "I respect people who can be both assertive and tender",
+          "description_short": "Reveals whether strength feels best when it stays connected to care for you.",
+          "tags": ["assertive", "empathy", "vulnerability"],
+          "popularity": 0.08
+        },
+        {
+          "id": "communication_style_040",
+          "kind": "statement",
+          "title": "The best conversations for me feel honest, attentive, and unforced",
+          "description_short": "Shows whether ease and depth need to arrive together for a conversation to feel good.",
+          "tags": ["listening", "vulnerability", "direct"],
+          "popularity": 0.06
+        }
+      ]
+    }
+  ]
+}

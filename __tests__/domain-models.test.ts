@@ -1,6 +1,8 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
 import {
+  asDeckCardId,
+  asDeckId,
   asEntityId,
   asSessionId,
   asSnapshotId,
@@ -9,9 +11,13 @@ import {
   rowToCatalogEntity,
   rowToProfileSnapshot,
   rowToSwipeEvent,
+  rowToSwipeSession,
+  swipeEventToRow,
+  swipeSessionToRow,
   type CatalogEntity,
   type CatalogEntityRow,
   type SwipeEventRow,
+  type SwipeSessionRow,
 } from '@/types/domain';
 import {
   getCatalogEntityById,
@@ -105,7 +111,8 @@ describe('domain row/domain models and mappers', () => {
     const invalidEventRow: SwipeEventRow = {
       id: 'event_1',
       session_id: 'session_1',
-      entity_id: 'entity_1',
+      deck_id: 'deck_1',
+      card_id: 'card_1',
       action: 'hard_yes',
       strength: 2,
       created_at: 1700000001000,
@@ -114,6 +121,35 @@ describe('domain row/domain models and mappers', () => {
     expect(() => rowToSwipeEvent(invalidEventRow)).toThrow(
       'Invalid swipe action: hard_yes',
     );
+  });
+
+  it('roundtrips swipe session and swipe event rows through deck-scoped mappers', () => {
+    const sessionRow: SwipeSessionRow = {
+      id: 'session_1',
+      deck_id: 'deck_values',
+      started_at: 1700000001000,
+      ended_at: null,
+      filters_json: '{"category":"values"}',
+    };
+    const session = rowToSwipeSession(sessionRow);
+
+    expect(session.deckId).toBe(asDeckId('deck_values'));
+    expect(swipeSessionToRow(session)).toEqual(sessionRow);
+
+    const eventRow: SwipeEventRow = {
+      id: 'event_1',
+      session_id: 'session_1',
+      deck_id: 'deck_values',
+      card_id: 'values_001',
+      action: 'strong_yes',
+      strength: 2,
+      created_at: 1700000002000,
+    };
+    const event = rowToSwipeEvent(eventRow);
+
+    expect(event.deckId).toBe(asDeckId('deck_values'));
+    expect(event.cardId).toBe(asDeckCardId('values_001'));
+    expect(swipeEventToRow(event)).toEqual(eventRow);
   });
 
   it('parses profile snapshot JSON with safe fallbacks', () => {
@@ -164,6 +200,8 @@ describe('catalog DB boundary uses row/domain mappers', () => {
 describe('id branding helpers', () => {
   it('creates branded IDs without runtime overhead', () => {
     expect(asEntityId('entity_2')).toBe('entity_2');
+    expect(asDeckId('deck_2')).toBe('deck_2');
+    expect(asDeckCardId('card_2')).toBe('card_2');
     expect(asSessionId('session_2')).toBe('session_2');
     expect(asSwipeEventId('event_2')).toBe('event_2');
     expect(asSnapshotId('snapshot_2')).toBe('snapshot_2');

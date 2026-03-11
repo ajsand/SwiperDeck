@@ -93,9 +93,9 @@ export default function RootLayout() {
 function DbInitializationLoading() {
   return (
     <View style={styles.initContainer}>
-      <Text style={styles.title}>Preparing local database...</Text>
+      <Text style={styles.title}>Preparing your decks...</Text>
       <Text style={styles.subtitle}>
-        TasteDeck is running startup migrations.
+        DateDeck is setting up your local data.
       </Text>
     </View>
   );
@@ -121,6 +121,18 @@ function RootLayoutNav() {
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="deck/[deckId]"
+            options={{ title: 'Deck Detail', headerShown: true }}
+          />
+          <Stack.Screen
+            name="deck/[deckId]/play"
+            options={{ headerShown: false, gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="deck/[deckId]/profile"
+            options={{ title: 'Deck Profile' }}
+          />
           <Stack.Screen name="details/[id]" options={{ title: 'Details' }} />
           <Stack.Screen
             name="modal"

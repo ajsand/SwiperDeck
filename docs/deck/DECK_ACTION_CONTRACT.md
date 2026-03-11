@@ -1,5 +1,14 @@
 # Deck Action Callback Contract (Frozen for Iteration 09)
 
+> **Fork context (DateDeck):**
+> This contract was originally written for the TasteDeck backlog where Iteration 09 was "Persist swipe sessions and swipe events." In the DateDeck fork, the iteration numbering shifted:
+>
+> - Fork Iteration 09 = Reframe product shell (this does not touch the action contract)
+> - Fork Iteration 11 = Standardize the universal action model (`love` -> `strong_yes`; `respect` and `curious` removed)
+> - Fork Iteration 14 = Refactor swipe/session logic to deck scope (persistence wiring)
+>
+> The contract's callback signatures, payload shapes, dispatch semantics, and statelessness invariants remain valid and frozen. Iteration 11 changes only the emitted literal values, not the callback shapes. Iteration 14 changes the persistence target from broad catalog entities to deck-scoped cards and sessions.
+
 > Defines the stable interface between the Deck UI (Iteration 08) and the persistence layer (Iteration 09).
 > Iteration 09 must wire persistence to this contract without modifying Deck components.
 
@@ -26,15 +35,15 @@ Both gesture and button paths invoke the same `DeckActionHandler`. The `meta` ob
 
 Only the 5 core actions are emitted:
 
-| Value     | Source(s)                      | Notes                    |
-| --------- | ------------------------------ | ------------------------ |
-| `hard_no` | Gesture (strong left), Button  |                          |
-| `no`      | Gesture (normal left), Button  |                          |
-| `skip`    | Button ONLY                    | Never emitted by gesture |
-| `yes`     | Gesture (normal right), Button |                          |
-| `love`    | Gesture (strong right), Button |                          |
+| Value        | Source(s)                      | Notes                    |
+| ------------ | ------------------------------ | ------------------------ |
+| `hard_no`    | Gesture (strong left), Button  |                          |
+| `no`         | Gesture (normal left), Button  |                          |
+| `skip`       | Button ONLY                    | Never emitted by gesture |
+| `yes`        | Gesture (normal right), Button |                          |
+| `strong_yes` | Gesture (strong right), Button |                          |
 
-All values are from `CoreSwipeAction` (`types/domain/actions.ts`). Phase 2 actions (`respect`, `curious`) are not wired in v1.
+All values are from `CoreSwipeAction` (`types/domain/actions.ts`). Legacy TasteDeck values `love`, `respect`, and `curious` are not part of the DateDeck fork's canonical action model.
 
 ## 3) Payload Shape Parity
 
@@ -81,7 +90,7 @@ The Deck screen is responsible for unlocking after the next card is loaded.
 
 | Component              | Reads DB? | Writes DB? | Manages sessions? |
 | ---------------------- | --------- | ---------- | ----------------- |
-| `DeckCard`             | No        | No         | No                |
+| `SwipeCard`            | No        | No         | No                |
 | `DeckActionBar`        | No        | No         | No                |
 | `DeckActionButton`     | No        | No         | No                |
 | `DeckStatePlaceholder` | No        | No         | No                |
@@ -108,7 +117,7 @@ function resolveDeckSwipeAction(input: {
 
 Returns `null` for cancelled/ambiguous gestures. Returns a resolved action for committed swipes. This function is pure (no side effects) and tested with deterministic fixtures.
 
-`GestureSwipeAction` = `'hard_no' | 'no' | 'yes' | 'love'` (excludes `skip`).
+`GestureSwipeAction` = `'hard_no' | 'no' | 'yes' | 'strong_yes'` (excludes `skip`).
 
 **Code location:** `hooks/useDeckGestures.ts`
 
@@ -119,24 +128,30 @@ Iteration 09 will create a hook or service that:
 1. **Creates a swipe session** when the Deck screen mounts (or first card appears).
 2. **Receives the callback** from `DeckSurface.onAction`.
 3. **On each action:**
-   - Creates a `swipe_events` row with `session_id`, `entity_id`, `action`, `strength` (from `actionToDbStrength`), `created_at`.
-   - The `entity_id` comes from the current `CatalogEntity.id` that the Deck screen passes to `DeckSurface`.
+   - Creates a `swipe_events` row with `session_id`, `deck_id`, `card_id`, `action`, `strength` (from `actionToDbStrength`), `created_at`.
+   - The `card_id` comes from the current `DeckCard.id` loaded from `deck_cards`.
+   - The `deck_id` comes from the active deck-scoped swipe session.
 4. **Advances to the next card** after persisting (unlock the interaction lock).
 
 The Deck screen's responsibility:
 
 ```typescript
 const handleAction: DeckActionHandler = (action, meta) => {
-  // Iteration 09 wires this:
-  persistSwipeEvent(currentSession.id, currentEntity.id, action);
+  // Iteration 14 wires this to the deck-scoped persistence layer:
+  persistSwipeEvent(
+    currentSession.id,
+    currentSession.deckId,
+    currentCard.id,
+    action,
+  );
   advanceToNextCard();
 };
 ```
 
 ### Invariants for persistence wiring
 
-- Only emit when `entity` is non-null (the `DeckSurface` should not render the action bar or enable gestures when `state !== 'ready'`).
-- The `action` value is always a valid `CoreSwipeAction` — no parsing needed at the persistence boundary.
+- Only emit when the current card is non-null (the swipe surface should not render the action bar or enable gestures when `state !== 'ready'`).
+- The `action` value is always a valid `CoreSwipeAction` - no parsing needed at the persistence boundary.
 - `actionToDbStrength(action)` from `types/domain/actions.ts` provides the INTEGER weight for the `strength` column.
 
 ## 8) Test Coverage Summary

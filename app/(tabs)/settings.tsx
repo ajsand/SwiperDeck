@@ -12,7 +12,7 @@ export default function SettingsScreen() {
         darkColor="rgba(255,255,255,0.1)"
       />
       <Text style={styles.subtitle}>
-        Export data, clear history, and manage preferences.
+        Manage your data, privacy, and preferences.
       </Text>
     </View>
   );

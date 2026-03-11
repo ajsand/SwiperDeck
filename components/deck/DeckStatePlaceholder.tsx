@@ -36,7 +36,7 @@ function DeckStatePlaceholderImpl({
       >
         <ActivityIndicator size="large" color="#FFFFFF" />
         <Text style={styles.title}>Loading cards...</Text>
-        <Text style={styles.message}>Preparing your next swipe choices.</Text>
+        <Text style={styles.message}>Loading your next card.</Text>
       </View>
     );
   }
@@ -47,12 +47,12 @@ function DeckStatePlaceholderImpl({
         testID="deck-placeholder-empty"
         accessible
         accessibilityRole="text"
-        accessibilityLabel="No cards found. Try adjusting filters or broadening types."
+        accessibilityLabel="No cards in this deck. Try adjusting filters or choosing a different deck."
         style={styles.container}
       >
-        <Text style={styles.title}>No cards found</Text>
+        <Text style={styles.title}>No cards in this deck</Text>
         <Text style={styles.message}>
-          Try adjusting filters or broadening media types.
+          Try adjusting filters or choosing a different deck.
         </Text>
         {onOpenFilters ? (
           <Pressable
@@ -83,7 +83,8 @@ function DeckStatePlaceholderImpl({
     >
       <Text style={styles.title}>Unable to load cards</Text>
       <Text style={styles.message}>
-        {errorMessage?.trim() || 'A recoverable error occurred while loading Deck.'}
+        {errorMessage?.trim() ||
+          'A recoverable error occurred while loading this deck.'}
       </Text>
       <Pressable
         testID="deck-placeholder-retry"

@@ -12,7 +12,7 @@ export default function FilterModalScreen() {
         darkColor="rgba(255,255,255,0.1)"
       />
       <Text style={styles.subtitle}>
-        Filter controls land here in Iteration 16.
+        Deck filtering controls will be added in a future iteration.
       </Text>
     </View>
   );

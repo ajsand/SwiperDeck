@@ -4,7 +4,7 @@ exports[`DeckStatePlaceholder keeps placeholder state matrix stable 1`] = `
 {
   "empty": {
     "hasRoot": true,
-    "title": "No cards found",
+    "title": "No cards in this deck",
   },
   "error": {
     "hasRoot": true,

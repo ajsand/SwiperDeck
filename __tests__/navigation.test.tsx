@@ -7,10 +7,15 @@ import LibraryScreen from '../app/(tabs)/library';
 import SettingsScreen from '../app/(tabs)/settings';
 import DetailScreen from '../app/details/[id]';
 import ModalScreen from '../app/modal';
+import { asDeckId, type Deck } from '@/types/domain';
+
+const mockPush = jest.fn();
+const mockUseDecks = jest.fn();
 
 jest.mock('expo-router', () => ({
   Link: ({ children }: { children: React.ReactNode }) => children,
   useLocalSearchParams: () => ({ id: 'test-id' }),
+  useRouter: () => ({ push: mockPush }),
 }));
 
 jest.mock('expo-status-bar', () => ({
@@ -88,21 +93,57 @@ jest.mock('../components/useColorScheme', () => ({
   useColorScheme: () => 'light',
 }));
 
+jest.mock('@/hooks/useDecks', () => ({
+  useDecks: () => mockUseDecks(),
+}));
+
+function buildDeck(overrides: Partial<Deck> = {}): Deck {
+  return {
+    id: asDeckId('deck_movies'),
+    title: 'Movies & TV',
+    description: 'Talk about films, comfort rewatches, and shared favorites.',
+    category: 'movies_tv',
+    tier: 'tier_1',
+    cardCount: 18,
+    compareEligible: true,
+    showdownEligible: true,
+    sensitivity: 'standard',
+    minCardsForProfile: 15,
+    minCardsForCompare: 30,
+    isCustom: false,
+    coverTileKey: null,
+    createdAt: 1700000000000,
+    updatedAt: 1700000001000,
+    ...overrides,
+  };
+}
+
 describe('Tab screens render without crash', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders Deck screen', () => {
+    mockUseDecks.mockReturnValue({
+      decks: [buildDeck()],
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
     render(<DeckScreen />);
-    expect(screen.getByText('Deck')).toBeTruthy();
-    expect(screen.getByText('Swipe to teach your taste.')).toBeTruthy();
+    expect(screen.getByText('Decks')).toBeTruthy();
+    expect(screen.getByText('Choose a deck to explore.')).toBeTruthy();
   });
 
   it('renders Profile screen', () => {
     render(<ProfileScreen />);
-    expect(screen.getByText('Taste Profile')).toBeTruthy();
+    expect(screen.getByText('Deck Profiles')).toBeTruthy();
   });
 
   it('renders Library screen', () => {
     render(<LibraryScreen />);
-    expect(screen.getByText('Library')).toBeTruthy();
+    expect(screen.getByText('History')).toBeTruthy();
   });
 
   it('renders Settings screen', () => {
@@ -114,7 +155,7 @@ describe('Tab screens render without crash', () => {
 describe('Detail and modal screens render without crash', () => {
   it('renders Detail screen with id param', () => {
     render(<DetailScreen />);
-    expect(screen.getByText('Entity Detail')).toBeTruthy();
+    expect(screen.getByText('Card Detail')).toBeTruthy();
     expect(screen.getByText('ID: test-id')).toBeTruthy();
   });
 

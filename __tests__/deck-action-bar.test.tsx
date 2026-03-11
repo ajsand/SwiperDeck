@@ -15,7 +15,13 @@ jest.mock('@expo/vector-icons/Ionicons', () => {
   return MockIonicons;
 });
 
-const EXPECTED_ACTIONS: CoreSwipeAction[] = ['hard_no', 'no', 'skip', 'yes', 'love'];
+const EXPECTED_ACTIONS: CoreSwipeAction[] = [
+  'hard_no',
+  'no',
+  'skip',
+  'yes',
+  'strong_yes',
+];
 
 describe('DeckActionBar', () => {
   it('renders all five core action buttons and dispatches button metadata', () => {
@@ -33,7 +39,7 @@ describe('DeckActionBar', () => {
       ['no', { source: 'button' }],
       ['skip', { source: 'button' }],
       ['yes', { source: 'button' }],
-      ['love', { source: 'button' }],
+      ['strong_yes', { source: 'button' }],
     ]);
   });
 

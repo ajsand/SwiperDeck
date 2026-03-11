@@ -1,70 +1,49 @@
-# Multi-Model Workflow - TasteDeck
+# Multi-Model Workflow - DateDeck Fork
 
-> Last updated: 2026-02-20
-> Applies to: Iterations 01-26
+> Last updated: 2026-03-09
+> Applies to: Fork Iterations 09-25
 
 ## Purpose
 
-Define how Claude, Codex, and Gemini are used in Cursor when executing TasteDeck iteration tasks.
+Define how Claude Opus 4.6 and GPT-5.4 are used in Cursor when executing DateDeck fork iterations.
 
-This workflow assumes models do not collaborate live; use model selection up front, and run parallel prompts only when uncertainty is high.
+This workflow follows `CLAUDE.md` Section 16. Models do not share live context; choose the right model for each stage, then hand off intentionally.
 
 ## Model Roles
 
-| Model           | Primary Role                                 | Secondary Role                                  |
-| --------------- | -------------------------------------------- | ----------------------------------------------- |
-| Claude Opus 4.6 | Orchestrate, decompose, review, enforce spec | Design memos and risk analysis                  |
-| GPT-5.3 Codex   | Primary implementation and refactors         | Debugging, tests, migrations                    |
-| Gemini 3.1      | Spatial/layout/navigation reasoning          | UI behavior diagnosis and chart layout guidance |
+| Model           | Primary Role                                                   | Secondary Role                           |
+| --------------- | -------------------------------------------------------------- | ---------------------------------------- |
+| Claude Opus 4.6 | Creative thinking, architecture reasoning, planning, review    | Spec refinement, risk analysis, docs     |
+| GPT-5.4         | Implementation, refactors, migrations, UI coding, tests, fixes | Integration work and validation followup |
 
-## Model Selection Rubric (0-3)
+## Selection Guidance
 
-Score each attribute by model, sum totals, pick highest score.
+Use Claude Opus 4.6 for:
 
-Tie-breakers:
+- iteration planning and decomposition
+- architecture tradeoffs
+- spec refinement
+- risk analysis
+- review for product drift
+- documentation generation
 
-- If implementation heavy -> Codex.
-- If architecture/tradeoff heavy -> Claude.
-- If navigation/layout/gesture heavy -> Gemini.
+Use GPT-5.4 for:
 
-| Task Attribute            | Claude | Codex | Gemini |
-| ------------------------- | -----: | ----: | -----: |
-| Implementation complexity |      1 |     3 |      1 |
-| Refactor risk             |      2 |     3 |      1 |
-| Spatial/layout/navigation |      1 |     2 |      3 |
-| Algorithmic reasoning     |      2 |     3 |      1 |
-| Debugging                 |      1 |     3 |      2 |
-| Documentation writing     |      3 |     1 |      1 |
-| Product/tradeoff thinking |      3 |     1 |      2 |
+- implementation
+- refactors
+- schema and migration work
+- UI coding
+- tests
+- bug fixing
+- integration work
 
-## Iteration-Type Decision Table
+## Iteration Execution Flow
 
-| Iteration Type             | Recommended Model(s)                                              |
-| -------------------------- | ----------------------------------------------------------------- |
-| Navigation shell           | Claude orchestration + Gemini (spatial plan) -> Codex (implement) |
-| SQLite migrations/schema   | Codex, Claude review                                              |
-| Ranking and scoring math   | Codex, Claude formula review                                      |
-| UI cards and gestures      | Codex, Gemini layout audit                                        |
-| Charts and profile visuals | Gemini layout brief -> Codex                                      |
-| Test suites                | Codex                                                             |
-| Performance pass           | Codex + Gemini rerender audit                                     |
-| Release hardening          | Claude checklist + Codex fixes + Gemini nav audit                 |
-
-## When to Run Parallel Models
-
-Run 2 models in parallel when:
-
-- architecture choice is ambiguous,
-- UI/gesture behavior has competing designs,
-- there are multiple valid ranking approaches.
-
-Evaluate outputs with this rubric:
-
-- correctness,
-- minimal diff,
-- CLAUDE.md alignment,
-- test coverage,
-- performance risk.
+1. Claude reads `CLAUDE.md`, the current iteration file, and the current codebase state.
+2. Claude defines scope and explicitly states what is being reused, refactored, or replaced from old TasteDeck work.
+3. GPT-5.4 implements only the scoped iteration work.
+4. GPT-5.4 runs validation and fixes any introduced issues.
+5. Claude reviews the result for tone, scope discipline, and fork alignment.
 
 ## Task Execution Protocol
 
@@ -72,83 +51,42 @@ Evaluate outputs with this rubric:
    - `CLAUDE.md`
    - current `iterations/<NN>-...md`
    - relevant code
-2. Plan:
-   - file list,
-   - schema impacts,
-   - risks.
-3. Implement in small scoped changes.
-4. Validate with real scripts:
+2. State whether the task is:
+   - reusing old TasteDeck code
+   - refactoring old TasteDeck code
+   - replacing old TasteDeck code
+3. List:
+   - files to touch
+   - schema impacts
+   - UI contract impacts
+   - risks
+4. Implement in small, scoped changes.
+5. Validate with real scripts:
    - `npm run typecheck`
    - `npm run lint`
-   - `npm test` (or targeted pattern)
    - `npm run format -- --check`
-5. Verify acceptance criteria and write handoff notes.
-
-Note for Iteration 01: lint/typecheck/test scripts are introduced in Iteration 02, so use `npm run start` smoke checks.
-
-## Task Brief Template
-
-```md
-## Task Brief - <Title>
-
-Iteration: <NN>
-Assigned model: <Claude|Codex|Gemini>
-
-### Problem Statement
-
-<what and why>
-
-### Constraints (from CLAUDE.md)
-
-- Local-first
-- Compute-first, AI-second
-- Keep iteration scope tight
-
-### Files to touch
-
-- <path>: <reason>
-
-### Acceptance Criteria
-
-1. ...
-2. ...
-
-### Non-goals
-
-- ...
-
-### Risks
-
-- ...
-
-### Validation
-
-- npm run typecheck
-- npm run lint
-- npm test -- <pattern>
-```
+   - `npm test`
+6. Verify acceptance criteria and leave short notes for the next iteration.
 
 ## Stop Conditions (Ask Human)
 
-- Breaking architecture decisions.
-- Spec conflicts between iteration doc and `CLAUDE.md`.
-- App-store/privacy policy interpretation questions.
-- Large refactor outside current iteration scope.
+- Spec conflicts between the iteration file and `CLAUDE.md`
+- Architecture changes that clearly exceed current iteration scope
+- Privacy, consent, or safety questions that require product judgment
+- Large refactors that would affect multiple future iterations
 
 ## Anti-Drift Rules
 
-- Search before creating new logic.
-- Keep changes scoped to current iteration.
-- Do not add cloud/backend behavior in Phase 1 unless the iteration explicitly calls for it.
-- Follow existing patterns and file conventions.
+- Keep the fork deck-first, not universal-profile-first.
+- Keep the app local-first unless the iteration explicitly scopes a compare/report export flow.
+- Treat AI as summarization only, never as diagnosis or matchmaking.
+- Preserve working infrastructure when practical: app shell, SQLite foundation, strict typing, deterministic tiles, and deck UI contracts.
+- Keep changes tightly scoped to the current iteration.
 
 ## References
 
 - `CLAUDE.md`
 - `iterations/README.md`
-- `docs/models/CLAUDE_OPUS_4_6_GUIDE.md`
-- `docs/models/GPT_5_3_CODEX_GUIDE.md`
-- `docs/models/GEMINI_3_1_GUIDE.md`
 - Expo Router docs: https://docs.expo.dev/router/introduction/
 - Expo SQLite docs: https://docs.expo.dev/versions/latest/sdk/sqlite/
 - React Navigation concepts: https://reactnavigation.org/docs/getting-started

@@ -1,6 +1,6 @@
 import { openDatabaseAsync, type SQLiteDatabase } from 'expo-sqlite';
 
-export const DATABASE_NAME = 'tastedeck.db';
+export const DATABASE_NAME = 'datedeck.db';
 
 let dbPromise: Promise<SQLiteDatabase> | null = null;
 

@@ -4,6 +4,16 @@ import { healthCheck } from '../lib/db/health';
 import { initializeDatabase } from '../lib/db/index';
 import { runMigrations } from '../lib/db/runMigrations';
 
+jest.mock('@/lib/content', () => ({
+  loadPrebuiltDecksIfNeeded: jest.fn().mockResolvedValue({
+    status: 'skipped',
+    version: 1,
+    deckCount: 0,
+    cardCount: 0,
+    skippedCardCount: 0,
+  }),
+}));
+
 type UserVersionRow = {
   user_version: number;
 };
@@ -74,13 +84,13 @@ describe('db migration runner', () => {
 
     const firstStartup = await initializeDatabase(sqliteDb);
     expect(firstStartup.ok).toBe(true);
-    expect(firstStartup.userVersion).toBe(2);
-    expect(firstStartup.targetVersion).toBe(2);
+    expect(firstStartup.userVersion).toBe(7);
+    expect(firstStartup.targetVersion).toBe(7);
 
     const secondStartup = await initializeDatabase(sqliteDb);
     expect(secondStartup.ok).toBe(true);
-    expect(secondStartup.userVersion).toBe(2);
-    expect(secondStartup.targetVersion).toBe(2);
+    expect(secondStartup.userVersion).toBe(7);
+    expect(secondStartup.targetVersion).toBe(7);
   });
 
   it('runs 001_init on first run and skips on second run', async () => {
@@ -90,18 +100,18 @@ describe('db migration runner', () => {
     const firstRun = await runMigrations(sqliteDb);
     expect(firstRun).toEqual({
       fromVersion: 0,
-      toVersion: 2,
-      appliedMigrations: 2,
+      toVersion: 7,
+      appliedMigrations: 7,
     });
 
     const secondRun = await runMigrations(sqliteDb);
     expect(secondRun).toEqual({
-      fromVersion: 2,
-      toVersion: 2,
+      fromVersion: 7,
+      toVersion: 7,
       appliedMigrations: 0,
     });
 
-    expect(db.userVersion).toBe(2);
+    expect(db.userVersion).toBe(7);
     expect(db.foreignKeysEnabled).toBe(1);
   });
 
@@ -113,8 +123,8 @@ describe('db migration runner', () => {
     const status = await healthCheck(sqliteDb);
 
     expect(status.ok).toBe(true);
-    expect(status.userVersion).toBe(2);
-    expect(status.targetVersion).toBe(2);
+    expect(status.userVersion).toBe(7);
+    expect(status.targetVersion).toBe(7);
     expect(status.foreignKeysEnabled).toBe(true);
     expect(status.journalMode).toBe('delete');
   });

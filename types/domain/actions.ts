@@ -1,16 +1,14 @@
-export const ACTIONS = [
+export const ACTIONS = ['hard_no', 'no', 'skip', 'yes', 'strong_yes'] as const;
+
+export type SwipeAction = (typeof ACTIONS)[number];
+
+export const CORE_ACTIONS = [
   'hard_no',
   'no',
   'skip',
   'yes',
-  'love',
-  'respect',
-  'curious',
+  'strong_yes',
 ] as const;
-
-export type SwipeAction = (typeof ACTIONS)[number];
-
-export const CORE_ACTIONS = ['hard_no', 'no', 'skip', 'yes', 'love'] as const;
 
 export type CoreSwipeAction = (typeof CORE_ACTIONS)[number];
 
@@ -19,9 +17,7 @@ export const ACTION_LABELS = {
   no: 'No',
   skip: 'Skip',
   yes: 'Yes',
-  love: 'Love',
-  respect: 'Respect',
-  curious: 'Curious',
+  strong_yes: 'Strong Yes',
 } as const satisfies Record<SwipeAction, string>;
 
 export const CORE_ACTION_LABELS = {
@@ -29,7 +25,7 @@ export const CORE_ACTION_LABELS = {
   no: ACTION_LABELS.no,
   skip: ACTION_LABELS.skip,
   yes: ACTION_LABELS.yes,
-  love: ACTION_LABELS.love,
+  strong_yes: ACTION_LABELS.strong_yes,
 } as const satisfies Record<CoreSwipeAction, string>;
 
 export const ACTION_WEIGHTS = {
@@ -37,9 +33,7 @@ export const ACTION_WEIGHTS = {
   no: -1,
   skip: 0,
   yes: 1,
-  love: 2,
-  respect: 0.5,
-  curious: 0.25,
+  strong_yes: 2,
 } as const satisfies Record<SwipeAction, number>;
 
 const ACTION_SET: ReadonlySet<string> = new Set(ACTIONS);

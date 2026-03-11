@@ -50,8 +50,8 @@ const ACTION_VISUAL_CONFIG: Record<CoreSwipeAction, DeckActionVisualConfig> = {
     size: 48,
     iconSize: 22,
   },
-  love: {
-    iconName: 'heart-outline',
+  strong_yes: {
+    iconName: 'star-outline',
     iconColor: '#EC4899',
     borderColor: '#EC4899',
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
@@ -65,7 +65,7 @@ const ACTION_HINTS: Record<CoreSwipeAction, string> = {
   no: 'Dislike this and move to next',
   skip: 'Skip without judging and move to next',
   yes: 'Like this and move to next',
-  love: 'Strongly like this and move to next',
+  strong_yes: 'Strongly positive - move to next',
 };
 
 export interface DeckActionButtonProps {

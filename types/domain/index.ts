@@ -1,5 +1,7 @@
 export * from './actions';
 export * from './catalog';
+export * from './deckProfile';
+export * from './decks';
 export * from './ids';
 export * from './parsers';
 export * from './scores';

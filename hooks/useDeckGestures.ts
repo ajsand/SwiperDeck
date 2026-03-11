@@ -63,7 +63,7 @@ export function resolveDeckSwipeAction(
 
   if (distanceX >= strongDistance) {
     return {
-      action: direction > 0 ? 'love' : 'hard_no',
+      action: direction > 0 ? 'strong_yes' : 'hard_no',
       distanceX,
       velocityX,
     };
@@ -122,7 +122,8 @@ export function useDeckGestures({
     .onUpdate((event) => {
       translationX.value = event.translationX;
       translationY.value = event.translationY * VERTICAL_DRAG_DAMPING;
-      rotation.value = (event.translationX / screenWidth) * CARD_ROTATION_DEGREES;
+      rotation.value =
+        (event.translationX / screenWidth) * CARD_ROTATION_DEGREES;
     })
     .onEnd((event) => {
       const resolved = resolveDeckSwipeAction({

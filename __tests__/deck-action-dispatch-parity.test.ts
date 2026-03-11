@@ -35,7 +35,7 @@ describe('deck action dispatch parity contract', () => {
     });
 
     expect(resolved).toBeTruthy();
-    expect(resolved?.action).toBe('love');
+    expect(resolved?.action).toBe('strong_yes');
 
     const payload = dispatchDeckAction({
       action: resolved!.action,
@@ -50,7 +50,7 @@ describe('deck action dispatch parity contract', () => {
     });
 
     expect(payload).toEqual({
-      action: 'love',
+      action: 'strong_yes',
       source: 'gesture',
       distanceX: 220,
       velocityX: 450,

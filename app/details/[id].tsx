@@ -8,7 +8,7 @@ export default function DetailScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Entity Detail</Text>
+      <Text style={styles.title}>Card Detail</Text>
       <View
         style={styles.separator}
         lightColor="#eee"

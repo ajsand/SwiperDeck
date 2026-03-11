@@ -1,4 +1,5 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
+import { loadPrebuiltDecksIfNeeded } from '@/lib/content';
 
 import { getDb } from './client';
 import { healthCheck, type DatabaseHealth } from './health';
@@ -7,10 +8,14 @@ import { runMigrations } from './runMigrations';
 
 export * from './catalogRepository';
 export * from './client';
+export * from './deckCardRepository';
+export * from './deckProfileRepository';
+export * from './deckRepository';
 export * from './health';
 export * from './logger';
 export * from './migrations';
 export * from './runMigrations';
+export * from './swipeRepository';
 
 export async function initializeDatabase(
   dbArg?: SQLiteDatabase,
@@ -21,6 +26,7 @@ export async function initializeDatabase(
 
   try {
     await runMigrations(db);
+    await loadPrebuiltDecksIfNeeded(db);
     const status = await healthCheck(db);
 
     logDbInfo(

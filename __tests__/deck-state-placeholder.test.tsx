@@ -15,7 +15,9 @@ describe('DeckStatePlaceholder', () => {
 
   it('renders empty state and triggers filter callback', () => {
     const onOpenFilters = jest.fn();
-    render(<DeckStatePlaceholder state="empty" onOpenFilters={onOpenFilters} />);
+    render(
+      <DeckStatePlaceholder state="empty" onOpenFilters={onOpenFilters} />,
+    );
 
     expect(screen.getByTestId('deck-placeholder-empty')).toBeTruthy();
     const button = screen.getByTestId('deck-placeholder-open-filters');
@@ -44,7 +46,10 @@ describe('DeckStatePlaceholder', () => {
     const loading = render(<DeckStatePlaceholder state="loading" />);
     const empty = render(<DeckStatePlaceholder state="empty" />);
     const error = render(
-      <DeckStatePlaceholder state="error" errorMessage="Recoverable deck error." />,
+      <DeckStatePlaceholder
+        state="error"
+        errorMessage="Recoverable deck error."
+      />,
     );
 
     const snapshot = {
@@ -54,7 +59,7 @@ describe('DeckStatePlaceholder', () => {
       },
       empty: {
         hasRoot: !!empty.queryByTestId('deck-placeholder-empty'),
-        title: empty.getByText('No cards found').props.children,
+        title: empty.getByText('No cards in this deck').props.children,
       },
       error: {
         hasRoot: !!error.queryByTestId('deck-placeholder-error'),

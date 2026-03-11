@@ -1,909 +1,1144 @@
-# CLAUDE.md — TasteDeck (Swipe-First Taste Profile App)
+# CLAUDE.md — DateDeck (Deck-Based First-Date Companion)
 
-> **Purpose of this doc:**
-> This is the **single source of truth** for building TasteDeck using Claude Opus 4.6.
-> It defines the product, screens, data model, ranking logic, AI usage, performance constraints, quality guardrails, and an iterative delivery plan.
+> **Purpose of this document**
+> This is the single source of truth for building the dating-focused fork of the original TasteDeck app.
+> It defines the product, constraints, architecture direction, AI boundaries, local-first rules, compare/report design, and the new iterative delivery plan.
+>
+> This fork starts from the **existing TasteDeck codebase state completed through Iteration 8**, then redesigns the product around dating, first dates, and in-person compare/contrast flows.
 
 ---
 
-## 0) What TasteDeck Is
+## 0) What This Fork Is
 
-**TasteDeck** is a mobile app where a user rapidly swipes through an endless stream of “cards” representing **entities** (books, movies, podcasts, albums, games, teams, athletes, thinkers, places, concepts, etc.).
+**DateDeck** is a local-first, deck-based first-date companion.
 
-Each swipe is a **preference signal**. The app uses those signals to:
+Users build **separate profiles per deck** by swiping on cards in specific categories, then intentionally compare a specific deck with another person **in person** to generate a structured, useful conversation report.
 
-1. **adapt the deck** (practical ranking; not overfit), and
-2. maintain a **Taste Profile** that updates continuously and explains the user’s taste with **visuals**, not just text.
+### Core value proposition
 
-### Core idea
+This is **not** a generic dating app and **not** a swipe-to-match product.
 
-- The swipe deck is the _input_.
-- The taste profile is the _output_.
-- AI is used to **summarize and label** computed taste stats — not to “magically understand a person.”
+It is designed to:
+
+- help people get to meaningful conversation faster on first dates
+- reduce low-value small talk
+- provide deck-specific insight into alignment, contrast, and talking points
+- remain local-first and privacy-conscious
+
+### What stays from the original TasteDeck architecture
+
+The following concepts remain valuable and reusable:
+
+- swipe/action-driven cards
+- adaptive deck sequencing
+- local-first storage
+- compare/contrast mode
+- showdown mode
+- deterministic card art fallback
+- SQLite-backed on-device persistence
+- typed domain model approach
+- iterative build discipline
+
+### What changes in this fork
+
+The new fork changes the meaning and scope of the product:
+
+- the unit of meaning is now the **deck**, not one giant universal taste profile
+- the app is organized around **dating-relevant categories**
+- compare/contrast is **deck-specific**, **intentional**, and **in-person**
+- AI is used to generate **deck-specific insight reports**, not matchmaking claims
+- custom decks remain supported, but with stronger safety and quality boundaries
 
 ---
 
 ## 1) Product Principles (Non-Negotiable)
 
-1. **Swipe-first**: the deck is the main experience.
-2. **Local-first**: user history and taste profile live on-device by default.
-3. **Bounded AI**: no huge “send all history to an LLM.” Compute stats locally; LLM (optional) only turns stats into human-readable labels/summaries.
-4. **Practical ranking**: cold-start = popular + diverse; warm-start = match + popularity + exploration.
-5. **Fast UX**: card render < 16ms budget where possible; swipe interactions must feel instant.
-6. **No copyright landmines by default**: prefer **generated tiles** for card art. Covers/posters optional later with licensed sources.
-7. **App-store ready**: stable navigation, offline usability, predictable data handling, clear privacy explanation.
+1. **Deck-first, not person-first**
+   Users are not reduced to a single universal score or vibe summary. Each deck is one lens into the user.
+
+2. **Local-first by default**
+   Swipe history, deck profiles, and custom decks live on device unless the user explicitly initiates a compare/report flow.
+
+3. **Conversation utility over engagement hacking**
+   The algorithm exists to learn meaningful deck-specific signals, not to optimize raw session length or addictive loops.
+
+4. **Consent-gated comparison**
+   No passive browsing of strangers, no hidden profile lookups, no secret compare mode.
+
+5. **AI as summarizer, not oracle**
+   AI may summarize shared signals, uncertainty, contrasts, and conversation prompts. It must not act like a diagnostician, fortune teller, or compatibility judge.
+
+6. **Universal action system**
+   All decks use the same core action semantics so profile logic, compare logic, and custom deck support remain coherent.
+
+7. **No-creep boundary**
+   The product must avoid features that feel invasive, manipulative, voyeuristic, or socially unsafe.
+
+8. **Custom decks are allowed, but bounded**
+   Users may create and import custom decks, but custom content must not become a backdoor for harassment, surveillance, or pseudo-psychological profiling.
+
+9. **Deck reports are scoped**
+   All meaningful outputs should be tied to one deck at a time. Broad “whole person” judgments are out of scope.
+
+10. **Do not become Tinder**
+    This product is not for browsing strangers, ranking people, or public social discovery.
 
 ---
 
-## 2) User Flows
+## 2) Baseline Inherited State From The Original App
 
-### 2.1 Onboarding
+This fork does **not** begin from an empty repo.
 
-- Explain quickly:
-  - “Swipe to teach your taste.”
-  - “Skip if you don’t know it.”
-  - “Taste Profile updates live.”
-- User chooses:
-  - Start Deck immediately (default)
-  - Optional: pick initial filters (Movies/Books/Music/etc.)
+Assume the original TasteDeck app has already completed work through Iteration 8, including:
 
-### 2.2 Swipe Session
+- Expo Router app shell
+- strict TypeScript + lint + formatting
+- SQLite initialization + migration framework
+- early schema and typed model foundations
+- starter data loading pipeline patterns
+- deterministic tile rendering
+- deck card UI and controls foundation
 
-- User sees one card at a time, swipes/taps a response.
-- Deck adapts as the session continues:
-  - early: trending/popular + diversity sampling
-  - later: preference match + exploration + long tail
+### Important baseline rule
 
-### 2.3 Taste Profile
+The old branch is a **technical starting point**, not a product constraint.
 
-- Shows what the system believes about the user:
-  - top themes, tastes, affinities
-  - “not my thing” (negative space)
-  - how it changes over time
+This fork is allowed to:
 
-### 2.4 History / Library
+- rename product concepts
+- refactor the schema
+- replace broad profile logic with deck-specific profile logic
+- replace old action names if needed
+- split or reorganize prior modules
 
-- User can review:
-  - liked items
-  - disliked items
-  - “skipped/unknown”
-- Optional: undo last swipe
+But it should reuse working infrastructure where practical:
 
-### 2.5 Settings
-
-- Export/delete local data
-- Toggle AI summary (local-only vs cloud summary)
-- Data + privacy info
+- app shell
+- DB client and migration engine
+- strict typing setup
+- deterministic tile primitives
+- testing patterns
+- deck card rendering patterns
 
 ---
 
-## 3) Swipe Signals (Not Just Yes/No)
+## 3) Product Definition
 
-### 3.1 Required actions (5-state)
+### What this app is
 
-These are the core preference signals:
+DateDeck is a local-first app that lets users build **deck-specific self-profiles** by swiping on cards in categories that matter in dating, then compare those profiles with another person **in person** to generate a conversation-friendly insight report.
 
-- **Hard No** (strong dislike)
-- **No**
-- **Skip / Don’t know** (neutral; not negative)
-- **Yes**
-- **Hard Yes / Love** (strong affinity)
+### What this app is not
 
-### 3.2 Optional contextual actions (phase 2)
+This app is not:
 
-Small buttons (not required):
+- a swipe-to-match app
+- a stranger-browsing app
+- a social feed
+- an anonymous rating tool
+- a surveillance or compatibility scoring engine
+- a public profile marketplace
 
-- **Respect**: “I recognize quality but it’s not me.”
-- **Curious**: “Not me yet, but interested.”
+### Best positioning
 
-### 3.3 Why this design
+DateDeck should be framed as:
 
-Skip must be separate from dislike to avoid corrupting the model.
-This approach keeps interactions fast while adding meaning.
+- a **first-date companion**
+- an **in-person compatibility icebreaker**
+- a **deck-based conversation catalyst**
+- a **self-discovery + compare/contrast app for dating contexts**
 
 ---
 
-## 4) Catalog (What Cards Are)
+## 4) Core User Flows
 
-### 4.1 Entity structure
+### 4.1 Onboarding
 
-Each swipe card represents an **Entity**:
+When the user first opens the app:
 
-- `id` (stable)
-- `type` (book, movie, tv, podcast, album, artist, game, team, athlete, thinker, place, concept, etc.)
+- explain the deck concept simply
+- explain that profiles are built per deck
+- explain that data stays local unless the user explicitly shares a deck for comparison/report generation
+- offer these starting paths:
+  - explore recommended decks
+  - continue a prior deck
+  - create/import a custom deck
+
+### 4.2 Choosing a deck
+
+Users select one deck at a time.
+
+Deck browser should group decks by purpose, such as:
+
+- light / fun
+- compatibility-relevant
+- lifestyle
+- values
+- deeper / sensitive
+
+Each deck should show:
+
+- title
+- short description
+- what it explores
+- approximate card count
+- rough threshold for a useful profile
+- whether the deck is compare-eligible
+- whether the deck is showdown-eligible
+
+### 4.3 Swiping through a deck
+
+- user sees one card at a time
+- all cards use the same action model
+- algorithm starts broad, then adapts
+- some cards resurface later as retest/calibration cards
+- card UI should feel quick, stable, and legible
+
+### 4.4 Generating a deck profile
+
+After a minimum threshold, show a deck profile containing:
+
+- early signal summary
+- confidence level
+- main alignments / affinities
+- strong aversions or low-affinity zones
+- unresolved / low-confidence areas
+- progress toward better confidence
+
+### 4.5 Comparing with another user in person
+
+Compare flow must require:
+
+- both users select the same deck
+- both users have enough deck data
+- both explicitly approve comparison
+- app shows what leaves device
+- AI summary/report is generated only for that deck
+
+### 4.6 Showdown mode
+
+- one deck per showdown
+- one host chooses card count and timer
+- same card appears for all participants simultaneously
+- all participants answer before timeout
+- final output is a lighter multiplayer compare summary
+
+### 4.7 Handling insufficient data
+
+If comparison is requested without enough signal:
+
+- block the full compare report
+- explain why
+- suggest a “quick fill” flow or more swipes
+- optionally provide a low-confidence preview only if clearly labeled as limited
+
+### 4.8 Error and privacy flows
+
+Before compare/report:
+
+- show exactly what is being shared
+- show which deck it applies to
+- allow cancel before submission
+- remind users the report is an interpretation, not a factual judgment
+
+---
+
+## 5) Deck System Design
+
+### 5.1 Core deck model
+
+A deck is a bounded category-specific profile system:
+
+- one category
+- one card set
+- one profile space
+- one comparison grammar
+- one report context
+
+### 5.2 Recommended launch categories
+
+#### Tier 1 — MVP launch decks
+
+These are highest-priority, useful, and relatively safe:
+
+- Movies & TV
+- Music
+- Food & Drinks
+- Travel
+- Lifestyle & Routines
+- Social Habits
+- Humor
+- Relationship Preferences
+- Values
+- Communication Style
+
+#### Tier 2 — Strong later additions
+
+- Video Games
+- Books
+- Ambition & Career
+- Family Orientation
+- Health & Fitness
+- Future Goals
+
+#### Tier 3 — Sensitive / gated decks
+
+These may be useful later, but should be intentionally framed and possibly gated:
+
+- Politics
+- Religion / Spirituality
+- Sexual boundaries / intimacy expectations
+- Children / marriage timeline
+- Money philosophy
+
+### 5.3 Prebuilt vs custom decks
+
+#### Prebuilt decks
+
+- editorially designed
+- balanced coverage
+- safe descriptions
+- category-specific report templates
+- better trust in AI summaries
+
+#### Custom decks
+
+- user-authored or imported
+- same action system
+- same compare flow if both users have enough data
+- more limited AI claims because deck quality is less guaranteed
+- local-only by default
+
+### 5.4 Card composition rules
+
+Each card must have:
+
+- stable id
+- deck id
+- card kind: `entity` or `statement`
+- title or statement text
+- short description
+- tags/themes for profile logic
+- universal action support
+- safe fallback rendering
+
+### 5.5 Good deck authoring guidance
+
+A strong deck includes:
+
+- foundational cards
+- representative cards
+- differentiator cards
+- nuance cards
+- retest candidates
+
+A weak deck:
+
+- is too niche too early
+- is repetitive
+- is manipulative
+- contains “gotcha” content
+- is overloaded with highly sensitive content
+- lacks representative breadth
+
+---
+
+## 6) Card Model
+
+### 6.1 Card kinds
+
+Cards may be:
+
+- **entity cards**: nouns, named things, people, works, places, products, media, etc.
+- **statement cards**: first-person statements, preference statements, habit statements, values-oriented phrasing, etc.
+
+### 6.2 Card fields
+
+Each card should conceptually contain:
+
+- `id`
+- `deck_id`
+- `kind`
 - `title`
-- `subtitle` (creator/year/genre/team)
-- `description_short` (1 line)
-- `tags[]` (themes/genres/topics)
-- `popularity_score` (0..1)
-- `tile_key` (for deterministic tile art)
-- Optional later:
-  - `image_url` (only if licensed/allowed)
-  - `embedding` (vector) for better matching
+- `description_short`
+- `tags[]`
+- `popularity_score`
+- `tile_key`
+- optional metadata for authoring/admin purposes
 
-### 4.2 Where catalog data comes from
+### 6.3 Description guidance
 
-**Initial approach (most viable):**
+Descriptions should:
 
-- Ship a **bundled “starter catalog”** (e.g., 5k–20k entities across types).
-- Update via a simple backend endpoint later.
+- stay short
+- clarify ambiguity
+- avoid loaded framing
+- make the user more confident about what they are reacting to
 
-**Expansion approach (later):**
+### 6.4 Text-only first
 
-- Use open structured sources like **Wikidata**, which requires CC0-compatible data.
-- CC0 means “no rights reserved” (public domain dedication).
+Cards should remain lightweight and scalable:
 
-> Note: even if entity data is CC0, images are often licensed differently. Default to tile art.
-
----
-
-## 5) Navigation & Screens (Expo Router)
-
-### 5.1 Required tabs
-
-Use a bottom tab layout (Expo Router Tabs).
-
-**Tabs:**
-
-1. **Deck**
-2. **Profile**
-3. **Library**
-4. **Settings**
-
-Use Stack navigation for details screens.
-
-### 5.2 Screen specs
-
-#### (A) Deck Screen
-
-**Components**
-
-- Card viewport (image/tile, title, subtitle, tags chips)
-- Actions:
-  - left/right swipe
-  - buttons for 5-state actions (optional but recommended for accessibility)
-  - “Skip”
-  - Undo (optional)
-- Filter button:
-  - opens filter modal/sheet
-
-**Behavior**
-
-- Preload next N cards (e.g., 5–10)
-- Keep swipe instant (record event locally first, then compute updates)
-
-#### (B) Filter Modal
-
-Filters determine candidate pool:
-
-- media types toggles (Movies, TV, Books, Podcasts, Music, Games, Sports, People, Places, Ideas)
-- “Diversity boost” toggle (optional)
-- “Show more mainstream first” slider (optional)
-
-#### (C) Profile Screen (Taste Profile)
-
-Must contain **visual outputs**:
-
-1. **Top Themes** (bubble list or bar chart)
-2. **Taste Dials** (sliders/dimensions inferred)
-3. **Yes vs No** (two lists)
-4. **Over time** (sparklines per theme)
-
-#### (D) Library Screen
-
-- Segmented control: Liked / Disliked / Skipped
-- Filters: type, date, tag/theme
-- Search (phase 2): text search; semantic later
-
-#### (E) Settings Screen
-
-- Data export (JSON)
-- Clear data (hard reset)
-- AI Summary toggle:
-  - Off: local-only labels
-  - On: uses Cloud Summary (if enabled)
-- About + privacy
+- mostly text-based
+- deterministic tile visuals by default
+- no dependency on licensed images
 
 ---
 
-## 6) Data Model (SQLite, Local-First)
+## 7) Action Model
 
-Use Expo SQLite.
+### 7.1 Canonical action system
 
-### 6.1 Tables (minimum viable, production-minded)
+This fork standardizes on a universal 5-state action system:
 
-#### `catalog_entities`
+- `hard_no`
+- `no`
+- `skip`
+- `yes`
+- `strong_yes`
 
-- `id TEXT PK`
-- `type TEXT`
-- `title TEXT`
-- `subtitle TEXT`
-- `description_short TEXT`
-- `tags_json TEXT` (JSON array)
-- `popularity REAL`
-- `tile_key TEXT`
-- `image_url TEXT NULL`
-- `updated_at INTEGER`
+### 7.2 Why this action system
 
-Indexes:
+It is:
 
-- `(type)`
-- `(popularity DESC)`
-- optional: `(title)`
+- consistent across decks
+- easier to learn
+- easier to model
+- easier to compare
+- better suited to both entity cards and statement cards
 
-#### `swipe_sessions`
+### 7.3 Action semantics
 
-- `id TEXT PK`
-- `started_at INTEGER`
-- `ended_at INTEGER NULL`
-- `filters_json TEXT`
+For entity cards:
 
-#### `swipe_events`
+- “How positively do I relate to this?”
 
-- `id TEXT PK`
-- `session_id TEXT`
-- `entity_id TEXT`
-- `action TEXT` // hard_no, no, skip, yes, love, respect, curious
-- `strength INTEGER` // map actions to weights
-- `created_at INTEGER`
+For statement cards:
 
-Indexes:
+- “How much do I agree with or identify with this?”
 
-- `(created_at DESC)`
-- `(entity_id)`
-- `(session_id)`
+### 7.4 Important action rule
 
-#### `taste_tag_scores`
+Do not create deck-specific action vocabularies in MVP.
 
-Materialized scores to keep profile fast:
+The UI labels may be adapted for clarity, but the underlying canonical values must remain universal.
 
-- `tag TEXT PK`
-- `score REAL`
-- `pos REAL`
-- `neg REAL`
-- `last_updated INTEGER`
+### 7.5 Optional later signals
 
-#### `taste_type_scores`
+Later, not MVP:
 
-- `type TEXT PK`
-- `score REAL`
-- `pos REAL`
-- `neg REAL`
-- `last_updated INTEGER`
+- `curious`
+- `used_to_like`
+- `respect_not_me`
 
-#### `entity_affinity`
-
-- `entity_id TEXT PK`
-- `score REAL`
-- `pos REAL`
-- `neg REAL`
-- `last_updated INTEGER`
-
-#### `profile_snapshots` (for “change over time”)
-
-- `id TEXT PK`
-- `created_at INTEGER`
-- `top_tags_json TEXT`
-- `top_types_json TEXT`
-- `summary_json TEXT`
-
-> Snapshots can be created daily or every N swipes.
+These are intentionally deferred because they complicate profile modeling.
 
 ---
 
-## 7) Preference Update Logic (How Swipes Affect Taste)
+## 8) Deck Profile Model
 
-### 7.1 Action weights
+### 8.1 Profile scope
 
-Map actions to numeric weights:
+A user has **one profile per deck**.
 
-- love = +2
-- yes = +1
-- skip = 0
-- no = -1
-- hard_no = -2
-- respect = +0.5 (optional)
-- curious = +0.25 (optional)
+There is no giant universal profile in MVP.
 
-### 7.2 Updating scores
+### 8.2 Each deck profile should include
 
-On swipe:
+- sentiment distribution
+- theme clusters
+- confidence score
+- coverage score
+- polarization markers
+- stability markers from retest cards
+- deck-specific summary surfaces
 
-1. look up entity tags
-2. apply weight to:
-   - `entity_affinity`
-   - `taste_type_scores`
-   - `taste_tag_scores`
+### 8.3 Profile stages
 
-### 7.3 Recency weighting (profile evolves)
+#### Stage 1 — Lightweight profile
 
-Use exponential decay for “current taste”:
+- enough cards for an early read
+- clearly low-confidence
+- useful for self-reflection, not strong comparison
 
-- `effective_weight = weight * exp(-age_days / half_life_days)`
-- choose half-life ~ 60–120 days (tunable)
+#### Stage 2 — Meaningful profile
 
-Store raw history; compute both:
+- enough breadth for a compare report
+- enough signal for AI summarization
 
-- **all-time taste**
-- **recent taste**
+#### Stage 3 — High-confidence profile
 
----
+- repeated engagement
+- retest confirmation
+- higher stability and interpretability
 
-## 8) Deck Ranking Algorithm (Practical + Diverse)
+### 8.4 Confidence rules
 
-We explicitly want **beyond-accuracy** outcomes: diversity, novelty, serendipity are recognized important objectives in recommender systems.
+Confidence must depend on:
 
-### 8.1 Candidate pool
+- card count
+- category coverage
+- consistency
+- retest agreement
+- breadth of signal
 
-- Use filters to select candidate entities not yet seen recently.
-- Exclude last N shown to avoid repeats.
+Not just raw swipe total.
 
-### 8.2 Cold start (no history)
+### 8.5 Retest / resurfacing logic
 
-- Serve high popularity across types + enforce diversity:
-  - sample across types
-  - cap repeated tags
+Retest cards should:
 
-### 8.3 Warm start
+- appear after meaningful time has passed
+- focus on important or ambiguous signals
+- remain limited in frequency
+- feel like calibration, not repetition spam
 
-Compute a per-user preference vector using tag scores.
+### 8.6 What the app may infer
 
-**Scoring function**
+Reasonable:
 
-```text
-score(i) = 0.45*pop(i) + 0.40*match(i) + 0.15*novel(i)
-```
+- enthusiasm areas
+- aversion areas
+- confidence/stability
+- high-confidence overlaps and contrasts
 
-Where:
+Not reasonable:
 
-- `pop(i)` = normalized popularity
-- `match(i)` = sum of user tag scores for i’s tags (normalized)
-- `novel(i)` = boost for underrepresented types/tags in session + user history
-
-### 8.4 Exploration strategy
-
-Start with ε-greedy:
-
-- 15% of the time, sample from novelty/diversity bucket
-- 85% pick from top ranked
-
-Optional later: Thompson sampling for exploration/exploitation tradeoff.
-
-### 8.5 “Don’t only show what they like”
-
-Diversity constraint:
-
-- enforce minimum entropy across:
-  - type distribution
-  - tag distribution
-
-This prevents bubble lock-in.
+- clinical personality diagnosis
+- hidden ideology inference from unrelated decks
+- long-term partner-fit claims from sparse data
 
 ---
 
-## 9) Taste Profile (What We Show)
+## 9) Compare / Contrast Report Design
 
-### 9.1 Required computed outputs
+### 9.1 Report goal
 
-- Top themes (tags clustered into themes)
-- Type affinities
-- Strong likes & strong dislikes
-- “Taste dials” (inferred dimensions)
+The compare report is:
 
-### 9.2 Themes (tag clustering)
+- an icebreaker
+- a structured conversation map
+- a mutual insight summary
+- a “what to talk about next” guide
 
-Most viable:
+### 9.2 Report requirements
 
-- v1: cluster by simple heuristics:
-  - tag prefix groups
-  - co-occurrence graph (tags that appear together frequently)
-- v2: embed tags and cluster (k-means / hierarchical)
-- v3: LLM labels clusters _only after clusters exist_
+The report must:
 
-### 9.3 Optional “Best–Worst” calibration rounds
+- be grounded in actual deck-specific action data
+- state confidence clearly
+- separate strong signal from weak signal
+- surface interesting contrasts without overstating incompatibility
+- provide useful talking points
 
-If implemented later, it improves ranking fidelity because it forces tradeoffs:
+### 9.3 Recommended report structure
 
-- user chooses “best” and “worst” among 4 cards
+#### 1. Deck summary
 
-Best-worst scaling (MaxDiff) is a known preference elicitation method.
+- deck name
+- confidence for each user
+- confidence for the comparison
+- number of shared cards analyzed
 
-This is optional and should not block the core experience.
+#### 2. Strongest alignments
 
----
+- strongest shared positive/negative reactions
+- grouped by themes where possible
 
-## 10) AI Usage (Bounded, Reliable)
+#### 3. Interesting contrasts
 
-### 10.1 What AI is allowed to do
+- meaningful differences framed as conversation material, not verdicts
 
-AI can:
+#### 4. Potential friction points
 
-- label clusters (“themes”) based on top tags/entities
-- generate a short “Taste DNA” summary from computed stats
-- suggest “try next” categories based on underexplored areas
+- only when confidence is high
+- phrased carefully
+- never framed as destiny or categorical incompatibility
 
-### 10.2 What AI must NOT do
+#### 5. Conversation starters
 
-AI must NOT:
+- the most useful section
+- should help the date move toward meaningful conversation quickly
 
-- infer sensitive traits (race, sexuality, religion, etc.)
-- act as a therapist/diagnostician
-- generate profile claims not supported by swipe data
+#### 6. Surprise overlaps
 
-### 10.3 Local vs Cloud AI
+- unexpected areas of shared signal
 
-**Local default:**
+#### 7. Low-confidence / unresolved areas
 
-- all ranking and profile stats computed locally
-- theme labels can be rule-based
+- places where the app should admit uncertainty
 
-**Optional cloud summary (phase 2):**
+### 9.4 Report tone
 
-- Send only an aggregated payload:
-  - top tags/types + strongest likes/dislikes + changes over time
-- No raw swipe history needed.
+The tone must be:
 
-This keeps LLM usage cheap and avoids context-window blowups.
+- warm
+- grounded
+- non-clinical
+- non-judgmental
+- uncertainty-aware
+- useful, not gimmicky
 
----
+### 9.5 What to avoid
 
-## 11) Card Art (Deterministic Tiles First)
+Avoid:
 
-Default: generated tiles (legal-safe, fast, consistent).
-
-### 11.1 Deterministic tile requirements
-
-Given `tile_key`:
-
-- generate:
-  - background gradient
-  - icon based on type
-  - title text (shortened)
-- output:
-  - cached image asset or rendered UI component
-
-### 11.2 Where tiles are generated
-
-Most viable:
-
-- generate tiles at build time on a server/script once
-- ship as assets or fetch on demand with CDN caching
-
-Avoid per-device heavy generation for 50k+ cards.
+- headline compatibility score
+- “red flag” labeling from sparse data
+- protected-trait inference
+- manipulative advice
+- “should you keep dating?” framing
+- deterministic identity claims
 
 ---
 
-## 12) Performance & Offline
+## 10) Showdown Mode Design
 
-### 12.1 Offline
+### 10.1 Role of showdown mode
 
-App must function offline after catalog is present:
+Showdown is a secondary, playful comparison mode.
 
-- swipe recording works offline
-- profile works offline
+It is not the core product.
 
-### 12.2 Responsiveness
+### 10.2 Best-fit contexts
 
-- Don’t recompute whole profile each swipe:
-  - incremental update to materialized score tables
-- snapshot creation is background and throttled
+- double dates
+- friend groups
+- social icebreaker settings
+- playful group-first-date scenarios
 
----
+### 10.3 Basic rules
 
-## 13) Quality Guardrails (Critical for “AI coding at scale”)
+- one deck per showdown
+- host sets card count and timer
+- same card shown to all
+- all users answer before timeout
+- summary generated at the end
 
-To prevent the “agent forgets the codebase” failure mode:
+### 10.4 Output style
 
-1. **TypeScript strict mode**
-2. **ESLint + Prettier**
-3. **Unit tests** for:
-   - ranking logic
-   - score updates
-   - snapshot creation
-4. **E2E smoke tests** (later) for core flows
+Showdown output should be lighter than one-to-one compare:
 
-Claude Opus should:
+- strongest group alignments
+- major split topics
+- surprise consensus
+- conversation spark cards
+- optionally light pairwise notes
 
-- always run lint/typecheck/tests after changes
-- keep changes scoped to the iteration
-- never duplicate existing logic—search first
+### 10.5 Risk controls
 
----
+Do not allow showdown for all decks.
 
-## 14) Acceptance Criteria (Definition of Done)
+Some decks should be non-showdown-eligible, especially:
 
-### 14.1 Deck
-
-- Swipes never lag
-- Each swipe produces stored event
-- Undo works (if implemented)
-
-### 14.2 Ranking
-
-- Cold start shows popular + diverse across types
-- Warm start adapts but still explores
-- No repeat loops
-
-### 14.3 Profile
-
-- Shows:
-  - top themes
-  - strong yes/no
-  - type breakdown
-  - changes over time
-- Updates immediately after swipes
-
-### 14.4 Library
-
-- user can review liked/disliked/skipped
-- can remove (optional) or reclassify a swipe
-
-### 14.5 App store readiness
-
-- stable navigation
-- consistent storage
-- privacy disclosure
-- no broken screens on Android/iOS/web (if web supported)
+- intimacy-related decks
+- highly sensitive worldview decks
+- trauma-adjacent material
+- decks where public answer timing creates pressure or humiliation risk
 
 ---
 
-## 15) Implementation Strategy for Claude Opus (How to Work This Repo)
+## 11) Local-First, Privacy, and Consent Rules
 
-### 15.1 Work method (required)
+### 11.1 Local-first default
 
-- Step 1: read this file + relevant code
-- Step 2: propose a plan with file list + schema changes
-- Step 3: implement with small commits
-- Step 4: run:
-  - typecheck
-  - lint
-  - tests
-- Step 5: provide a short verification checklist
+The default architecture is:
 
-### 15.2 Rule: “Compute-first, AI-second”
+- no mandatory account system
+- no server-side profile storage by default
+- user owns swipe and deck data locally
+- custom decks stored locally unless explicitly exported
 
-Any feature that can be done deterministically (ranking, aggregation, clustering heuristics) must be done that way first. AI is for labels and summaries only.
+### 11.2 External AI usage rules
+
+External AI is allowed only when:
+
+- user explicitly starts compare/report
+- both participants consent
+- the deck is eligible
+- the app has enough data to justify the report
+
+### 11.3 Minimal export rule
+
+Only export the minimum necessary deck-scoped data:
+
+- deck id/version
+- normalized action summaries
+- selected overlaps/differences
+- confidence metadata
+- limited raw detail when necessary for grounding
+
+### 11.4 Consent rule
+
+Consent must be:
+
+- explicit
+- per comparison
+- per deck
+- cancelable before submission
+
+### 11.5 Anti-creepy boundaries
+
+The app must not support:
+
+- public profile lookup
+- hidden comparison
+- anonymous reviews of other people
+- passive social graphing
+- blanket compatibility scoring
+- public sharing of another person’s compare report without consent
+
+### 11.6 Sensitive deck safeguards
+
+Sensitive decks may require:
+
+- warnings
+- opt-in gating
+- stronger compare thresholds
+- no showdown support
+- more constrained AI report language
 
 ---
 
-## 16) Phased Build (So We Actually Ship)
+## 12) AI Usage (Bounded and Controlled)
 
-**Phase 1 (ship quality):**
+### 12.1 What AI is allowed to do
 
-- Deck + 5-state actions
-- Local ranking (tags + popularity)
-- Profile (themes + yes/no + change over time basic)
-- Library
-- Settings (clear/export)
+AI may:
 
-**Phase 2 (make it smarter):**
+- summarize deck-specific alignment and contrast
+- produce conversation prompts
+- explain uncertainty
+- identify likely shared themes and meaningful differences
+- generate showdown summaries
 
-- Theme clustering upgrades
-- Cloud summary toggle (stats-only payload)
-- Better visuals/dials
-- Better exploration strategy
+### 12.2 What AI must not do
 
-**Phase 3 (scale catalog):**
+AI must not:
 
-- Catalog update pipeline
-- Better licensing-aware images (optional)
-- Tile generation pipeline
+- diagnose users
+- infer protected or deeply sensitive hidden traits
+- make romantic outcome predictions
+- give clinical or manipulative advice
+- invent certainty where data is weak
+- turn sparse signals into heavy judgments
+
+### 12.3 Architectural rule
+
+Compute deck profile state locally first.
+
+AI is second-stage summarization only.
+
+### 12.4 Output grounding rule
+
+Any AI-generated report must be grounded in:
+
+- deck-specific action data
+- confidence metadata
+- explicit uncertainty markers
+
+No generic horoscope-like output.
 
 ---
 
-## 17) Iterative Task Backlog for Claude Opus 4.6 (Execute in Order)
+## 13) System Architecture Direction
 
-> Execute one task at a time in sequence. Keep each task scoped and shippable.
+### 13.1 Reuse from the original app
 
-1. **Bootstrap app shell**: create Expo Router project structure with tabs: Deck, Profile, Library, Settings.
-2. **Add TypeScript strict + lint + format**: enforce `strict: true`, ESLint, Prettier, scripts.
-3. **Create SQLite initialization layer**: implement DB open/migrate with versioned migrations.
-4. **Add base schema tables**: create all tables listed in Section 6 with indexes.
-5. **Add typed domain models**: create shared types for entity, swipe event, scores, snapshot.
-6. **Load starter catalog**: add import pipeline from bundled JSON into `catalog_entities`.
-7. **Implement deterministic tile component**: gradient + type icon + title fallback using `tile_key`.
-8. **Build Deck card UI**: render card, metadata, tags, and accessibility-friendly action buttons.
-9. **Implement swipe action recording**: persist session + swipe events with action-to-weight mapping.
-10. **Implement undo last swipe**: remove latest swipe event and reverse materialized score updates.
-11. **Incremental taste updates**: update `entity_affinity`, `taste_type_scores`, `taste_tag_scores` per swipe.
-12. **Cold-start candidate selector**: popular + diversity-balanced sampler across selected types.
-13. **Warm-start ranker**: score formula with pop/match/novel + normalization.
-14. **Add ε-greedy exploration**: 85/15 exploit/explore selection policy.
-15. **Add repetition guardrails**: avoid recently shown entities and cap repeated tags.
-16. **Build filter modal**: media type toggles, diversity boost, mainstream slider.
-17. **Build Profile visualizations v1**: top themes chart, type affinity bars, likes/dislikes lists.
-18. **Add profile snapshots job**: periodic snapshot creation every N swipes and daily boundary.
-19. **Build “over time” view**: sparkline/chart from `profile_snapshots`.
-20. **Build Library screen v1**: segmented Liked/Disliked/Skipped + type/date filters.
-21. **Build Settings data controls**: export JSON, clear local data, privacy/about screen.
-22. **Add local AI-label fallback rules**: deterministic theme labels without cloud calls.
-23. **Add optional cloud summary toggle**: send aggregate stats payload only (no raw history).
-24. **Test suite for scoring/ranking/snapshots**: unit tests covering edge cases + regression fixtures.
-25. **Performance pass**: preload next 5–10 cards, avoid blocking UI thread, profile expensive selectors.
-26. **Release hardening**: error boundaries, offline behavior checks, empty-state UX, app-store readiness checklist.
+The fork should reuse where practical:
+
+- app shell and navigation foundation
+- local SQLite infrastructure
+- migration framework
+- strict typing and linting setup
+- deterministic tile system
+- swipe UI primitives
+- testing setup
+- compare/report orchestration patterns
+
+### 13.2 New conceptual entities
+
+This fork introduces or elevates:
+
+- `decks`
+- `deck_cards`
+- `deck_profile_state`
+- `deck_profile_snapshots`
+- `deck_compare_sessions`
+- `deck_compare_reports`
+- `custom_decks`
+- `custom_deck_cards`
+- `showdown_sessions`
+- `showdown_participants`
+- `showdown_reports`
+
+### 13.3 Key architectural shift
+
+Move from:
+
+- broad catalog and broad profile modeling
+
+To:
+
+- deck-first content
+- deck-scoped profile computation
+- deck-scoped compare/report payloads
+
+### 13.4 Schema philosophy
+
+Schema should be refactored to make decks first-class.
+
+Do not force-fit the dating fork into an awkward broad-catalog schema if it compromises clarity.
+
+---
+
+## 14) Algorithm Requirements
+
+### 14.1 Goals
+
+The deck algorithm must:
+
+- begin with common, representative cards
+- adapt as user signal grows
+- avoid becoming too narrow too quickly
+- preserve breadth across the category
+- introduce novelty thoughtfully
+- resurface retest cards later
+
+### 14.2 Desired balance
+
+The next-card algorithm should balance:
+
+- common cards
+- representative cards
+- personalized cards
+- retest cards
+- novelty cards
+
+### 14.3 Anti-overfit rule
+
+The deck should not simply mirror recent swipes.
+
+It should aim to learn the user comprehensively within the category.
+
+### 14.4 Compare eligibility threshold
+
+Each deck should define a minimum threshold for:
+
+- profile generation
+- compare readiness
+- showdown eligibility
+
+These may differ by deck.
+
+---
+
+## 15) UX, Accessibility, and Performance
+
+### 15.1 UX requirements
+
+The app must feel:
+
+- quick
+- legible
+- stable
+- low-friction
+- accessible without gestures
+
+### 15.2 Control requirement
+
+Buttons and gestures must remain parity-safe:
+
+- same action system
+- same output semantics
+- same deck effect
+
+### 15.3 State requirements
+
+All major flows must handle:
+
+- loading
+- insufficient data
+- empty decks
+- recoverable compare failure
+- external AI report failure
+
+### 15.4 Accessibility
+
+All action controls and compare flows must remain usable:
+
+- without gestures
+- with screen readers
+- with clear labels and hints
+- with clear consent messaging
+
+---
+
+## 16) Model Workflow in Cursor
+
+This repo is developed in Cursor using multiple models, but with explicit responsibility boundaries.
+
+### 16.1 Model roles
+
+#### Claude Opus 4.6
+
+Use only for:
+
+- creative thinking
+- architecture reasoning
+- planning
+- iteration design
+- spec refinement
+- review and orchestration
+- risk analysis
+- documentation generation
+
+Claude should **not** be the primary coding model.
+
+#### GPT-5.4
+
+Use for:
+
+- actual implementation
+- refactors
+- migrations
+- UI coding
+- tests
+- bug fixing
+- integration work
+
+### 16.2 Workflow rule
+
+For each iteration:
+
+1. Claude reads this file and the current codebase state
+2. Claude proposes or refines the iteration scope
+3. GPT-5.4 implements the scoped task
+4. Claude reviews output for alignment and drift
+
+### 16.3 Guardrail
+
+Do not let the models invent a parallel architecture that ignores this file.
+
+This file is the controlling spec.
+
+---
+
+## 17) Required Work Method
+
+For every new iteration:
+
+1. Read this `CLAUDE.md`
+2. Read the previous iteration notes and current code
+3. State what old TasteDeck functionality is being reused vs replaced
+4. Propose file list + schema changes + UI contract changes
+5. Implement only the scoped iteration
+6. Run typecheck, lint, and tests
+7. Leave short handoff notes for the next iteration
+
+### Additional fork rule
+
+Because this is a redesign fork:
+
+- every new iteration should explicitly say whether it is:
+  - reusing old branch work,
+  - refactoring old branch work,
+  - or replacing old branch work entirely
+
+---
+
+## 18) Phased Build Strategy For The Fork
+
+### Phase 1 — Fork MVP foundation
+
+- deck-first information architecture
+- replace broad profile framing with per-deck framing
+- launch deck browser and deck selection
+- adapt action language and profile logic for dating use
+- prebuilt dating-relevant decks
+- one-to-one compare flow for one deck at a time
+
+### Phase 2 — Better deck intelligence
+
+- confidence modeling
+- retest logic
+- unresolved-area surfacing
+- richer deck profile summaries
+
+### Phase 3 — Report maturity
+
+- better AI summary templates
+- safer language and uncertainty handling
+- stronger compare insights and conversation starters
+
+### Phase 4 — Showdown adaptation
+
+- deck-scoped showdown
+- group summary outputs
+- sensitive-deck gating
+
+### Phase 5 — Custom deck maturity
+
+- deck creation/import/export
+- deck validation
+- custom deck compare support
+- local transfer patterns
+
+---
+
+## 19) Fork Iteration Backlog (Starts After Original Iteration 8)
+
+> Important:
+> The old branch is complete through Iteration 8.
+> The fork begins from that technical baseline.
+> New iteration numbering starts at **Fork Iteration 09** to reflect that inherited state.
+
+### Fork Iteration 09 — Reframe product shell for deck-first dating fork
+
+- update product copy, onboarding language, and home/deck entry points
+- replace broad “taste profile” framing with deck-first framing
+- introduce deck browser IA
+
+### Fork Iteration 10 — Introduce first-class `decks` and `deck_cards`
+
+- refactor schema and domain models so decks become first-class
+- map existing broad catalog concepts into deck-scoped concepts
+
+### Fork Iteration 11 — Standardize universal dating-fork action model
+
+- finalize canonical action values for this fork
+- refactor UI/action payloads to universal deck semantics
+- migrate old action naming if needed
+
+### Fork Iteration 12 — Build deck selection and deck detail flows
+
+- choose deck
+- display deck purpose, confidence threshold, sensitivity, and status
+- add starter-path UX from onboarding
+
+### Fork Iteration 13 — Ship MVP prebuilt decks
+
+- add Tier 1 launch decks
+- define card authoring conventions
+- build lightweight deck content pipeline
+
+### Fork Iteration 14 — Refactor swipe/session logic to deck scope
+
+- ensure swipe history, sessions, and profile state are deck-specific
+- prepare for per-deck confidence modeling
+
+### Fork Iteration 15 — Build deck profile summary v1
+
+- early signal summary
+- confidence level
+- top affinities / aversions
+- unresolved areas
+
+### Fork Iteration 16 — Build compare eligibility and consent flow
+
+- verify both users have enough data
+- show consent UI
+- define compare session lifecycle
+
+### Fork Iteration 17 — Build compare payload minimization layer
+
+- compute local compare summaries
+- prepare minimal payload for AI report generation
+- define failure and cancel behavior
+
+### Fork Iteration 18 — Implement one-to-one AI compare report v1
+
+- deck-specific compare report
+- confidence-aware output
+- structured conversation starter sections
+
+### Fork Iteration 19 — Add sensitive deck gating and report safeguards
+
+- deck eligibility rules
+- no-showdown rules
+- safer report behavior for sensitive decks
+
+### Fork Iteration 20 — Adapt showdown mode to dating fork
+
+- deck-scoped showdown
+- timer/card cadence
+- lighter multiplayer summary
+
+### Fork Iteration 21 — Add local custom deck creation/import
+
+- custom deck authoring
+- import/export format
+- local-only storage by default
+
+### Fork Iteration 22 — Enable compare support for custom decks
+
+- quality thresholds
+- limited AI claim boundaries
+- compare safeguards for untrusted deck content
+
+### Fork Iteration 23 — Profile confidence and retest logic refinement
+
+- resurfacing rules
+- stability markers
+- higher-confidence deck profile stage
+
+### Fork Iteration 24 — Deck report quality refinement
+
+- stronger deck-specific report templates
+- better contrast grouping
+- better uncertainty surfacing
+
+### Fork Iteration 25 — Release hardening for the dating fork
+
+- privacy disclosures
+- compare/report fallback UX
+- sensitive deck review
+- performance tuning
+- app-store readiness
+
+---
+
+## 20) Open Questions / Design Risks
+
+1. **Action semantics drift**
+   If decks start demanding different meanings, profile logic will fragment.
+   Keep one universal model unless there is overwhelming evidence otherwise.
+
+2. **Sensitive decks can distort product tone**
+   Launching with politics/religion too early may make the app feel confrontational rather than connective.
+
+3. **Custom decks may become unsafe**
+   Local-only by default helps, but custom content still needs quality and safety rules.
+
+4. **Compare reports can become gimmicky**
+   If the report is fluffy, trust drops. If it is too blunt, it becomes invasive.
+
+5. **Showdown can undermine intimacy**
+   It should remain secondary, playful, and selectively allowed.
+
+6. **No-account design reduces convenience**
+   This is acceptable, but local export/import and compare flows must be excellent.
+
+7. **Fork drift risk**
+   Because the old codebase already exists, future iterations must clearly state what is inherited, refactored, or replaced.
+
+---
+
+## 21) Final Product Framing
+
+The clearest framing for this fork is:
+
+**A local-first, deck-based first-date companion that helps two people compare how they think, feel, and relate within specific categories—so they can get to meaningful conversation faster.**
+
+This framing is preferred over:
+
+- “dating app”
+- “compatibility engine”
+- “matchmaking platform”
+- “social taste graph”
+
+because it keeps the product coherent, differentiated, and aligned with its privacy-conscious local-first architecture.
 
 ---
 
 ### End of CLAUDE.md
-
-## 18) Phase 4 Addendum (Decks + Showdown + Slider Mode)
-
-> This section is append-only guidance extending Sections 16–17. Phases 1–3 remain intact and fully supported.
-
-### 18.1 Placement in the phased build
-
-**Phase 4 (Decks + Showdown + Slider Mode):**
-
-- Add deck-aware experiences on top of the existing general/all-deck catalog flow.
-- Add in-person synchronized showdown sessions (no social graph, no chat, no accounts required).
-- Add optional slider input mode (1–10) with deterministic derived-weight mapping.
-- Add session-scoped profile computation isolated from global/all-time taste profile data.
-
-### 18.2 Goals / non-negotiables
-
-1. **No regressions to Phases 1–3**
-   - Default deck/general browsing from prior phases must continue to work even if no custom/system deck is selected.
-   - Existing ranking/profile behavior remains valid for the general/all-deck flow.
-
-2. **Deck support is additive**
-   - System-curated decks are ordered subsets from `catalog_entities`.
-   - Custom decks are local user-owned collections that may include catalog entities and optional user-created custom entities.
-
-3. **Showdown is in-person and session-scoped**
-   - Join flow is QR-first with optional short code fallback.
-   - No chat, no bios, no discovery features.
-   - Session data computes session-only profiles and does not mutate global profile by default.
-
-4. **Privacy + local-first defaults**
-   - No account required in Phase 4.
-   - Networking is only for ephemeral real-time sync transport.
-   - Cross-contamination into global profile is opt-in and disabled by default.
-
-### 18.3 User flows
-
-#### A) Create/manage a deck
-
-1. User opens Deck Management.
-2. User creates a deck (title + optional description).
-3. User adds cards from catalog search/list.
-4. User optionally creates custom cards/entities and adds them.
-5. User reorders cards (stable order index).
-6. User saves and can set deck as active for solo or showdown start.
-
-#### B) Start showdown session (host)
-
-1. Host taps “Start Showdown”.
-2. Host selects deck and settings:
-   - `secondsPerCard`
-   - `maxCards`
-   - `mode`: `synced_order` | `paced_random`
-   - input mode: `swipe_5_state` | `slider_1_10`
-3. App creates an ephemeral session and displays QR join token.
-4. Host starts session when participants are ready.
-
-#### C) Join showdown (participant)
-
-1. Participant opens join flow.
-2. Participant scans QR (or enters fallback code).
-3. Participant enters local display name (optional ephemeral alias).
-4. Participant waits in lobby until host starts.
-
-#### D) Timed card playback + response
-
-For each session card slot:
-
-1. Card is shown with countdown (`secondsPerCard`).
-2. If participant responds before timeout:
-   - record response immediately.
-3. If participant does not respond before timeout:
-   - record `timeout_skip` neutral event.
-4. Proceed to next card until `maxCards` or deck end.
-
-#### E) Session results
-
-1. Session ends for all participants.
-2. App computes per-participant **session-scoped taste profile** from session events only.
-3. Results screen shows compare/contrast summaries.
-4. Global/all-time profile remains unchanged unless explicit future opt-in action is taken.
-
-### 18.4 Data model additions (SQLite, additive migrations only)
-
-All schema changes are additive and implemented as new migrations. No destructive changes to Phase 1–3 tables.
-
-#### Deck tables
-
-- `decks`
-  - `id` (PK)
-  - `source_type` (`system` | `user`)
-  - `title`
-  - `description` (nullable)
-  - `is_archived` (default false)
-  - `created_at`, `updated_at`
-
-- `deck_cards`
-  - `deck_id` (FK -> `decks.id`)
-  - `entity_id` (nullable FK -> `catalog_entities.id`)
-  - `custom_entity_id` (nullable FK -> `custom_entities.id`)
-  - `position` (integer, stable order)
-  - `added_at`
-  - constraints: exactly one of `entity_id` or `custom_entity_id` must be non-null
-
-- `custom_entities`
-  - `id` (PK)
-  - `created_by_device` (local marker)
-  - `title`
-  - `media_type`
-  - `metadata_json` (nullable)
-  - `created_at`, `updated_at`
-
-- Optional extension: `custom_entity_tags`
-  - `custom_entity_id` + `tag`
-
-#### Showdown tables
-
-- `showdown_sessions`
-  - `id` (PK)
-  - `host_device_id`
-  - `join_code`
-  - `deck_id`
-  - `seconds_per_card`
-  - `max_cards`
-  - `mode` (`synced_order` | `paced_random`)
-  - `input_mode` (`swipe_5_state` | `slider_1_10`)
-  - `status` (`created` | `active` | `ended` | `aborted`)
-  - `started_at`, `ended_at`, `created_at`
-
-- `showdown_participants`
-  - `id` (PK)
-  - `session_id`
-  - `device_id`
-  - `display_name`
-  - `joined_at`, `left_at`
-
-- `showdown_round_cards`
-  - `session_id`
-  - `round_index`
-  - `entity_id` / `custom_entity_id`
-  - `scheduled_start_ms`
-  - `scheduled_end_ms`
-
-- `showdown_responses`
-  - `session_id`
-  - `participant_id`
-  - `round_index`
-  - `entity_id` / `custom_entity_id`
-  - `action_kind` (`swipe_action` | `slider_rating` | `timeout_skip`)
-  - `swipe_action` (nullable)
-  - `slider_value` (nullable integer 1..10)
-  - `derived_weight`
-  - `responded_at`
-  - uniqueness: (`session_id`, `participant_id`, `round_index`) for exactly one response per round
-
-#### Session profile tables (isolated from global profile)
-
-- `showdown_profile_type_scores`
-- `showdown_profile_tag_scores`
-- `showdown_profile_snapshots`
-
-Each table is keyed by `session_id` + `participant_id` (+ dimension key), and never reused as direct inputs to global/all-time profile tables.
-
-#### Index guidance
-
-- `deck_cards(deck_id, position)`
-- `showdown_responses(session_id, participant_id, round_index)` unique
-- `showdown_round_cards(session_id, round_index)`
-- `showdown_participants(session_id)`
-- `showdown_profile_* (session_id, participant_id)`
-
-### 18.5 Session-scoped scoring/profile rules
-
-1. **Session-only input set**
-   - Build profile from `showdown_responses` for that `session_id` only.
-
-2. **No global mutation by default**
-   - Phase 4 default behavior does not write session-derived values into Phase 1–3 global profile tables.
-
-3. **Isolation invariant**
-   - All showdown profile computation reads/writes namespaced `showdown_*` tables.
-
-4. **Optional future merge path**
-   - Any “apply session to global taste profile” action must be explicit, user-confirmed, and audited as separate logic.
-
-### 18.6 Input modes + mapping rules
-
-#### Swipe mode
-
-- Reuses Phase 1–3 swipe semantics and weight mapping for session scoring.
-- Compatibility adapter should avoid changing legacy weight constants.
-
-#### Slider mode (`slider_1_10`)
-
-- Scale semantics:
-  - `1` = strong negative
-  - `5` = neutral
-  - `10` = strong positive
-
-- Storage rules:
-  - Persist raw slider rating (`slider_value` integer 1..10).
-  - Persist deterministic `derived_weight` used by session scoring.
-
-- Recommended deterministic mapping (v1):
-  - `derived_weight = clamp(((slider_value - 5.5) / 4.5) * 2, -2, 2)`
-  - Keep full precision for scoring; round only for display.
-
-- Compatibility rule:
-  - Do not alter prior phases’ core action weight behavior unless routed through explicit compatibility handling.
-
-### 18.7 Networking abstraction (provider-agnostic)
-
-Phase 4 introduces a transport boundary only; implementation backend remains pluggable.
-
-```ts
-interface ISessionTransport {
-  createSession(payload: CreateSessionPayload): Promise<CreateSessionResult>;
-  joinSession(payload: JoinSessionPayload): Promise<JoinSessionResult>;
-  broadcastTick(payload: TickEvent): Promise<void>;
-  broadcastCard(payload: CardEvent): Promise<void>;
-  receiveEvents(handler: (event: SessionEvent) => void): Unsubscribe;
-  leave(payload: LeaveSessionPayload): Promise<void>;
-}
-```
-
-#### Notes
-
-- Recommended minimal backend: lightweight websocket/realtime relay.
-- Keep provider-specific details outside domain logic.
-- Domain layer consumes normalized `SessionEvent` objects only.
-
-### 18.8 Performance + reliability constraints
-
-1. **Timer drift tolerance**
-   - Keep participant render timers anchored to session schedule timestamps.
-   - Detect drift and resync on server tick boundaries.
-
-2. **Late packets / duplicates**
-   - Use sequence IDs and idempotent response writes.
-
-3. **Reconnect behavior**
-   - Participant reconnect should recover current round index and remaining time.
-   - Never create duplicate responses for same round.
-
-4. **Offline/degraded handling**
-   - If participant disconnects briefly, allow local input buffering with replay if still in active round.
-   - If unrecoverable, mark session interruption and fail gracefully.
-
-5. **UI responsiveness**
-   - Countdown + input capture must stay under frame budget on typical mid-range devices.
-
-### 18.9 Acceptance criteria + definition-of-done evidence
-
-#### Acceptance criteria
-
-- Deck creation/editing/ordering works without affecting Phase 1–3 default flow.
-- Host can start showdown with chosen deck/settings and participants can join via QR/code.
-- Each participant receives exactly one recorded response per round (explicit action or `timeout_skip`).
-- Session profiles are generated and viewable for compare/contrast.
-- Global profile remains unchanged after session unless explicit opt-in merge is invoked (not default path).
-- Slider mode stores raw value + deterministic derived weight and does not break swipe-mode scoring.
-
-#### Definition-of-done evidence
-
-- Migration docs showing additive schema only.
-- Protocol/event docs for `ISessionTransport` and session lifecycle.
-- UX specs for deck management, QR join, showdown playback, and results compare.
-- Deterministic scoring examples for swipe + slider + timeout events.
-- QA checklist coverage for drift, reconnect, timeout, and privacy boundary cases.
-
----
-
-## 19) Iterative Backlog Addendum — Phase 4 (continue numbering)
-
-27. **Decks data model + migrations**: additive tables/indexes for `decks`, `deck_cards`, `custom_entities`, and deck membership ordering.
-28. **Deck management UI v1**: create/edit deck, add/remove/reorder cards, and choose active deck without breaking default general/all-deck flow.
-29. **Showdown protocol + transport abstraction docs**: define lifecycle events and `ISessionTransport` (provider-agnostic, no implementation coupling).
-30. **QR join flow UI spec + placeholder screen**: host QR display, participant scan/join, waiting-room/error states.
-31. **Showdown screen v1 doc plan**: timed playback state machine, per-card input capture, timeout auto-record behavior.
-32. **Session scoring + profile generation**: session-only aggregation tables/snapshots with strict isolation from global profile.
-33. **Session results compare view**: participant comparisons, top themes, similarity/contrast summaries (no social/discovery features).
-34. **Slider mode implementation plan**: 1–10 storage contract, deterministic derived-weight mapping, compatibility guardrails.
-35. **Phase 4 hardening checklist**: reconnect handling, timer drift tolerances, idempotency, privacy/data-retention edge cases.
