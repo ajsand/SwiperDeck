@@ -1,16 +1,25 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import {
-  getAllDecks,
-  getDb,
-  getSwipeEventCountByDeckId,
-} from '@/lib/db';
-import type { Deck, DeckProfileStage } from '@/types/domain';
+import { evaluateDeckCompareReadiness } from '@/lib/compare/deckCompareReadiness';
+import { getAllDecks, getDb } from '@/lib/db';
+import { computeDeckProfileSummary } from '@/lib/profile/deckProfileService';
+import type {
+  Deck,
+  DeckCompareReadinessState,
+  DeckProfileActionHint,
+  DeckProfileStage,
+  DeckProfileSummary,
+} from '@/types/domain';
 
 export interface DeckWithProfileStatus {
   deck: Deck;
+  summary: DeckProfileSummary | null;
   swipeCount: number;
   stage: DeckProfileStage;
+  compareReady: boolean;
+  compareState: DeckCompareReadinessState;
+  compareDetail: string;
+  primaryHint: DeckProfileActionHint | null;
 }
 
 export interface UseDecksWithProfileStatusResult {
@@ -20,24 +29,27 @@ export interface UseDecksWithProfileStatusResult {
   refresh: () => Promise<void>;
 }
 
-function deriveStage(
-  swipeCount: number,
-  minProfile: number,
-  minCompare: number,
-): DeckProfileStage {
-  if (swipeCount < minProfile) {
-    return 'lightweight';
-  }
-
-  return 'meaningful';
-}
-
 export function useDecksWithProfileStatus(): UseDecksWithProfileStatusResult {
   const [decks, setDecks] = useState<DeckWithProfileStatus[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const activeRequestRef = useRef(0);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const fetch = useCallback(async () => {
+    const requestId = activeRequestRef.current + 1;
+    activeRequestRef.current = requestId;
+
+    if (!isMountedRef.current) {
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -47,29 +59,44 @@ export function useDecksWithProfileStatus(): UseDecksWithProfileStatusResult {
 
       const withStatus: DeckWithProfileStatus[] = await Promise.all(
         allDecks.map(async (deck) => {
-          const swipeCount = await getSwipeEventCountByDeckId(db, deck.id);
+          const summary = await computeDeckProfileSummary(db, deck.id);
+          const readiness = evaluateDeckCompareReadiness({
+            deck,
+            summary,
+          });
 
           return {
             deck,
-            swipeCount,
-            stage: deriveStage(
-              swipeCount,
-              deck.minCardsForProfile,
-              deck.minCardsForCompare,
-            ),
+            summary,
+            swipeCount: summary?.confidence.swipeCount ?? 0,
+            stage: summary?.stage ?? 'lightweight',
+            compareReady: readiness.ready,
+            compareState: readiness.state,
+            compareDetail: readiness.detail,
+            primaryHint: summary?.nextSteps[0] ?? null,
           };
         }),
       );
 
+      if (!isMountedRef.current || activeRequestRef.current !== requestId) {
+        return;
+      }
+
       setDecks(withStatus);
     } catch (err) {
+      if (!isMountedRef.current || activeRequestRef.current !== requestId) {
+        return;
+      }
+
       setError(
-        err instanceof Error
-          ? err.message
-          : 'Failed to load deck profiles.',
+        err instanceof Error ? err.message : 'Failed to load deck profiles.',
       );
       setDecks([]);
     } finally {
+      if (!isMountedRef.current || activeRequestRef.current !== requestId) {
+        return;
+      }
+
       setLoading(false);
     }
   }, []);

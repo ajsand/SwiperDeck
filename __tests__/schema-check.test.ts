@@ -44,8 +44,13 @@ const REQUIRED_TABLES = [
   '__deck_content_meta',
   'decks',
   'deck_cards',
+  'deck_tag_facets',
+  'deck_tag_taxonomy',
+  'deck_card_tag_links',
   'swipe_sessions',
   'swipe_events',
+  'deck_card_state',
+  'deck_tag_state',
   'deck_tag_scores',
   'deck_card_affinity',
   'deck_profile_snapshots',
@@ -106,6 +111,34 @@ const REQUIRED_COLUMNS: Record<string, string[]> = {
     'created_at',
     'updated_at',
   ],
+  deck_tag_facets: [
+    'id',
+    'deck_id',
+    'key',
+    'label',
+    'description',
+    'sort_order',
+    'created_at',
+    'updated_at',
+  ],
+  deck_tag_taxonomy: [
+    'id',
+    'deck_id',
+    'facet_id',
+    'slug',
+    'label',
+    'description',
+    'sort_order',
+    'created_at',
+    'updated_at',
+  ],
+  deck_card_tag_links: [
+    'card_id',
+    'tag_id',
+    'role',
+    'created_at',
+    'updated_at',
+  ],
   swipe_sessions: ['id', 'deck_id', 'started_at', 'ended_at', 'filters_json'],
   swipe_events: [
     'id',
@@ -116,6 +149,32 @@ const REQUIRED_COLUMNS: Record<string, string[]> = {
     'strength',
     'created_at',
   ],
+  deck_card_state: [
+    'deck_id',
+    'card_id',
+    'presentation_count',
+    'swipe_count',
+    'last_presented_at',
+    'last_swiped_at',
+    'updated_at',
+  ],
+  deck_tag_state: [
+    'deck_id',
+    'tag_id',
+    'exposure_count',
+    'distinct_cards_seen',
+    'positive_weight',
+    'negative_weight',
+    'skip_count',
+    'net_weight',
+    'uncertainty_score',
+    'first_seen_at',
+    'last_seen_at',
+    'last_positive_at',
+    'last_negative_at',
+    'last_retested_at',
+    'updated_at',
+  ],
   taste_tag_scores: ['tag', 'score', 'pos', 'neg', 'last_updated'],
   taste_type_scores: ['type', 'score', 'pos', 'neg', 'last_updated'],
   entity_affinity: ['entity_id', 'score', 'pos', 'neg', 'last_updated'],
@@ -124,6 +183,23 @@ const REQUIRED_COLUMNS: Record<string, string[]> = {
     'created_at',
     'top_tags_json',
     'top_types_json',
+    'summary_json',
+  ],
+  deck_tag_scores: ['deck_id', 'tag_id', 'score', 'pos', 'neg', 'last_updated'],
+  deck_card_affinity: [
+    'deck_id',
+    'card_id',
+    'score',
+    'pos',
+    'neg',
+    'last_updated',
+  ],
+  deck_profile_snapshots: [
+    'id',
+    'deck_id',
+    'created_at',
+    'top_tags_json',
+    'top_aversions_json',
     'summary_json',
   ],
 };
@@ -141,6 +217,13 @@ const REQUIRED_INDEXES: Record<string, string[]> = {
     'idx_deck_cards_popularity',
     'idx_deck_cards_sort_order',
   ],
+  deck_tag_facets: ['idx_deck_tag_facets_deck_id'],
+  deck_tag_taxonomy: [
+    'idx_deck_tag_taxonomy_deck_id',
+    'idx_deck_tag_taxonomy_facet_id',
+    'idx_deck_tag_taxonomy_deck_slug',
+  ],
+  deck_card_tag_links: ['idx_deck_card_tag_links_tag_id'],
   swipe_sessions: [
     'idx_swipe_sessions_deck_id',
     'idx_swipe_sessions_started_at',
@@ -150,6 +233,17 @@ const REQUIRED_INDEXES: Record<string, string[]> = {
     'idx_swipe_events_session_id',
     'idx_swipe_events_deck_id',
     'idx_swipe_events_card_id',
+  ],
+  deck_card_state: [
+    'idx_deck_card_state_deck_id',
+    'idx_deck_card_state_last_presented',
+    'idx_deck_card_state_last_swiped',
+  ],
+  deck_tag_state: [
+    'idx_deck_tag_state_deck_id',
+    'idx_deck_tag_state_tag_id',
+    'idx_deck_tag_state_last_seen',
+    'idx_deck_tag_state_uncertainty',
   ],
   taste_tag_scores: [
     'idx_taste_tag_scores_score',
@@ -167,6 +261,7 @@ const REQUIRED_INDEXES: Record<string, string[]> = {
   deck_tag_scores: [
     'idx_deck_tag_scores_deck_id',
     'idx_deck_tag_scores_score',
+    'idx_deck_tag_scores_tag_id',
   ],
   deck_card_affinity: [
     'idx_deck_card_affinity_deck_id',
@@ -826,6 +921,109 @@ describe('schema introspection + smoke CRUD', () => {
         .join(', ')}`,
     );
 
+    const deckTagFacetForeignKeys = await db.getAllAsync<ForeignKeyRow>(
+      "PRAGMA foreign_key_list('deck_tag_facets')",
+    );
+    expect(deckTagFacetForeignKeys).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          table: 'decks',
+          from: 'deck_id',
+          to: 'id',
+        }),
+      ]),
+    );
+
+    const deckTagTaxonomyForeignKeys = await db.getAllAsync<ForeignKeyRow>(
+      "PRAGMA foreign_key_list('deck_tag_taxonomy')",
+    );
+    expect(deckTagTaxonomyForeignKeys).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          table: 'decks',
+          from: 'deck_id',
+          to: 'id',
+        }),
+        expect.objectContaining({
+          table: 'deck_tag_facets',
+          from: 'facet_id',
+          to: 'id',
+        }),
+      ]),
+    );
+
+    const deckCardTagLinkForeignKeys = await db.getAllAsync<ForeignKeyRow>(
+      "PRAGMA foreign_key_list('deck_card_tag_links')",
+    );
+    expect(deckCardTagLinkForeignKeys).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          table: 'deck_cards',
+          from: 'card_id',
+          to: 'id',
+        }),
+        expect.objectContaining({
+          table: 'deck_tag_taxonomy',
+          from: 'tag_id',
+          to: 'id',
+        }),
+      ]),
+    );
+
+    const deckTagScoreForeignKeys = await db.getAllAsync<ForeignKeyRow>(
+      "PRAGMA foreign_key_list('deck_tag_scores')",
+    );
+    expect(deckTagScoreForeignKeys).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          table: 'decks',
+          from: 'deck_id',
+          to: 'id',
+        }),
+        expect.objectContaining({
+          table: 'deck_tag_taxonomy',
+          from: 'tag_id',
+          to: 'id',
+        }),
+      ]),
+    );
+
+    const deckTagStateForeignKeys = await db.getAllAsync<ForeignKeyRow>(
+      "PRAGMA foreign_key_list('deck_tag_state')",
+    );
+    expect(deckTagStateForeignKeys).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          table: 'decks',
+          from: 'deck_id',
+          to: 'id',
+        }),
+        expect.objectContaining({
+          table: 'deck_tag_taxonomy',
+          from: 'tag_id',
+          to: 'id',
+        }),
+      ]),
+    );
+
+    const deckCardStateForeignKeys = await db.getAllAsync<ForeignKeyRow>(
+      "PRAGMA foreign_key_list('deck_card_state')",
+    );
+    expect(deckCardStateForeignKeys).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          table: 'decks',
+          from: 'deck_id',
+          to: 'id',
+        }),
+        expect.objectContaining({
+          table: 'deck_cards',
+          from: 'card_id',
+          to: 'id',
+        }),
+      ]),
+    );
+
     const foreignKeysEnabled = await db.getFirstAsync<{ foreign_keys: number }>(
       'PRAGMA foreign_keys',
     );
@@ -899,6 +1097,52 @@ describe('schema introspection + smoke CRUD', () => {
       0.81,
       'movie:before-sunrise',
       1,
+      now,
+      now,
+    );
+
+    await db.runAsync(
+      `
+        INSERT INTO deck_tag_facets (
+          id, deck_id, key, label, description, sort_order, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      'movies_tv:tone',
+      'deck_1',
+      'tone',
+      'Tone',
+      'Mood lane',
+      0,
+      now,
+      now,
+    );
+
+    await db.runAsync(
+      `
+        INSERT INTO deck_tag_taxonomy (
+          id, deck_id, facet_id, slug, label, description, sort_order, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      'movies_tv:romance',
+      'deck_1',
+      'movies_tv:tone',
+      'romance',
+      'Romance',
+      'Romance cards',
+      0,
+      now,
+      now,
+    );
+
+    await db.runAsync(
+      `
+        INSERT INTO deck_card_tag_links (
+          card_id, tag_id, role, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?)
+      `,
+      'deck_card_1',
+      'movies_tv:romance',
+      'primary',
       now,
       now,
     );
@@ -1003,12 +1247,52 @@ describe('schema introspection + smoke CRUD', () => {
 
     await db.runAsync(
       `
+        INSERT INTO deck_card_state (
+          deck_id, card_id, presentation_count, swipe_count, last_presented_at, last_swiped_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      `,
+      'deck_1',
+      'deck_card_1',
+      1,
+      1,
+      now + 1500,
+      now + 2000,
+      now + 5000,
+    );
+
+    await db.runAsync(
+      `
+        INSERT INTO deck_tag_state (
+          deck_id, tag_id, exposure_count, distinct_cards_seen, positive_weight, negative_weight,
+          skip_count, net_weight, uncertainty_score, first_seen_at, last_seen_at, last_positive_at,
+          last_negative_at, last_retested_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      'deck_1',
+      'movies_tv:romance',
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0.67,
+      now + 2000,
+      now + 2000,
+      now + 2000,
+      null,
+      null,
+      now + 5000,
+    );
+
+    await db.runAsync(
+      `
         INSERT INTO deck_tag_scores (
-          deck_id, tag, score, pos, neg, last_updated
+          deck_id, tag_id, score, pos, neg, last_updated
         ) VALUES (?, ?, ?, ?, ?, ?)
       `,
       'deck_1',
-      'romance',
+      'movies_tv:romance',
       2.0,
       2.0,
       0,
@@ -1055,6 +1339,9 @@ describe('schema introspection + smoke CRUD', () => {
       1,
     );
     expect(await db.getAllAsync('SELECT * FROM swipe_events')).toHaveLength(1);
+    expect(await db.getAllAsync('SELECT * FROM deck_card_state')).toHaveLength(
+      1,
+    );
     expect(await db.getAllAsync('SELECT * FROM taste_tag_scores')).toHaveLength(
       1,
     );
@@ -1067,6 +1354,18 @@ describe('schema introspection + smoke CRUD', () => {
     expect(
       await db.getAllAsync('SELECT * FROM profile_snapshots'),
     ).toHaveLength(1);
+    expect(await db.getAllAsync('SELECT * FROM deck_tag_facets')).toHaveLength(
+      1,
+    );
+    expect(
+      await db.getAllAsync('SELECT * FROM deck_tag_taxonomy'),
+    ).toHaveLength(1);
+    expect(
+      await db.getAllAsync('SELECT * FROM deck_card_tag_links'),
+    ).toHaveLength(1);
+    expect(await db.getAllAsync('SELECT * FROM deck_tag_state')).toHaveLength(
+      1,
+    );
     expect(await db.getAllAsync('SELECT * FROM deck_tag_scores')).toHaveLength(
       1,
     );
@@ -1095,12 +1394,24 @@ describe('schema introspection + smoke CRUD', () => {
 
     expect(await db.getAllAsync('SELECT * FROM decks')).toHaveLength(0);
     expect(await db.getAllAsync('SELECT * FROM deck_cards')).toHaveLength(0);
+    expect(await db.getAllAsync('SELECT * FROM deck_tag_facets')).toHaveLength(
+      0,
+    );
+    expect(
+      await db.getAllAsync('SELECT * FROM deck_tag_taxonomy'),
+    ).toHaveLength(0);
+    expect(
+      await db.getAllAsync('SELECT * FROM deck_card_tag_links'),
+    ).toHaveLength(0);
+    expect(await db.getAllAsync('SELECT * FROM deck_tag_state')).toHaveLength(
+      0,
+    );
     expect(await db.getAllAsync('SELECT * FROM deck_tag_scores')).toHaveLength(
       0,
     );
-    expect(await db.getAllAsync('SELECT * FROM deck_card_affinity')).toHaveLength(
-      0,
-    );
+    expect(
+      await db.getAllAsync('SELECT * FROM deck_card_affinity'),
+    ).toHaveLength(0);
     expect(
       await db.getAllAsync('SELECT * FROM deck_profile_snapshots'),
     ).toHaveLength(0);
@@ -1108,6 +1419,9 @@ describe('schema introspection + smoke CRUD', () => {
       0,
     );
     expect(await db.getAllAsync('SELECT * FROM swipe_events')).toHaveLength(0);
+    expect(await db.getAllAsync('SELECT * FROM deck_card_state')).toHaveLength(
+      0,
+    );
 
     const foreignKeyViolations = await db.getAllAsync(
       'PRAGMA foreign_key_check',

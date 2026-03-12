@@ -14,6 +14,11 @@ import {
 import { DeckBrowserError } from '@/components/deck-browser';
 import { DeterministicTile } from '@/components/tiles';
 import { useDeckById } from '@/hooks/useDeckById';
+import {
+  getDeckSafetyBadgeLabel,
+  getDeckSafetyPolicy,
+  getDeckShowdownPolicy,
+} from '@/lib/policy/deckSafetyPolicy';
 import { iconForDeckCategory } from '@/lib/tiles';
 import { asDeckId } from '@/types/domain';
 
@@ -36,16 +41,58 @@ function formatTier(tier: string): string {
   return tier.replace('tier_', 'Tier ');
 }
 
-function formatSensitivity(sensitivity: string): string {
-  if (sensitivity === 'standard') {
+function formatSensitivityLabel(args: {
+  sensitivity: string;
+  badgeLabel: string | null;
+}): string {
+  if (args.badgeLabel) {
+    return args.badgeLabel;
+  }
+
+  if (args.sensitivity === 'standard') {
     return 'Standard sensitivity';
   }
 
-  if (sensitivity === 'sensitive') {
+  if (args.sensitivity === 'sensitive') {
     return 'Sensitive topic';
   }
 
   return 'Gated topic';
+}
+
+function compareThresholdCopy(args: {
+  isCustom: boolean;
+  compareEligible: boolean;
+  minCardsForCompare: number;
+  readinessWarning: string;
+}): string {
+  if (args.isCustom) {
+    return 'Custom decks stay local-first and are not compare-eligible under the current product scope.';
+  }
+
+  if (!args.compareEligible) {
+    return 'Compare is unavailable for this deck under the current product rules.';
+  }
+
+  const base = `At least ${args.minCardsForCompare} swipes before compare readiness can be considered. Coverage, ambiguity, and stability still matter.`;
+
+  return args.readinessWarning.length > 0
+    ? `${base} ${args.readinessWarning}`
+    : base;
+}
+
+function showdownStatusCopy(args: {
+  showdownAllowed: boolean;
+  showdownReason: string | null;
+}): string {
+  if (args.showdownAllowed) {
+    return 'Showdown stays lighter than compare: one shared card at a time, local group reactions, and a short summary at the end.';
+  }
+
+  return (
+    args.showdownReason ??
+    'This deck is not eligible for showdown under the current product rules.'
+  );
 }
 
 export default function DeckDetailScreen() {
@@ -59,6 +106,18 @@ export default function DeckDetailScreen() {
   const categoryIcon = useMemo(
     () => iconForDeckCategory(deck?.category ?? 'unknown'),
     [deck?.category],
+  );
+  const safetyPolicy = useMemo(
+    () => (deck ? getDeckSafetyPolicy(deck) : null),
+    [deck],
+  );
+  const showdownPolicy = useMemo(
+    () => (deck ? getDeckShowdownPolicy(deck) : null),
+    [deck],
+  );
+  const safetyBadgeLabel = useMemo(
+    () => (deck ? getDeckSafetyBadgeLabel(deck) : null),
+    [deck],
   );
 
   const handleStartSwiping = () => {
@@ -174,7 +233,7 @@ export default function DeckDetailScreen() {
             </View>
             <View style={styles.chip}>
               <Text style={styles.chipText}>
-                {deck.showdownEligible
+                {showdownPolicy?.allowed
                   ? 'Showdown eligible'
                   : 'Showdown unavailable'}
               </Text>
@@ -182,11 +241,16 @@ export default function DeckDetailScreen() {
             <View
               style={[
                 styles.chip,
-                deck.sensitivity !== 'standard' ? styles.warningChip : null,
+                safetyBadgeLabel || deck.sensitivity !== 'standard'
+                  ? styles.warningChip
+                  : null,
               ]}
             >
               <Text style={styles.chipText}>
-                {formatSensitivity(deck.sensitivity)}
+                {formatSensitivityLabel({
+                  sensitivity: deck.sensitivity,
+                  badgeLabel: safetyBadgeLabel,
+                })}
               </Text>
             </View>
             {deck.isCustom ? (
@@ -207,7 +271,21 @@ export default function DeckDetailScreen() {
             <View style={styles.thresholdCard}>
               <Text style={styles.thresholdLabel}>Compare threshold</Text>
               <Text style={styles.thresholdValue}>
-                At least {deck.minCardsForCompare} cards for comparison
+                {compareThresholdCopy({
+                  isCustom: deck.isCustom,
+                  compareEligible: deck.compareEligible,
+                  minCardsForCompare: deck.minCardsForCompare,
+                  readinessWarning: safetyPolicy?.warnings.readiness ?? '',
+                })}
+              </Text>
+            </View>
+            <View style={styles.thresholdCard}>
+              <Text style={styles.thresholdLabel}>Showdown status</Text>
+              <Text style={styles.thresholdValue}>
+                {showdownStatusCopy({
+                  showdownAllowed: showdownPolicy?.allowed ?? false,
+                  showdownReason: showdownPolicy?.reason ?? null,
+                })}
               </Text>
             </View>
           </View>
@@ -240,6 +318,40 @@ export default function DeckDetailScreen() {
           >
             <Text style={styles.secondaryButtonText}>View Profile</Text>
           </Pressable>
+          <Pressable
+            testID="deck-detail-compare-readiness"
+            accessibilityRole="button"
+            accessibilityLabel="Review compare readiness"
+            accessibilityHint="Opens compare readiness and consent information for this deck"
+            onPress={() =>
+              router.push(`/deck/${deck.id as string}/compare` as never)
+            }
+            style={({ pressed }) => [
+              styles.secondaryButton,
+              pressed ? styles.primaryButtonPressed : null,
+            ]}
+          >
+            <Text style={styles.secondaryButtonText}>Compare Readiness</Text>
+          </Pressable>
+          {showdownPolicy?.allowed ? (
+            <Pressable
+              testID="deck-detail-start-showdown"
+              accessibilityRole="button"
+              accessibilityLabel="Start showdown"
+              accessibilityHint="Starts a local showdown session for this deck"
+              onPress={() =>
+                router.push(
+                  `/showdown/create?deckId=${deck.id as string}` as never,
+                )
+              }
+              style={({ pressed }) => [
+                styles.secondaryButton,
+                pressed ? styles.primaryButtonPressed : null,
+              ]}
+            >
+              <Text style={styles.secondaryButtonText}>Start Showdown</Text>
+            </Pressable>
+          ) : null}
         </ScrollView>
       )}
     </View>

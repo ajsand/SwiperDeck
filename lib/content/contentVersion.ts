@@ -1,6 +1,6 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-export const PREBUILT_DECK_VERSION = 1;
+export const PREBUILT_DECK_VERSION = 2;
 
 type ContentMetaBoundaryDb = Pick<SQLiteDatabase, 'runAsync' | 'getFirstAsync'>;
 

@@ -51,27 +51,27 @@ This iteration transitions the app from "UI prototype with no persistence" to "f
 
 ### Relationship to old TasteDeck code
 
-| Category | What happens |
-|----------|--------------|
-| **Replaced (schema)** | `swipe_sessions` rebuilt with `deck_id` column and FK. `swipe_events` rebuilt: `entity_id` column replaced by `card_id`, new `deck_id` column, FK targets changed from `catalog_entities` to `deck_cards`/`decks`. Old dev-only data is dropped during rebuild. |
-| **Replaced (domain types)** | `SwipeSessionRow`/`SwipeSession` gain `deck_id`/`deckId`. `SwipeEventRow`/`SwipeEvent` change `entity_id` → `card_id` and gain `deck_id`. All mappers updated. |
-| **Replaced (UI component)** | `DeckCard.tsx` renamed to `SwipeCard.tsx` with a new decoupled prop interface. Old `CatalogEntity` coupling removed. |
-| **Reused** | `DeckActionBar`, `DeckActionButton`, `DeckStatePlaceholder`, `DeckTagsRow`, `DeterministicTile`, `dispatchDeckAction`, `useDeckGestures`, `deckActionPayload.ts`, `deckState.ts` — all reused as-is. The action model (`hard_no`/`no`/`skip`/`yes`/`strong_yes`) is final from Iteration 11. |
-| **Preserved (not modified)** | Old `catalog_entities` table, old scoring tables, old `catalogRepository.ts`, old snapshot types. These become legacy artifacts; some may be removed in Iteration 25 (release hardening). |
+| Category                     | What happens                                                                                                                                                                                                                                                                                 |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Replaced (schema)**        | `swipe_sessions` rebuilt with `deck_id` column and FK. `swipe_events` rebuilt: `entity_id` column replaced by `card_id`, new `deck_id` column, FK targets changed from `catalog_entities` to `deck_cards`/`decks`. Old dev-only data is dropped during rebuild.                              |
+| **Replaced (domain types)**  | `SwipeSessionRow`/`SwipeSession` gain `deck_id`/`deckId`. `SwipeEventRow`/`SwipeEvent` change `entity_id` → `card_id` and gain `deck_id`. All mappers updated.                                                                                                                               |
+| **Replaced (UI component)**  | `DeckCard.tsx` renamed to `SwipeCard.tsx` with a new decoupled prop interface. Old `CatalogEntity` coupling removed.                                                                                                                                                                         |
+| **Reused**                   | `DeckActionBar`, `DeckActionButton`, `DeckStatePlaceholder`, `DeckTagsRow`, `DeterministicTile`, `dispatchDeckAction`, `useDeckGestures`, `deckActionPayload.ts`, `deckState.ts` — all reused as-is. The action model (`hard_no`/`no`/`skip`/`yes`/`strong_yes`) is final from Iteration 11. |
+| **Preserved (not modified)** | Old `catalog_entities` table, old scoring tables, old `catalogRepository.ts`, old snapshot types. These become legacy artifacts; some may be removed in Iteration 25 (release hardening).                                                                                                    |
 
 ## 4. Multi-model execution strategy
 
-| Step | Model | Task |
-|------|-------|------|
-| 1 | Claude Opus 4.6 | Write this iteration file with full schema diff, type contracts, and wiring spec (done) |
-| 2 | GPT-5.4 | Implement migration 006 |
-| 3 | GPT-5.4 | Update domain types and mappers in `swipes.ts` |
-| 4 | GPT-5.4 | Create swipe repository |
-| 5 | GPT-5.4 | Rename `DeckCard` → `SwipeCard` component, update barrel exports and tests |
-| 6 | GPT-5.4 | Build `useDeckSwipeSession` hook and `play.tsx` screen |
-| 7 | GPT-5.4 | Wire deck detail CTA, register route |
-| 8 | GPT-5.4 | Update all tests, run full validation |
-| 9 | Claude Opus 4.6 | Review: schema correctness, FK integrity, session lifecycle, state handling |
+| Step | Model           | Task                                                                                    |
+| ---- | --------------- | --------------------------------------------------------------------------------------- |
+| 1    | Claude Opus 4.6 | Write this iteration file with full schema diff, type contracts, and wiring spec (done) |
+| 2    | GPT-5.4         | Implement migration 006                                                                 |
+| 3    | GPT-5.4         | Update domain types and mappers in `swipes.ts`                                          |
+| 4    | GPT-5.4         | Create swipe repository                                                                 |
+| 5    | GPT-5.4         | Rename `DeckCard` → `SwipeCard` component, update barrel exports and tests              |
+| 6    | GPT-5.4         | Build `useDeckSwipeSession` hook and `play.tsx` screen                                  |
+| 7    | GPT-5.4         | Wire deck detail CTA, register route                                                    |
+| 8    | GPT-5.4         | Update all tests, run full validation                                                   |
+| 9    | Claude Opus 4.6 | Review: schema correctness, FK integrity, session lifecycle, state handling             |
 
 ### Implementation order
 
@@ -87,13 +87,13 @@ The safest sequence:
 
 ### Source-of-truth references
 
-| Document | Relevant sections |
-|----------|-------------------|
-| `/CLAUDE.md` Section 4.3 | Swiping through a deck: one card at a time, algorithm starts broad |
-| `/CLAUDE.md` Section 8.1 | One profile per deck — sessions must be deck-scoped |
-| `/CLAUDE.md` Section 13.3 | Key architectural shift: deck-scoped profile computation |
-| `/CLAUDE.md` Section 14.1 | Algorithm: begin with common/representative, then adapt |
-| `/CLAUDE.md` Section 15.1–15.4 | UX/accessibility requirements |
+| Document                          | Relevant sections                                                                          |
+| --------------------------------- | ------------------------------------------------------------------------------------------ |
+| `/CLAUDE.md` Section 4.3          | Swiping through a deck: one card at a time, algorithm starts broad                         |
+| `/CLAUDE.md` Section 8.1          | One profile per deck — sessions must be deck-scoped                                        |
+| `/CLAUDE.md` Section 13.3         | Key architectural shift: deck-scoped profile computation                                   |
+| `/CLAUDE.md` Section 14.1         | Algorithm: begin with common/representative, then adapt                                    |
+| `/CLAUDE.md` Section 15.1–15.4    | UX/accessibility requirements                                                              |
 | `/iterations/13-...md` Section 12 | Handoff: content loaded, schema v5, DeckCard collision flagged, card sort_order documented |
 
 ### Schema diff: before and after
@@ -164,49 +164,49 @@ Changes: `entity_id` → `card_id` (FK target changed to `deck_cards`), `deck_id
 
 #### `SwipeSessionRow` — before → after
 
-| Field | Before | After |
-|-------|--------|-------|
-| `id` | `string` | `string` (unchanged) |
-| `deck_id` | *(absent)* | `string` **NEW** |
-| `started_at` | `number` | `number` (unchanged) |
-| `ended_at` | `number \| null` | `number \| null` (unchanged) |
-| `filters_json` | `string` | `string` (unchanged) |
+| Field          | Before           | After                        |
+| -------------- | ---------------- | ---------------------------- |
+| `id`           | `string`         | `string` (unchanged)         |
+| `deck_id`      | _(absent)_       | `string` **NEW**             |
+| `started_at`   | `number`         | `number` (unchanged)         |
+| `ended_at`     | `number \| null` | `number \| null` (unchanged) |
+| `filters_json` | `string`         | `string` (unchanged)         |
 
 #### `SwipeSession` — before → after
 
-| Field | Before | After |
-|-------|--------|-------|
-| `id` | `SessionId` | `SessionId` (unchanged) |
-| `deckId` | *(absent)* | `DeckId` **NEW** |
-| `startedAt` | `number` | `number` (unchanged) |
-| `endedAt` | `number \| null` | `number \| null` (unchanged) |
-| `filters` | `SessionFilters` | `SessionFilters` (unchanged) |
+| Field       | Before           | After                        |
+| ----------- | ---------------- | ---------------------------- |
+| `id`        | `SessionId`      | `SessionId` (unchanged)      |
+| `deckId`    | _(absent)_       | `DeckId` **NEW**             |
+| `startedAt` | `number`         | `number` (unchanged)         |
+| `endedAt`   | `number \| null` | `number \| null` (unchanged) |
+| `filters`   | `SessionFilters` | `SessionFilters` (unchanged) |
 
 #### `SwipeEventRow` — before → after
 
-| Field | Before | After |
-|-------|--------|-------|
-| `id` | `string` | `string` (unchanged) |
-| `session_id` | `string` | `string` (unchanged) |
-| `deck_id` | *(absent)* | `string` **NEW** |
-| `entity_id` | `string` | *(removed)* |
-| `card_id` | *(absent)* | `string` **NEW (replaces entity_id)** |
-| `action` | `string` | `string` (unchanged) |
-| `strength` | `number` | `number` (unchanged) |
-| `created_at` | `number` | `number` (unchanged) |
+| Field        | Before     | After                                 |
+| ------------ | ---------- | ------------------------------------- |
+| `id`         | `string`   | `string` (unchanged)                  |
+| `session_id` | `string`   | `string` (unchanged)                  |
+| `deck_id`    | _(absent)_ | `string` **NEW**                      |
+| `entity_id`  | `string`   | _(removed)_                           |
+| `card_id`    | _(absent)_ | `string` **NEW (replaces entity_id)** |
+| `action`     | `string`   | `string` (unchanged)                  |
+| `strength`   | `number`   | `number` (unchanged)                  |
+| `created_at` | `number`   | `number` (unchanged)                  |
 
 #### `SwipeEvent` — before → after
 
-| Field | Before | After |
-|-------|--------|-------|
-| `id` | `SwipeEventId` | `SwipeEventId` (unchanged) |
-| `sessionId` | `SessionId` | `SessionId` (unchanged) |
-| `deckId` | *(absent)* | `DeckId` **NEW** |
-| `entityId` | `EntityId` | *(removed)* |
-| `cardId` | *(absent)* | `DeckCardId` **NEW** |
-| `action` | `SwipeAction` | `SwipeAction` (unchanged) |
-| `strength` | `number` | `number` (unchanged) |
-| `createdAt` | `number` | `number` (unchanged) |
+| Field       | Before         | After                      |
+| ----------- | -------------- | -------------------------- |
+| `id`        | `SwipeEventId` | `SwipeEventId` (unchanged) |
+| `sessionId` | `SessionId`    | `SessionId` (unchanged)    |
+| `deckId`    | _(absent)_     | `DeckId` **NEW**           |
+| `entityId`  | `EntityId`     | _(removed)_                |
+| `cardId`    | _(absent)_     | `DeckCardId` **NEW**       |
+| `action`    | `SwipeAction`  | `SwipeAction` (unchanged)  |
+| `strength`  | `number`       | `number` (unchanged)       |
+| `createdAt` | `number`       | `number` (unchanged)       |
 
 ### SwipeCard component prop interface (replaces DeckCard)
 
@@ -225,73 +225,75 @@ The `tileType` prop receives the deck's `category` string — this drives the ic
 
 ### New files to CREATE
 
-| File | Purpose |
-|------|---------|
-| `app/deck/[deckId]/play.tsx` | Swipe session screen |
-| `lib/db/swipeRepository.ts` | Deck-scoped session/event CRUD |
-| `hooks/useDeckSwipeSession.ts` | Session state management (card queue, persistence, advance) |
-| `__tests__/swipe-repository.test.ts` | Repository tests |
-| `__tests__/deck-swipe-session.test.ts` | Hook/integration tests |
+| File                                   | Purpose                                                     |
+| -------------------------------------- | ----------------------------------------------------------- |
+| `app/deck/[deckId]/play.tsx`           | Swipe session screen                                        |
+| `lib/db/swipeRepository.ts`            | Deck-scoped session/event CRUD                              |
+| `hooks/useDeckSwipeSession.ts`         | Session state management (card queue, persistence, advance) |
+| `__tests__/swipe-repository.test.ts`   | Repository tests                                            |
+| `__tests__/deck-swipe-session.test.ts` | Hook/integration tests                                      |
 
 ### Files to MODIFY
 
-| File | What changes |
-|------|--------------|
-| `lib/db/migrations.ts` | Add migration 006 |
-| `types/domain/swipes.ts` | Update session/event row types, domain types, mappers |
-| `components/deck/DeckCard.tsx` | Rename to `SwipeCard.tsx`, change prop interface |
-| `components/deck/index.ts` | Update barrel: `DeckCard` → `SwipeCard` |
-| `app/deck/[deckId].tsx` | Wire "Start Swiping" CTA to navigate to `play` route |
-| `app/_layout.tsx` | Register `deck/[deckId]/play` route (or let Expo Router auto-discover) |
-| `lib/db/index.ts` | Add barrel export for `swipeRepository` |
-| `__tests__/schema-check.test.ts` | Update columns, FKs, indexes for rebuilt tables |
-| `__tests__/db-migrations.test.ts` | Update expected version to 6 |
-| `__tests__/domain-models.test.ts` | Update session/event mapper tests |
-| `__tests__/deck-action-bar.test.tsx` | Update if it imported `DeckCard` |
+| File                                 | What changes                                                           |
+| ------------------------------------ | ---------------------------------------------------------------------- |
+| `lib/db/migrations.ts`               | Add migration 006                                                      |
+| `types/domain/swipes.ts`             | Update session/event row types, domain types, mappers                  |
+| `components/deck/DeckCard.tsx`       | Rename to `SwipeCard.tsx`, change prop interface                       |
+| `components/deck/index.ts`           | Update barrel: `DeckCard` → `SwipeCard`                                |
+| `app/deck/[deckId].tsx`              | Wire "Start Swiping" CTA to navigate to `play` route                   |
+| `app/_layout.tsx`                    | Register `deck/[deckId]/play` route (or let Expo Router auto-discover) |
+| `lib/db/index.ts`                    | Add barrel export for `swipeRepository`                                |
+| `__tests__/schema-check.test.ts`     | Update columns, FKs, indexes for rebuilt tables                        |
+| `__tests__/db-migrations.test.ts`    | Update expected version to 6                                           |
+| `__tests__/domain-models.test.ts`    | Update session/event mapper tests                                      |
+| `__tests__/deck-action-bar.test.tsx` | Update if it imported `DeckCard`                                       |
 
 ### Files to PRESERVE (do not modify)
 
-| File | Why |
-|------|-----|
-| `components/deck/DeckActionBar.tsx` | Action bar — stable |
-| `components/deck/DeckActionButton.tsx` | Action buttons — stable |
-| `components/deck/DeckStatePlaceholder.tsx` | Placeholder states — reused in play screen |
-| `components/deck/DeckTagsRow.tsx` | Tag chips — reused in SwipeCard |
-| `components/deck/deckActionPayload.ts` | Callback contract — stable |
-| `components/deck/dispatchDeckAction.ts` | Dispatch lock — stable |
-| `components/deck/deckState.ts` | View states — stable |
-| `hooks/useDeckGestures.ts` | Gesture system — stable |
-| `hooks/useDeckGestures.constants.ts` | Gesture constants — stable |
-| `types/domain/actions.ts` | Action model — finalized in Iteration 11 |
-| `types/domain/decks.ts` | Deck/DeckCard types — stable from Iteration 10 |
-| `types/domain/scores.ts` | Old scoring types — preserved until Iteration 15 |
-| `lib/db/deckRepository.ts` | Deck CRUD — stable |
-| `lib/db/deckCardRepository.ts` | DeckCard CRUD — stable |
-| `lib/content/*` | Content pipeline — stable from Iteration 13 |
+| File                                       | Why                                              |
+| ------------------------------------------ | ------------------------------------------------ |
+| `components/deck/DeckActionBar.tsx`        | Action bar — stable                              |
+| `components/deck/DeckActionButton.tsx`     | Action buttons — stable                          |
+| `components/deck/DeckStatePlaceholder.tsx` | Placeholder states — reused in play screen       |
+| `components/deck/DeckTagsRow.tsx`          | Tag chips — reused in SwipeCard                  |
+| `components/deck/deckActionPayload.ts`     | Callback contract — stable                       |
+| `components/deck/dispatchDeckAction.ts`    | Dispatch lock — stable                           |
+| `components/deck/deckState.ts`             | View states — stable                             |
+| `hooks/useDeckGestures.ts`                 | Gesture system — stable                          |
+| `hooks/useDeckGestures.constants.ts`       | Gesture constants — stable                       |
+| `types/domain/actions.ts`                  | Action model — finalized in Iteration 11         |
+| `types/domain/decks.ts`                    | Deck/DeckCard types — stable from Iteration 10   |
+| `types/domain/scores.ts`                   | Old scoring types — preserved until Iteration 15 |
+| `lib/db/deckRepository.ts`                 | Deck CRUD — stable                               |
+| `lib/db/deckCardRepository.ts`             | DeckCard CRUD — stable                           |
+| `lib/content/*`                            | Content pipeline — stable from Iteration 13      |
 
 ### External troubleshooting and learning resources
 
 #### Official docs
+
 - [Expo Router — Nested dynamic routes](https://docs.expo.dev/router/create-pages/#dynamic-routes) — for `app/deck/[deckId]/play.tsx`
 - [Expo SQLite — Transactions](https://docs.expo.dev/versions/latest/sdk/sqlite/)
 - [React Native Pressable](https://reactnative.dev/docs/pressable) — for CTA button
 - [SQLite table rebuild pattern](https://www.sqlite.org/lang_altertable.html#otheralter)
 
 #### Guides
+
 - This repo's migration 004 — the exact pattern for SQLite table rebuild (create new, copy, drop, rename)
 - This repo's `docs/deck/DECK_ACTION_CONTRACT.md` — callback contract to preserve
 
 ## 6. When stuck
 
-| Problem | Resolution |
-|---------|------------|
-| Migration rebuild drops data | This is intentional. Old `swipe_events` reference `catalog_entities` which is not the fork's data store. There is no production data. The migration creates clean tables with the new FKs. |
-| FK error: `deck_id` references nonexistent deck | The `decks` table must be populated (Iteration 13) before any swipe session can be created. The swipe session screen should guard against this by verifying the deck exists before creating a session. |
-| `SwipeCard` import breaks existing tests | After renaming, `grep -r "DeckCard" __tests__/` will show stale imports. Update all to `SwipeCard`. The barrel in `components/deck/index.ts` should export `SwipeCard` (not `DeckCard`). |
-| Route `deck/[deckId]/play` not found | Create the directory `app/deck/[deckId]/` and add `play.tsx`. Expo Router supports nested dynamic segments. The route will auto-resolve to `/deck/{id}/play`. |
-| Card queue runs out | When all cards are exhausted, the session should show a completion state: "You've seen all cards in this deck!" with a "Back to Deck" button. Track `seenCardIds` in the hook. |
-| Gesture system doesn't work in play screen | Ensure `GestureHandlerRootView` wraps the screen (it already does via root layout). The `useDeckGestures` hook needs `enabled: true` and a valid `screenWidth`. |
-| `tileType` produces fallback icon | The `iconForEntityType` function maps `type` strings to icons. Deck category strings (like `movies_tv`) may not be in the entity type map. Use the `iconForDeckCategory` helper from Iteration 12 (if created), or extend the map. |
+| Problem                                            | Resolution                                                                                                                                                                                                                                            |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Migration rebuild drops data                       | This is intentional. Old `swipe_events` reference `catalog_entities` which is not the fork's data store. There is no production data. The migration creates clean tables with the new FKs.                                                            |
+| FK error: `deck_id` references nonexistent deck    | The `decks` table must be populated (Iteration 13) before any swipe session can be created. The swipe session screen should guard against this by verifying the deck exists before creating a session.                                                |
+| `SwipeCard` import breaks existing tests           | After renaming, `grep -r "DeckCard" __tests__/` will show stale imports. Update all to `SwipeCard`. The barrel in `components/deck/index.ts` should export `SwipeCard` (not `DeckCard`).                                                              |
+| Route `deck/[deckId]/play` not found               | Create the directory `app/deck/[deckId]/` and add `play.tsx`. Expo Router supports nested dynamic segments. The route will auto-resolve to `/deck/{id}/play`.                                                                                         |
+| Card queue runs out                                | When all cards are exhausted, the session should show a completion state: "You've seen all cards in this deck!" with a "Back to Deck" button. Track `seenCardIds` in the hook.                                                                        |
+| Gesture system doesn't work in play screen         | Ensure `GestureHandlerRootView` wraps the screen (it already does via root layout). The `useDeckGestures` hook needs `enabled: true` and a valid `screenWidth`.                                                                                       |
+| `tileType` produces fallback icon                  | The `iconForEntityType` function maps `type` strings to icons. Deck category strings (like `movies_tv`) may not be in the entity type map. Use the `iconForDeckCategory` helper from Iteration 12 (if created), or extend the map.                    |
 | TypeScript errors after changing SwipeEvent fields | Expected. `entityId` is removed, `cardId` and `deckId` are added. Every consumer of `SwipeEvent` will error — fix each one. Since no code was previously consuming `SwipeEvent` from the DB (persistence wasn't wired), most errors will be in tests. |
 
 ## 7. Implementation checklist
@@ -349,10 +351,11 @@ CREATE INDEX idx_swipe_events_card_id ON swipe_events(card_id);
 Update both row and domain types. The full set of changes:
 
 **SwipeSessionRow:**
+
 ```typescript
 export interface SwipeSessionRow {
   id: string;
-  deck_id: string;        // NEW
+  deck_id: string; // NEW
   started_at: number;
   ended_at: number | null;
   filters_json: string;
@@ -360,10 +363,11 @@ export interface SwipeSessionRow {
 ```
 
 **SwipeSession:**
+
 ```typescript
 export interface SwipeSession {
   id: SessionId;
-  deckId: DeckId;          // NEW
+  deckId: DeckId; // NEW
   startedAt: number;
   endedAt: number | null;
   filters: SessionFilters;
@@ -371,12 +375,13 @@ export interface SwipeSession {
 ```
 
 **SwipeEventRow:**
+
 ```typescript
 export interface SwipeEventRow {
   id: string;
   session_id: string;
-  deck_id: string;         // NEW
-  card_id: string;         // RENAMED from entity_id
+  deck_id: string; // NEW
+  card_id: string; // RENAMED from entity_id
   action: string;
   strength: number;
   created_at: number;
@@ -384,12 +389,13 @@ export interface SwipeEventRow {
 ```
 
 **SwipeEvent:**
+
 ```typescript
 export interface SwipeEvent {
   id: SwipeEventId;
   sessionId: SessionId;
-  deckId: DeckId;           // NEW
-  cardId: DeckCardId;       // RENAMED from entityId
+  deckId: DeckId; // NEW
+  cardId: DeckCardId; // RENAMED from entityId
   action: SwipeAction;
   strength: number;
   createdAt: number;
@@ -403,20 +409,23 @@ Update all four mapper functions (`rowToSwipeSession`, `swipeSessionToRow`, `row
 **New file:** `lib/db/swipeRepository.ts`
 
 ```typescript
-type SwipeBoundaryDb = Pick<SQLiteDatabase, 'runAsync' | 'getFirstAsync' | 'getAllAsync'>;
+type SwipeBoundaryDb = Pick<
+  SQLiteDatabase,
+  'runAsync' | 'getFirstAsync' | 'getAllAsync'
+>;
 ```
 
 Functions:
 
-| Function | Signature | Purpose |
-|----------|-----------|---------|
-| `createSwipeSession` | `(db, deckId: DeckId) => Promise<SwipeSession>` | Creates a new session row with generated ID and current timestamp |
-| `endSwipeSession` | `(db, sessionId: SessionId) => Promise<void>` | Sets `ended_at` to current timestamp |
-| `insertSwipeEvent` | `(db, event: SwipeEvent) => Promise<void>` | Inserts a single event row |
-| `getSwipeEventsByDeckId` | `(db, deckId: DeckId) => Promise<SwipeEvent[]>` | All events for a deck, ordered by `created_at DESC` |
-| `getSwipeEventCountByDeckId` | `(db, deckId: DeckId) => Promise<number>` | Count of events for a deck (for confidence checks) |
-| `getSwipedCardIdsByDeckId` | `(db, deckId: DeckId) => Promise<Set<DeckCardId>>` | Distinct card IDs already swiped in this deck (for filtering the card queue) |
-| `getSessionsByDeckId` | `(db, deckId: DeckId) => Promise<SwipeSession[]>` | All sessions for a deck |
+| Function                     | Signature                                          | Purpose                                                                      |
+| ---------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `createSwipeSession`         | `(db, deckId: DeckId) => Promise<SwipeSession>`    | Creates a new session row with generated ID and current timestamp            |
+| `endSwipeSession`            | `(db, sessionId: SessionId) => Promise<void>`      | Sets `ended_at` to current timestamp                                         |
+| `insertSwipeEvent`           | `(db, event: SwipeEvent) => Promise<void>`         | Inserts a single event row                                                   |
+| `getSwipeEventsByDeckId`     | `(db, deckId: DeckId) => Promise<SwipeEvent[]>`    | All events for a deck, ordered by `created_at DESC`                          |
+| `getSwipeEventCountByDeckId` | `(db, deckId: DeckId) => Promise<number>`          | Count of events for a deck (for confidence checks)                           |
+| `getSwipedCardIdsByDeckId`   | `(db, deckId: DeckId) => Promise<Set<DeckCardId>>` | Distinct card IDs already swiped in this deck (for filtering the card queue) |
+| `getSessionsByDeckId`        | `(db, deckId: DeckId) => Promise<SwipeSession[]>`  | All sessions for a deck                                                      |
 
 For ID generation, use a simple `crypto.randomUUID()` or a timestamp-based UUID. The branded `asSessionId(uuid)` and `asSwipeEventId(uuid)` wrappers apply.
 
@@ -484,6 +493,7 @@ The `onAction` callback returned by the hook has the `DeckActionHandler` signatu
 This is a full-screen Stack screen that hosts the deck-scoped swipe session.
 
 **Structure:**
+
 ```
 View (full screen, dark background)
   ├── Header: deck title + cards remaining counter
@@ -495,6 +505,7 @@ View (full screen, dark background)
 ```
 
 **Data flow:**
+
 1. Extract `deckId` from route params
 2. Load deck metadata via `useDeckById(deckId)` for title display
 3. Use `useDeckSwipeSession({ deckId, deckCategory })` for session state
@@ -611,22 +622,22 @@ npm test
 
 ## 10. Definition of done evidence
 
-| Evidence | Verification command |
-|----------|---------------------|
-| Migration 006 exists | `rg "006_" lib/db/migrations.ts` |
-| Schema version 6 | `npm test -- db-migrations` passes |
-| `deck_id` in swipe_sessions | `npm test -- schema-check` passes with updated columns |
-| `card_id` in swipe_events | `npm test -- schema-check` passes |
-| `entity_id` removed | `rg "entity_id" types/domain/swipes.ts` returns 0 hits |
-| SwipeCard exists | `ls components/deck/SwipeCard.tsx` |
-| DeckCard UI gone | `rg "DeckCard" components/deck/index.ts` returns 0 hits |
-| Play route exists | `ls app/deck/\[deckId\]/play.tsx` |
-| Swipe repository exists | `ls lib/db/swipeRepository.ts` |
-| Session hook exists | `ls hooks/useDeckSwipeSession.ts` |
-| Tests pass | `npm test` exit code 0 |
-| Typecheck passes | `npm run typecheck` exit code 0 |
-| Lint passes | `npm run lint` exit code 0 |
-| Format passes | `npm run format -- --check` exit code 0 |
+| Evidence                    | Verification command                                    |
+| --------------------------- | ------------------------------------------------------- |
+| Migration 006 exists        | `rg "006_" lib/db/migrations.ts`                        |
+| Schema version 6            | `npm test -- db-migrations` passes                      |
+| `deck_id` in swipe_sessions | `npm test -- schema-check` passes with updated columns  |
+| `card_id` in swipe_events   | `npm test -- schema-check` passes                       |
+| `entity_id` removed         | `rg "entity_id" types/domain/swipes.ts` returns 0 hits  |
+| SwipeCard exists            | `ls components/deck/SwipeCard.tsx`                      |
+| DeckCard UI gone            | `rg "DeckCard" components/deck/index.ts` returns 0 hits |
+| Play route exists           | `ls app/deck/\[deckId\]/play.tsx`                       |
+| Swipe repository exists     | `ls lib/db/swipeRepository.ts`                          |
+| Session hook exists         | `ls hooks/useDeckSwipeSession.ts`                       |
+| Tests pass                  | `npm test` exit code 0                                  |
+| Typecheck passes            | `npm run typecheck` exit code 0                         |
+| Lint passes                 | `npm run lint` exit code 0                              |
+| Format passes               | `npm run format -- --check` exit code 0                 |
 
 ## 11. Validation commands
 

@@ -9,6 +9,9 @@ import { runMigrations } from './runMigrations';
 export * from './catalogRepository';
 export * from './client';
 export * from './deckCardRepository';
+export * from './deckCardStateRepository';
+export * from './deckTagRepository';
+export * from './deckTagStateRepository';
 export * from './deckProfileRepository';
 export * from './deckRepository';
 export * from './health';
@@ -26,7 +29,15 @@ export async function initializeDatabase(
 
   try {
     await runMigrations(db);
-    await loadPrebuiltDecksIfNeeded(db);
+    const prebuiltLoadResult = await loadPrebuiltDecksIfNeeded(db);
+
+    if (prebuiltLoadResult.status === 'failed') {
+      throw (
+        prebuiltLoadResult.error ??
+        new Error('Prebuilt deck content failed to load.')
+      );
+    }
+
     const status = await healthCheck(db);
 
     logDbInfo(

@@ -11,9 +11,14 @@ import { asDeckId, type Deck } from '@/types/domain';
 
 const mockPush = jest.fn();
 const mockUseDecks = jest.fn();
+const mockUseDecksWithProfileStatus = jest.fn();
+const mockUseDeckCardDetails = jest.fn();
 
 jest.mock('expo-router', () => ({
   Link: ({ children }: { children: React.ReactNode }) => children,
+  Stack: {
+    Screen: () => null,
+  },
   useLocalSearchParams: () => ({ id: 'test-id' }),
   useRouter: () => ({ push: mockPush }),
 }));
@@ -97,6 +102,14 @@ jest.mock('@/hooks/useDecks', () => ({
   useDecks: () => mockUseDecks(),
 }));
 
+jest.mock('@/hooks/useDecksWithProfileStatus', () => ({
+  useDecksWithProfileStatus: () => mockUseDecksWithProfileStatus(),
+}));
+
+jest.mock('@/hooks/useDeckCardDetails', () => ({
+  useDeckCardDetails: () => mockUseDeckCardDetails(),
+}));
+
 function buildDeck(overrides: Partial<Deck> = {}): Deck {
   return {
     id: asDeckId('deck_movies'),
@@ -121,6 +134,33 @@ function buildDeck(overrides: Partial<Deck> = {}): Deck {
 describe('Tab screens render without crash', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseDecksWithProfileStatus.mockReturnValue({
+      decks: [],
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+    mockUseDeckCardDetails.mockReturnValue({
+      card: {
+        id: 'test-id',
+        deckId: asDeckId('deck_movies'),
+        kind: 'statement',
+        title: 'I would rather rewatch a favorite than chase every new release',
+        subtitle: 'Movies & TV',
+        descriptionShort: 'Tests comfort-watch leaning.',
+        tags: ['Comfort watch'],
+        popularity: 0.8,
+        tileKey: 'statement:test-id',
+        sortOrder: 1,
+        createdAt: 1700000000000,
+        updatedAt: 1700000000000,
+      },
+      deck: buildDeck(),
+      tagLabels: ['Comfort watch'],
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
   });
 
   it('renders Deck screen', () => {
@@ -142,25 +182,73 @@ describe('Tab screens render without crash', () => {
   });
 
   it('renders Library screen', () => {
+    mockUseDecksWithProfileStatus.mockReturnValue({
+      decks: [
+        {
+          deck: buildDeck(),
+          swipeCount: 12,
+          stage: 'meaningful',
+          compareReady: false,
+          compareState: 'needs_more_breadth',
+          compareDetail:
+            'This deck has a profile, but it still needs broader coverage across cards, tags, or facets before compare should unlock.',
+          primaryHint: null,
+        },
+      ],
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
     render(<LibraryScreen />);
     expect(screen.getByText('History')).toBeTruthy();
+    expect(
+      screen.getByText('Deck activity is tracked locally, one deck at a time.'),
+    ).toBeTruthy();
   });
 
   it('renders Settings screen', () => {
+    mockUseDecksWithProfileStatus.mockReturnValue({
+      decks: [
+        {
+          deck: buildDeck(),
+          swipeCount: 30,
+          stage: 'meaningful',
+          compareReady: false,
+          compareState: 'needs_more_stability',
+          compareDetail:
+            'This deck has enough breadth to be interesting, but it still needs more stability or less ambiguity before compare should unlock.',
+          primaryHint: null,
+        },
+      ],
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
     render(<SettingsScreen />);
     expect(screen.getByText('Settings')).toBeTruthy();
+    expect(
+      screen.getByText(
+        'DateDeck stays local-first, deck-first, and consent-gated by design.',
+      ),
+    ).toBeTruthy();
   });
 });
 
 describe('Detail and modal screens render without crash', () => {
   it('renders Detail screen with id param', () => {
     render(<DetailScreen />);
-    expect(screen.getByText('Card Detail')).toBeTruthy();
-    expect(screen.getByText('ID: test-id')).toBeTruthy();
+    expect(
+      screen.getAllByText(
+        'I would rather rewatch a favorite than chase every new release',
+      ).length,
+    ).toBeGreaterThan(0);
+    expect(screen.getByText('Comfort watch')).toBeTruthy();
   });
 
   it('renders Modal screen', () => {
     render(<ModalScreen />);
-    expect(screen.getByText('Modal')).toBeTruthy();
+    expect(screen.getByText('Deck Browser Filters')).toBeTruthy();
   });
 });

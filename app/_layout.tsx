@@ -12,6 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet, Text, View } from 'react-native';
 import 'react-native-reanimated';
 
+import PersistentBottomNav from '@/components/navigation/PersistentBottomNav';
 import { useColorScheme } from '@/components/useColorScheme';
 import { initializeDatabase } from '@/lib/db';
 
@@ -119,27 +120,52 @@ function RootLayoutNav() {
   return (
     <GestureHandlerRootView style={styles.gestureRoot}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="deck/[deckId]"
-            options={{ title: 'Deck Detail', headerShown: true }}
-          />
-          <Stack.Screen
-            name="deck/[deckId]/play"
-            options={{ headerShown: false, gestureEnabled: false }}
-          />
-          <Stack.Screen
-            name="deck/[deckId]/profile"
-            options={{ title: 'Deck Profile' }}
-          />
-          <Stack.Screen name="details/[id]" options={{ title: 'Details' }} />
-          <Stack.Screen
-            name="modal"
-            options={{ presentation: 'modal', title: 'Filters' }}
-          />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <View style={styles.appShell}>
+          <View style={styles.stackFrame}>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="deck/[deckId]"
+                options={{ title: 'Deck Detail', headerShown: true }}
+              />
+              <Stack.Screen
+                name="deck/[deckId]/play"
+                options={{ headerShown: false, gestureEnabled: false }}
+              />
+              <Stack.Screen
+                name="deck/[deckId]/profile"
+                options={{ title: 'Deck Profile' }}
+              />
+              <Stack.Screen
+                name="deck/[deckId]/compare"
+                options={{ title: 'Compare Readiness' }}
+              />
+              <Stack.Screen
+                name="compare/[deckId]/consent"
+                options={{ title: 'Compare Consent' }}
+              />
+              <Stack.Screen
+                name="compare/[deckId]/report"
+                options={{ title: 'Compare Report' }}
+              />
+              <Stack.Screen
+                name="showdown/create"
+                options={{ title: 'Start Showdown' }}
+              />
+              <Stack.Screen
+                name="showdown/[sessionId]"
+                options={{ title: 'Showdown' }}
+              />
+              <Stack.Screen name="details/[id]" options={{ title: 'Card' }} />
+              <Stack.Screen
+                name="modal"
+                options={{ presentation: 'modal', title: 'Deck Filters' }}
+              />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+          </View>
+          <PersistentBottomNav />
+        </View>
       </ThemeProvider>
     </GestureHandlerRootView>
   );
@@ -170,6 +196,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   gestureRoot: {
+    flex: 1,
+  },
+  appShell: {
+    flex: 1,
+    backgroundColor: '#0B0B10',
+  },
+  stackFrame: {
     flex: 1,
   },
 });

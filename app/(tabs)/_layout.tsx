@@ -21,6 +21,7 @@ export default function TabLayout() {
       initialRouteName="index"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarStyle: { display: 'none' },
         headerShown: useClientOnlyValue(false, true),
       }}
     >

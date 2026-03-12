@@ -3,11 +3,15 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 
 import { getDeckCardsByDeckId, getDb } from '@/lib/db';
 import { updateScoresFromSwipeEvent } from '@/lib/profile/deckProfileService';
+import { buildDeckSequenceQueue } from '@/lib/sequence/broadStartStrategy';
+import {
+  recordDeckCardPresentation,
+  recordDeckCardSwipe,
+} from '@/lib/db/deckCardStateRepository';
 import {
   createSwipeEvent,
   createSwipeSession,
   endSwipeSession,
-  getSwipedCardIdsByDeckId,
   insertSwipeEvent,
 } from '@/lib/db/swipeRepository';
 import {
@@ -16,6 +20,7 @@ import {
   type DeckId,
   type SessionId,
 } from '@/types/domain';
+import type { DeckSequenceDecision } from '@/lib/sequence/deckSequenceTypes';
 
 import type { DeckActionHandler } from '@/components/deck/deckActionPayload';
 
@@ -34,10 +39,12 @@ export type DeckSwipeSessionState =
 export interface UseDeckSwipeSessionResult {
   state: DeckSwipeSessionState;
   currentCard: DeckCard | null;
+  currentDecision: DeckSequenceDecision | null;
   cardsRemaining: number;
   totalCards: number;
   errorMessage?: string;
   onAction: DeckActionHandler;
+  endSession: () => Promise<void>;
   retry: () => void;
 }
 
@@ -66,12 +73,16 @@ export function useDeckSwipeSession({
 }: UseDeckSwipeSessionOptions): UseDeckSwipeSessionResult {
   const [state, setState] = useState<DeckSwipeSessionState>('loading');
   const [queue, setQueue] = useState<DeckCard[]>([]);
+  const [currentDecision, setCurrentDecision] =
+    useState<DeckSequenceDecision | null>(null);
   const [totalCards, setTotalCards] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
   const [refreshCount, setRefreshCount] = useState(0);
   const dbRef = useRef<SwipeSessionDb | null>(null);
   const sessionIdRef = useRef<SessionId | null>(null);
   const sessionClosedRef = useRef(false);
+  const allCardsRef = useRef<DeckCard[]>([]);
+  const lastPresentedCardIdRef = useRef<string | null>(null);
 
   const retry = useCallback(() => {
     setRefreshCount((current) => current + 1);
@@ -100,9 +111,12 @@ export function useDeckSwipeSession({
       setState('loading');
       setErrorMessage(undefined);
       setQueue([]);
+      setCurrentDecision(null);
       setTotalCards(0);
       sessionIdRef.current = null;
       sessionClosedRef.current = false;
+      allCardsRef.current = [];
+      lastPresentedCardIdRef.current = null;
 
       try {
         const db = await getDb();
@@ -110,15 +124,19 @@ export function useDeckSwipeSession({
 
         const allCards = await getDeckCardsByDeckId(db, deckId);
         const orderedCards = sortDeckCards(allCards);
-        const seenCardIds = await getSwipedCardIdsByDeckId(db, deckId);
-        const remainingCards = orderedCards.filter(
-          (card) => !seenCardIds.has(card.id),
+        // Adaptive sequencing may reinsert a due retest card ahead of unseen cards.
+        const queueEntries = await buildDeckSequenceQueue(
+          db,
+          deckId,
+          orderedCards,
         );
+        const remainingCards = queueEntries.map((entry) => entry.card);
 
         if (cancelled) {
           return;
         }
 
+        allCardsRef.current = orderedCards;
         setTotalCards(orderedCards.length);
 
         if (orderedCards.length === 0) {
@@ -142,6 +160,7 @@ export function useDeckSwipeSession({
         }
 
         setQueue(remainingCards);
+        setCurrentDecision(queueEntries[0]?.decision ?? null);
         setState('ready');
       } catch (error) {
         if (cancelled) {
@@ -185,14 +204,26 @@ export function useDeckSwipeSession({
           createdAt: Date.now(),
         });
         await insertSwipeEvent(db, event);
+        await recordDeckCardSwipe(db, {
+          deckId,
+          cardId: currentCard.id,
+          swipedAt: event.createdAt,
+        });
         try {
           await updateScoresFromSwipeEvent(db, event);
         } catch {
           // Profile score update is best-effort; do not block swipe flow
         }
 
-        const nextQueue = queue.slice(1);
+        // Rebuild from live state so guardrails and retest eligibility stay current.
+        const nextEntries = await buildDeckSequenceQueue(
+          db,
+          deckId,
+          allCardsRef.current,
+        );
+        const nextQueue = nextEntries.map((entry) => entry.card);
         setQueue(nextQueue);
+        setCurrentDecision(nextEntries[0]?.decision ?? null);
 
         if (nextQueue.length === 0) {
           setState('complete');
@@ -216,13 +247,68 @@ export function useDeckSwipeSession({
     [queue, state],
   );
 
+  useEffect(() => {
+    if (state !== 'ready' || !currentCard) {
+      lastPresentedCardIdRef.current = null;
+      return;
+    }
+
+    if (lastPresentedCardIdRef.current === (currentCard.id as string)) {
+      return;
+    }
+
+    lastPresentedCardIdRef.current = currentCard.id as string;
+
+    let cancelled = false;
+
+    const persistPresentation = async () => {
+      const db = dbRef.current;
+
+      if (!db) {
+        return;
+      }
+
+      try {
+        await recordDeckCardPresentation(db, {
+          deckId,
+          cardId: currentCard.id,
+          presentedAt: Date.now(),
+        });
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : 'A recoverable error occurred while tracking this card view.',
+        );
+        setState('error');
+        void closeSessionIfNeeded();
+      }
+    };
+
+    void persistPresentation();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [closeSessionIfNeeded, currentCard, deckId, state]);
+
+  const endSession = useCallback(async () => {
+    await closeSessionIfNeeded();
+  }, [closeSessionIfNeeded]);
+
   return {
     state,
     currentCard,
+    currentDecision,
     cardsRemaining: queue.length,
     totalCards,
     errorMessage,
     onAction,
+    endSession,
     retry,
   };
 }

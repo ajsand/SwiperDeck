@@ -47,26 +47,27 @@ function DeckStatePlaceholderImpl({
         testID="deck-placeholder-empty"
         accessible
         accessibilityRole="text"
-        accessibilityLabel="No cards in this deck. Try adjusting filters or choosing a different deck."
+        accessibilityLabel="No cards are available in this deck right now. Try a different deck."
         style={styles.container}
       >
-        <Text style={styles.title}>No cards in this deck</Text>
+        <Text style={styles.title}>No cards available</Text>
         <Text style={styles.message}>
-          Try adjusting filters or choosing a different deck.
+          This deck has no playable cards on this device right now. Try a
+          different deck.
         </Text>
         {onOpenFilters ? (
           <Pressable
             testID="deck-placeholder-open-filters"
             accessibilityRole="button"
-            accessibilityLabel="Adjust filters"
-            accessibilityHint="Opens filtering options to broaden deck results"
+            accessibilityLabel="Choose a different deck"
+            accessibilityHint="Returns to deck browsing"
             onPress={onOpenFilters}
             style={({ pressed }) => [
               styles.button,
               pressed ? styles.buttonPressed : null,
             ]}
           >
-            <Text style={styles.buttonText}>Adjust filters</Text>
+            <Text style={styles.buttonText}>Browse decks</Text>
           </Pressable>
         ) : null}
       </View>

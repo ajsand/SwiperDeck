@@ -51,7 +51,10 @@ const TILE_PALETTES_INTERNAL: readonly TilePaletteDefinition[] = Object.freeze([
 ]);
 
 const GRADIENT_DIRECTIONS = Object.freeze<
-  Record<GradientDirectionKey, Readonly<{ start: GradientPoint; end: GradientPoint }>>
+  Record<
+    GradientDirectionKey,
+    Readonly<{ start: GradientPoint; end: GradientPoint }>
+  >
 >({
   diagonal_tl_br: Object.freeze({
     start: Object.freeze({ x: 0, y: 0 }),
@@ -84,7 +87,8 @@ const OVERLAY_STYLE_VALUES: readonly OverlayStyleKey[] = Object.freeze([
   'scrim_medium',
 ]);
 
-export const TILE_PALETTES: readonly TilePaletteDefinition[] = TILE_PALETTES_INTERNAL;
+export const TILE_PALETTES: readonly TilePaletteDefinition[] =
+  TILE_PALETTES_INTERNAL;
 
 export function paletteFromHash(hash: number): PaletteFromHashResult {
   const normalizedHash = hash >>> 0;

@@ -119,7 +119,12 @@ function DeterministicTileImpl({
           pointerEvents="none"
           accessible={false}
         >
-          <Ionicons testID="tile-icon" name={iconName} size={22} color="#FFFFFF" />
+          <Ionicons
+            testID="tile-icon"
+            name={iconName}
+            size={22}
+            color="#FFFFFF"
+          />
         </View>
       ) : (
         <View
@@ -128,7 +133,12 @@ function DeterministicTileImpl({
           pointerEvents="none"
           accessible={false}
         >
-          <Ionicons testID="tile-icon" name={iconName} size={28} color="#FFFFFF" />
+          <Ionicons
+            testID="tile-icon"
+            name={iconName}
+            size={28}
+            color="#FFFFFF"
+          />
         </View>
       )}
 

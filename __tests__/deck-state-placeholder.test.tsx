@@ -13,7 +13,7 @@ describe('DeckStatePlaceholder', () => {
     expect(loadingNode.props.accessibilityState).toEqual({ busy: true });
   });
 
-  it('renders empty state and triggers filter callback', () => {
+  it('renders empty state and triggers recovery callback', () => {
     const onOpenFilters = jest.fn();
     render(
       <DeckStatePlaceholder state="empty" onOpenFilters={onOpenFilters} />,
@@ -59,7 +59,7 @@ describe('DeckStatePlaceholder', () => {
       },
       empty: {
         hasRoot: !!empty.queryByTestId('deck-placeholder-empty'),
-        title: empty.getByText('No cards in this deck').props.children,
+        title: empty.getByText('No cards available').props.children,
       },
       error: {
         hasRoot: !!error.queryByTestId('deck-placeholder-error'),

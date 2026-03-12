@@ -7,14 +7,17 @@ import {
   asSessionId,
   type DeckCard,
 } from '@/types/domain';
+import type { DeckSequenceQueueEntry } from '@/lib/sequence/deckSequenceTypes';
 
 const mockGetDb = jest.fn();
 const mockGetDeckCardsByDeckId = jest.fn();
-const mockGetSwipedCardIdsByDeckId = jest.fn();
 const mockCreateSwipeSession = jest.fn();
 const mockEndSwipeSession = jest.fn();
 const mockInsertSwipeEvent = jest.fn();
 const mockCreateSwipeEvent = jest.fn();
+const mockBuildDeckSequenceQueue = jest.fn();
+const mockRecordDeckCardPresentation = jest.fn();
+const mockRecordDeckCardSwipe = jest.fn();
 
 jest.mock('@/lib/db', () => ({
   getDb: (...args: unknown[]) => mockGetDb(...args),
@@ -23,12 +26,21 @@ jest.mock('@/lib/db', () => ({
 }));
 
 jest.mock('@/lib/db/swipeRepository', () => ({
-  getSwipedCardIdsByDeckId: (...args: unknown[]) =>
-    mockGetSwipedCardIdsByDeckId(...args),
   createSwipeSession: (...args: unknown[]) => mockCreateSwipeSession(...args),
   endSwipeSession: (...args: unknown[]) => mockEndSwipeSession(...args),
   insertSwipeEvent: (...args: unknown[]) => mockInsertSwipeEvent(...args),
   createSwipeEvent: (...args: unknown[]) => mockCreateSwipeEvent(...args),
+}));
+
+jest.mock('@/lib/sequence/broadStartStrategy', () => ({
+  buildDeckSequenceQueue: (...args: unknown[]) =>
+    mockBuildDeckSequenceQueue(...args),
+}));
+
+jest.mock('@/lib/db/deckCardStateRepository', () => ({
+  recordDeckCardPresentation: (...args: unknown[]) =>
+    mockRecordDeckCardPresentation(...args),
+  recordDeckCardSwipe: (...args: unknown[]) => mockRecordDeckCardSwipe(...args),
 }));
 
 function buildCard(overrides: Partial<DeckCard> = {}): DeckCard {
@@ -46,6 +58,31 @@ function buildCard(overrides: Partial<DeckCard> = {}): DeckCard {
     createdAt: 1700000000000,
     updatedAt: 1700000001000,
     ...overrides,
+  };
+}
+
+function buildQueueEntry(
+  card: DeckCard,
+  stage: 'broad_start' | 'adaptive' = 'broad_start',
+): DeckSequenceQueueEntry {
+  return {
+    card,
+    decision: {
+      cardId: card.id,
+      stage,
+      score: 1,
+      primaryReason:
+        stage === 'adaptive'
+          ? 'reinforce_positive_area'
+          : 'clarify_low_coverage_tag',
+      reasons: [
+        {
+          code: 'representative_pick',
+          scoreDelta: 1,
+          detail: 'representative_pick',
+        },
+      ],
+    },
   };
 }
 
@@ -70,10 +107,13 @@ describe('useDeckSwipeSession', () => {
     );
     mockInsertSwipeEvent.mockResolvedValue(undefined);
     mockEndSwipeSession.mockResolvedValue(undefined);
+    mockBuildDeckSequenceQueue.mockResolvedValue([]);
+    mockRecordDeckCardPresentation.mockResolvedValue(undefined);
+    mockRecordDeckCardSwipe.mockResolvedValue(undefined);
   });
 
-  it('filters seen cards and serves the lowest sort_order card first', async () => {
-    mockGetDeckCardsByDeckId.mockResolvedValue([
+  it('uses the sequencing strategy result instead of raw author order', async () => {
+    const cards = [
       buildCard({
         id: asDeckCardId('values_003'),
         sortOrder: 3,
@@ -89,10 +129,12 @@ describe('useDeckSwipeSession', () => {
         sortOrder: 0,
         popularity: 0.9,
       }),
+    ];
+    mockGetDeckCardsByDeckId.mockResolvedValue(cards);
+    mockBuildDeckSequenceQueue.mockResolvedValue([
+      buildQueueEntry(cards[1]),
+      buildQueueEntry(cards[0]),
     ]);
-    mockGetSwipedCardIdsByDeckId.mockResolvedValue(
-      new Set([asDeckCardId('values_001')]),
-    );
 
     const { result } = renderHook(() =>
       useDeckSwipeSession({
@@ -105,9 +147,23 @@ describe('useDeckSwipeSession', () => {
       expect(result.current.state).toBe('ready');
     });
 
+    await waitFor(() => {
+      expect(mockRecordDeckCardPresentation).toHaveBeenCalledWith(fakeDb, {
+        deckId: asDeckId('deck_values'),
+        cardId: asDeckCardId('values_002'),
+        presentedAt: expect.any(Number),
+      });
+    });
+
     expect(result.current.totalCards).toBe(3);
     expect(result.current.cardsRemaining).toBe(2);
     expect(result.current.currentCard?.id).toBe(asDeckCardId('values_002'));
+    expect(result.current.currentDecision?.stage).toBe('broad_start');
+    expect(mockBuildDeckSequenceQueue).toHaveBeenCalledWith(
+      fakeDb,
+      asDeckId('deck_values'),
+      expect.arrayContaining(cards),
+    );
     expect(mockCreateSwipeSession).toHaveBeenCalledWith(
       fakeDb,
       asDeckId('deck_values'),
@@ -118,11 +174,18 @@ describe('useDeckSwipeSession', () => {
   });
 
   it('persists a swipe event and advances through the queue to completion', async () => {
-    mockGetDeckCardsByDeckId.mockResolvedValue([
+    const cards = [
       buildCard({ id: asDeckCardId('values_001'), sortOrder: 0 }),
       buildCard({ id: asDeckCardId('values_002'), sortOrder: 1 }),
-    ]);
-    mockGetSwipedCardIdsByDeckId.mockResolvedValue(new Set());
+    ];
+    mockGetDeckCardsByDeckId.mockResolvedValue(cards);
+    mockBuildDeckSequenceQueue
+      .mockResolvedValueOnce([
+        buildQueueEntry(cards[0]),
+        buildQueueEntry(cards[1]),
+      ])
+      .mockResolvedValueOnce([buildQueueEntry(cards[1])])
+      .mockResolvedValueOnce([]);
 
     const { result, unmount } = renderHook(() =>
       useDeckSwipeSession({
@@ -145,8 +208,14 @@ describe('useDeckSwipeSession', () => {
     });
 
     expect(mockInsertSwipeEvent).toHaveBeenCalledTimes(1);
+    expect(mockRecordDeckCardSwipe).toHaveBeenCalledWith(fakeDb, {
+      deckId: asDeckId('deck_values'),
+      cardId: asDeckCardId('values_001'),
+      swipedAt: expect.any(Number),
+    });
     expect(result.current.currentCard?.id).toBe(asDeckCardId('values_002'));
     expect(result.current.cardsRemaining).toBe(1);
+    expect(mockBuildDeckSequenceQueue).toHaveBeenCalledTimes(2);
 
     await act(async () => {
       await (
@@ -159,9 +228,33 @@ describe('useDeckSwipeSession', () => {
 
     expect(result.current.state).toBe('complete');
     expect(result.current.currentCard).toBeNull();
+    expect(result.current.currentDecision).toBeNull();
     expect(mockEndSwipeSession).toHaveBeenCalledTimes(1);
 
     unmount();
+    expect(mockEndSwipeSession).toHaveBeenCalledTimes(1);
+  });
+
+  it('can end a live session explicitly without waiting for unmount', async () => {
+    const cards = [buildCard({ id: asDeckCardId('values_001') })];
+    mockGetDeckCardsByDeckId.mockResolvedValue(cards);
+    mockBuildDeckSequenceQueue.mockResolvedValue([buildQueueEntry(cards[0])]);
+
+    const { result } = renderHook(() =>
+      useDeckSwipeSession({
+        deckId: asDeckId('deck_values'),
+        deckCategory: 'values',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(result.current.state).toBe('ready');
+    });
+
+    await act(async () => {
+      await result.current.endSession();
+    });
+
     expect(mockEndSwipeSession).toHaveBeenCalledTimes(1);
   });
 
@@ -171,9 +264,7 @@ describe('useDeckSwipeSession', () => {
       buildCard({ id: asDeckCardId('values_002'), sortOrder: 1 }),
     ];
     mockGetDeckCardsByDeckId.mockResolvedValue(cards);
-    mockGetSwipedCardIdsByDeckId.mockResolvedValue(
-      new Set(cards.map((card) => card.id)),
-    );
+    mockBuildDeckSequenceQueue.mockResolvedValue([]);
 
     const { result } = renderHook(() =>
       useDeckSwipeSession({

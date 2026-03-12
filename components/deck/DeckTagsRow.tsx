@@ -8,7 +8,10 @@ export interface DeckTagsRowProps {
   maxVisible?: number;
 }
 
-function DeckTagsRowImpl({ tags, maxVisible = MAX_VISIBLE_TAGS }: DeckTagsRowProps) {
+function DeckTagsRowImpl({
+  tags,
+  maxVisible = MAX_VISIBLE_TAGS,
+}: DeckTagsRowProps) {
   const visibleTags = useMemo(
     () => tags.slice(0, maxVisible),
     [tags, maxVisible],

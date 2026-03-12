@@ -4,7 +4,7 @@ import { CARD_KINDS, DECK_CATEGORIES } from '@/types/domain';
 describe('prebuilt deck integrity', () => {
   it('parses successfully and contains the 10 Tier 1 decks', () => {
     expect(prebuiltDecksData).toBeTruthy();
-    expect(prebuiltDecksData.version).toBe(1);
+    expect(prebuiltDecksData.version).toBe(2);
     expect(prebuiltDecksData.decks).toHaveLength(10);
   });
 
@@ -55,6 +55,9 @@ describe('prebuilt deck integrity', () => {
         expect(Array.isArray(card.tags)).toBe(true);
         expect(card.tags.length).toBeGreaterThanOrEqual(1);
         expect(card.tags.length).toBeLessThanOrEqual(15);
+        expect(Array.isArray(card.tag_assignments)).toBe(true);
+        expect(card.tag_assignments.length).toBeGreaterThanOrEqual(1);
+        expect(card.tag_assignments.length).toBeLessThanOrEqual(3);
         expect(typeof card.popularity).toBe('number');
         expect(card.popularity).toBeGreaterThanOrEqual(0);
         expect(card.popularity).toBeLessThanOrEqual(1);

@@ -3,8 +3,9 @@ import { memo, useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { DeterministicTile } from '@/components/tiles';
+import { getDeckSafetyBadgeLabel } from '@/lib/policy/deckSafetyPolicy';
 import { iconForDeckCategory } from '@/lib/tiles';
-import type { Deck, DeckId, DeckSensitivity } from '@/types/domain';
+import type { Deck, DeckId } from '@/types/domain';
 
 export interface DeckBrowserCardProps {
   deck: Deck;
@@ -26,27 +27,12 @@ function formatDeckCategory(category: string): string {
     .replace('Food Drinks', 'Food & Drinks');
 }
 
-function sensitivityLabel(sensitivity: DeckSensitivity): string | null {
-  if (sensitivity === 'sensitive') {
-    return 'Sensitive topic';
-  }
-
-  if (sensitivity === 'gated') {
-    return 'Gated topic';
-  }
-
-  return null;
-}
-
 function DeckBrowserCardImpl({ deck, onPress }: DeckBrowserCardProps) {
   const categoryLabel = useMemo(
     () => formatDeckCategory(deck.category),
     [deck.category],
   );
-  const sensitivityText = useMemo(
-    () => sensitivityLabel(deck.sensitivity),
-    [deck.sensitivity],
-  );
+  const sensitivityText = useMemo(() => getDeckSafetyBadgeLabel(deck), [deck]);
   const fallbackIcon = useMemo(
     () => iconForDeckCategory(deck.category),
     [deck.category],

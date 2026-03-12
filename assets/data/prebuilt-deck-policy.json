@@ -1,0 +1,263 @@
+{
+  "version": 1,
+  "default_policy": {
+    "compare": {
+      "minConfidence": 0.62,
+      "minTagCoverage": 0.6,
+      "minFacetCoverage": 0.7,
+      "maxAmbiguityRatio": 0.45,
+      "requireRetestSettled": false
+    },
+    "payload": {
+      "maxAffinityThemes": 5,
+      "maxAversionThemes": 5,
+      "maxUnresolvedAreas": 5,
+      "maxEvidenceCards": 2
+    },
+    "report": {
+      "aiMode": "allow",
+      "preferLocalFallbackBelowConfidence": 0,
+      "hideSensitiveConversationPrompts": false,
+      "additionalGuardrails": []
+    },
+    "warnings": {
+      "readiness": "",
+      "consent": "",
+      "report": ""
+    }
+  },
+  "decks": [
+    {
+      "deck_id": "deck_relationship_preferences",
+      "category": "relationship_preferences",
+      "caution_level": "strict",
+      "compare": {
+        "minConfidence": 0.72,
+        "minTagCoverage": 0.68,
+        "minFacetCoverage": 1,
+        "maxAmbiguityRatio": 0.28,
+        "requireRetestSettled": true
+      },
+      "payload": {
+        "maxAffinityThemes": 4,
+        "maxAversionThemes": 4,
+        "maxUnresolvedAreas": 3,
+        "maxEvidenceCards": 0
+      },
+      "report": {
+        "aiMode": "local_only",
+        "preferLocalFallbackBelowConfidence": 1,
+        "hideSensitiveConversationPrompts": true,
+        "additionalGuardrails": [
+          "Avoid framing relationship expectations as diagnoses, verdicts, or hard compatibility judgments.",
+          "Keep conflict, trust, and boundaries language especially tentative unless both payloads are clearly stable."
+        ]
+      },
+      "showdown": {
+        "allowed": false,
+        "reason": "Relationship expectations should stay in a private one-to-one compare flow, not a group summary."
+      },
+      "warnings": {
+        "readiness": "This deck covers relationship expectations and needs stronger confidence, coverage, and stability before compare should unlock.",
+        "consent": "This deck touches private expectations, boundaries, and trust. Keep the compare intentional, in person, and explicitly consented.",
+        "report": "Relationship preference output should stay cautious and specific to this deck. It should not turn private expectations into sweeping judgments."
+      },
+      "tag_rules": [
+        {
+          "tag_id": "relationship_preferences:boundaries",
+          "caution_level": "strict",
+          "min_exposure_count": 3,
+          "require_stable": true,
+          "allow_unresolved_export": false,
+          "allow_conversation_prompt": false,
+          "note": "Boundary signal should be withheld until it has clear, stable evidence."
+        },
+        {
+          "tag_id": "relationship_preferences:conflict",
+          "caution_level": "strict",
+          "min_exposure_count": 3,
+          "require_stable": true,
+          "allow_unresolved_export": false,
+          "allow_conversation_prompt": false,
+          "note": "Conflict preferences can be socially risky when they are still ambiguous."
+        },
+        {
+          "tag_id": "relationship_preferences:trust",
+          "caution_level": "strict",
+          "min_exposure_count": 3,
+          "require_stable": true,
+          "allow_unresolved_export": false,
+          "allow_conversation_prompt": false,
+          "note": "Trust themes need stable evidence before they should appear in compare output."
+        }
+      ]
+    },
+    {
+      "deck_id": "deck_values",
+      "category": "values",
+      "caution_level": "heightened",
+      "compare": {
+        "minConfidence": 0.7,
+        "minTagCoverage": 0.68,
+        "minFacetCoverage": 0.85,
+        "maxAmbiguityRatio": 0.32,
+        "requireRetestSettled": true
+      },
+      "payload": {
+        "maxAffinityThemes": 4,
+        "maxAversionThemes": 4,
+        "maxUnresolvedAreas": 3,
+        "maxEvidenceCards": 0
+      },
+      "report": {
+        "aiMode": "prefer_local_fallback",
+        "preferLocalFallbackBelowConfidence": 0.74,
+        "hideSensitiveConversationPrompts": true,
+        "additionalGuardrails": [
+          "Values should be described as current deck-specific signal, not as a full moral or ideological portrait.",
+          "When worldviews diverge, frame the difference as a conversation topic rather than a verdict."
+        ]
+      },
+      "showdown": {
+        "allowed": false,
+        "reason": "Values decks are too sensitive for a playful group showdown mode."
+      },
+      "warnings": {
+        "readiness": "This deck touches worldview and value priorities, so compare needs stronger confidence and lower ambiguity than a standard deck.",
+        "consent": "Value differences can feel personal quickly. Keep this compare intentional, local, and focused on discussion rather than judgment.",
+        "report": "Value summaries should stay uncertainty-aware and avoid turning partial signal into a fixed worldview label."
+      },
+      "tag_rules": [
+        {
+          "tag_id": "values:family",
+          "caution_level": "strict",
+          "min_exposure_count": 3,
+          "require_stable": true,
+          "allow_unresolved_export": false,
+          "allow_conversation_prompt": false,
+          "note": "Family priorities should not be surfaced when the signal is still unstable."
+        },
+        {
+          "tag_id": "values:justice",
+          "caution_level": "strict",
+          "min_exposure_count": 3,
+          "require_stable": true,
+          "allow_unresolved_export": false,
+          "allow_conversation_prompt": false,
+          "note": "Justice themes can overstate worldview differences if confidence is weak."
+        },
+        {
+          "tag_id": "values:tradition",
+          "caution_level": "heightened",
+          "min_exposure_count": 2,
+          "require_stable": false,
+          "allow_unresolved_export": false,
+          "allow_conversation_prompt": false,
+          "note": "Tradition themes need extra care and should not drive direct prompts when uncertainty remains."
+        }
+      ]
+    },
+    {
+      "deck_id": "deck_communication_style",
+      "category": "communication_style",
+      "caution_level": "heightened",
+      "compare": {
+        "minConfidence": 0.7,
+        "minTagCoverage": 0.65,
+        "minFacetCoverage": 0.85,
+        "maxAmbiguityRatio": 0.32,
+        "requireRetestSettled": true
+      },
+      "payload": {
+        "maxAffinityThemes": 4,
+        "maxAversionThemes": 4,
+        "maxUnresolvedAreas": 3,
+        "maxEvidenceCards": 1
+      },
+      "report": {
+        "aiMode": "prefer_local_fallback",
+        "preferLocalFallbackBelowConfidence": 0.76,
+        "hideSensitiveConversationPrompts": true,
+        "additionalGuardrails": [
+          "Avoid framing communication signal as a diagnosis or permanent flaw.",
+          "Keep emotional openness and avoidance themes especially tentative unless both payloads are stable."
+        ]
+      },
+      "showdown": {
+        "allowed": false,
+        "reason": "Communication style should stay in a one-to-one compare flow instead of a group showdown."
+      },
+      "warnings": {
+        "readiness": "Communication style compare needs stronger stability because tone and context can distort early signal.",
+        "consent": "This deck can surface vulnerable themes about conflict and openness. Keep the compare careful, explicit, and non-performative.",
+        "report": "Communication summaries should stay deck-scoped and avoid pathologizing either person."
+      },
+      "tag_rules": [
+        {
+          "tag_id": "communication_style:vulnerability",
+          "caution_level": "strict",
+          "min_exposure_count": 3,
+          "require_stable": true,
+          "allow_unresolved_export": false,
+          "allow_conversation_prompt": false,
+          "note": "Vulnerability signal should not be exported until it is stable."
+        },
+        {
+          "tag_id": "communication_style:passive",
+          "caution_level": "heightened",
+          "min_exposure_count": 2,
+          "require_stable": true,
+          "allow_unresolved_export": false,
+          "allow_conversation_prompt": false,
+          "note": "Passive communication themes should stay cautious and avoid direct prompts."
+        }
+      ]
+    },
+    {
+      "deck_id": "deck_social_habits",
+      "category": "social_habits",
+      "caution_level": "standard",
+      "compare": {
+        "minConfidence": 0.62,
+        "minTagCoverage": 0.6,
+        "minFacetCoverage": 0.7,
+        "maxAmbiguityRatio": 0.45,
+        "requireRetestSettled": false
+      },
+      "payload": {
+        "maxAffinityThemes": 5,
+        "maxAversionThemes": 5,
+        "maxUnresolvedAreas": 4,
+        "maxEvidenceCards": 2
+      },
+      "report": {
+        "aiMode": "allow",
+        "preferLocalFallbackBelowConfidence": 0,
+        "hideSensitiveConversationPrompts": false,
+        "additionalGuardrails": [
+          "If boundaries appear, keep the tone careful and avoid implying one right social style."
+        ]
+      },
+      "showdown": {
+        "allowed": true,
+        "reason": null
+      },
+      "warnings": {
+        "readiness": "",
+        "consent": "Some social-habit themes, especially around boundaries, may be withheld until the signal is stronger.",
+        "report": "If social boundary themes remain uncertain, the report should withhold them rather than speculate."
+      },
+      "tag_rules": [
+        {
+          "tag_id": "social_habits:boundaries",
+          "caution_level": "heightened",
+          "min_exposure_count": 2,
+          "require_stable": true,
+          "allow_unresolved_export": false,
+          "allow_conversation_prompt": false,
+          "note": "Boundary themes inside an otherwise standard deck still need extra care."
+        }
+      ]
+    }
+  ]
+}

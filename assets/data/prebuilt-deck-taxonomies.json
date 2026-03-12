@@ -1,0 +1,1175 @@
+{
+  "version": 2,
+  "decks": [
+    {
+      "deck_id": "deck_movies_tv",
+      "category": "movies_tv",
+      "facets": [
+        {
+          "id": "movies_tv:tone",
+          "key": "tone",
+          "label": "Tone",
+          "description": "Emotional and tonal lanes inside the deck.",
+          "sort_order": 0
+        },
+        {
+          "id": "movies_tv:format",
+          "key": "format",
+          "label": "Format",
+          "description": "How the screen experience is shaped or consumed.",
+          "sort_order": 1
+        },
+        {
+          "id": "movies_tv:lane",
+          "key": "lane",
+          "label": "Lane",
+          "description": "Broader taste clusters for what kind of watch it is.",
+          "sort_order": 2
+        }
+      ],
+      "tags": [
+        {
+          "id": "movies_tv:action",
+          "facet_id": "movies_tv:lane",
+          "slug": "action",
+          "label": "Action",
+          "description": "Action cards within the Movies & TV deck.",
+          "sort_order": 0
+        },
+        {
+          "id": "movies_tv:animation",
+          "facet_id": "movies_tv:format",
+          "slug": "animation",
+          "label": "Animation",
+          "description": "Animation cards within the Movies & TV deck.",
+          "sort_order": 1
+        },
+        {
+          "id": "movies_tv:binge",
+          "facet_id": "movies_tv:format",
+          "slug": "binge",
+          "label": "Binge",
+          "description": "Binge cards within the Movies & TV deck.",
+          "sort_order": 2
+        },
+        {
+          "id": "movies_tv:cinema",
+          "facet_id": "movies_tv:format",
+          "slug": "cinema",
+          "label": "Cinema",
+          "description": "Cinema cards within the Movies & TV deck.",
+          "sort_order": 3
+        },
+        {
+          "id": "movies_tv:classic",
+          "facet_id": "movies_tv:lane",
+          "slug": "classic",
+          "label": "Classic",
+          "description": "Classic cards within the Movies & TV deck.",
+          "sort_order": 4
+        },
+        {
+          "id": "movies_tv:comedy",
+          "facet_id": "movies_tv:tone",
+          "slug": "comedy",
+          "label": "Comedy",
+          "description": "Comedy cards within the Movies & TV deck.",
+          "sort_order": 5
+        },
+        {
+          "id": "movies_tv:documentary",
+          "facet_id": "movies_tv:format",
+          "slug": "documentary",
+          "label": "Documentary",
+          "description": "Documentary cards within the Movies & TV deck.",
+          "sort_order": 6
+        },
+        {
+          "id": "movies_tv:drama",
+          "facet_id": "movies_tv:tone",
+          "slug": "drama",
+          "label": "Drama",
+          "description": "Drama cards within the Movies & TV deck.",
+          "sort_order": 7
+        },
+        {
+          "id": "movies_tv:horror",
+          "facet_id": "movies_tv:tone",
+          "slug": "horror",
+          "label": "Horror",
+          "description": "Horror cards within the Movies & TV deck.",
+          "sort_order": 8
+        },
+        {
+          "id": "movies_tv:indie",
+          "facet_id": "movies_tv:lane",
+          "slug": "indie",
+          "label": "Indie",
+          "description": "Indie cards within the Movies & TV deck.",
+          "sort_order": 9
+        },
+        {
+          "id": "movies_tv:romance",
+          "facet_id": "movies_tv:tone",
+          "slug": "romance",
+          "label": "Romance",
+          "description": "Romance cards within the Movies & TV deck.",
+          "sort_order": 10
+        },
+        {
+          "id": "movies_tv:scifi",
+          "facet_id": "movies_tv:lane",
+          "slug": "scifi",
+          "label": "Sci-fi",
+          "description": "Sci-fi cards within the Movies & TV deck.",
+          "sort_order": 11
+        }
+      ]
+    },
+    {
+      "deck_id": "deck_music",
+      "category": "music",
+      "facets": [
+        {
+          "id": "music:genres",
+          "key": "genres",
+          "label": "Genres",
+          "description": "Core musical genres and traditions.",
+          "sort_order": 0
+        },
+        {
+          "id": "music:discovery",
+          "key": "discovery",
+          "label": "Discovery",
+          "description": "How music shows up in your life beyond genre.",
+          "sort_order": 1
+        },
+        {
+          "id": "music:energy",
+          "key": "energy",
+          "label": "Energy",
+          "description": "How polished, exploratory, or scene-driven the sound feels.",
+          "sort_order": 2
+        }
+      ],
+      "tags": [
+        {
+          "id": "music:classical",
+          "facet_id": "music:genres",
+          "slug": "classical",
+          "label": "Classical",
+          "description": "Classical cards within the Music deck.",
+          "sort_order": 0
+        },
+        {
+          "id": "music:country",
+          "facet_id": "music:genres",
+          "slug": "country",
+          "label": "Country",
+          "description": "Country cards within the Music deck.",
+          "sort_order": 1
+        },
+        {
+          "id": "music:discovery",
+          "facet_id": "music:discovery",
+          "slug": "discovery",
+          "label": "Discovery",
+          "description": "Discovery cards within the Music deck.",
+          "sort_order": 2
+        },
+        {
+          "id": "music:electronic",
+          "facet_id": "music:genres",
+          "slug": "electronic",
+          "label": "Electronic",
+          "description": "Electronic cards within the Music deck.",
+          "sort_order": 3
+        },
+        {
+          "id": "music:hiphop",
+          "facet_id": "music:genres",
+          "slug": "hiphop",
+          "label": "Hip-hop",
+          "description": "Hip-hop cards within the Music deck.",
+          "sort_order": 4
+        },
+        {
+          "id": "music:indie",
+          "facet_id": "music:discovery",
+          "slug": "indie",
+          "label": "Indie",
+          "description": "Indie cards within the Music deck.",
+          "sort_order": 5
+        },
+        {
+          "id": "music:jazz",
+          "facet_id": "music:genres",
+          "slug": "jazz",
+          "label": "Jazz",
+          "description": "Jazz cards within the Music deck.",
+          "sort_order": 6
+        },
+        {
+          "id": "music:karaoke",
+          "facet_id": "music:discovery",
+          "slug": "karaoke",
+          "label": "Karaoke",
+          "description": "Karaoke cards within the Music deck.",
+          "sort_order": 7
+        },
+        {
+          "id": "music:live-music",
+          "facet_id": "music:discovery",
+          "slug": "live-music",
+          "label": "Live music",
+          "description": "Live music cards within the Music deck.",
+          "sort_order": 8
+        },
+        {
+          "id": "music:pop",
+          "facet_id": "music:genres",
+          "slug": "pop",
+          "label": "Pop",
+          "description": "Pop cards within the Music deck.",
+          "sort_order": 9
+        },
+        {
+          "id": "music:rnb",
+          "facet_id": "music:genres",
+          "slug": "rnb",
+          "label": "R&B",
+          "description": "R&B cards within the Music deck.",
+          "sort_order": 10
+        },
+        {
+          "id": "music:rock",
+          "facet_id": "music:genres",
+          "slug": "rock",
+          "label": "Rock",
+          "description": "Rock cards within the Music deck.",
+          "sort_order": 11
+        }
+      ]
+    },
+    {
+      "deck_id": "deck_food_drinks",
+      "category": "food_drinks",
+      "facets": [
+        {
+          "id": "food_drinks:mealtime",
+          "key": "mealtime",
+          "label": "Mealtime",
+          "description": "How someone prefers to eat or source food.",
+          "sort_order": 0
+        },
+        {
+          "id": "food_drinks:taste",
+          "key": "taste",
+          "label": "Taste",
+          "description": "Flavor and dietary preference signals.",
+          "sort_order": 1
+        },
+        {
+          "id": "food_drinks:drinks",
+          "key": "drinks",
+          "label": "Drinks",
+          "description": "Drink rituals and adventurousness around food.",
+          "sort_order": 2
+        }
+      ],
+      "tags": [
+        {
+          "id": "food_drinks:adventure-eating",
+          "facet_id": "food_drinks:drinks",
+          "slug": "adventure-eating",
+          "label": "Adventure eating",
+          "description": "Adventure eating cards within the Food & Drinks deck.",
+          "sort_order": 0
+        },
+        {
+          "id": "food_drinks:coffee",
+          "facet_id": "food_drinks:drinks",
+          "slug": "coffee",
+          "label": "Coffee",
+          "description": "Coffee cards within the Food & Drinks deck.",
+          "sort_order": 1
+        },
+        {
+          "id": "food_drinks:comfort-food",
+          "facet_id": "food_drinks:mealtime",
+          "slug": "comfort-food",
+          "label": "Comfort food",
+          "description": "Comfort food cards within the Food & Drinks deck.",
+          "sort_order": 2
+        },
+        {
+          "id": "food_drinks:cooking",
+          "facet_id": "food_drinks:mealtime",
+          "slug": "cooking",
+          "label": "Cooking",
+          "description": "Cooking cards within the Food & Drinks deck.",
+          "sort_order": 3
+        },
+        {
+          "id": "food_drinks:dining-out",
+          "facet_id": "food_drinks:mealtime",
+          "slug": "dining-out",
+          "label": "Dining Out",
+          "description": "Dining Out cards within the Food & Drinks deck.",
+          "sort_order": 4
+        },
+        {
+          "id": "food_drinks:drinks",
+          "facet_id": "food_drinks:drinks",
+          "slug": "drinks",
+          "label": "Drinks",
+          "description": "Drinks cards within the Food & Drinks deck.",
+          "sort_order": 5
+        },
+        {
+          "id": "food_drinks:health",
+          "facet_id": "food_drinks:taste",
+          "slug": "health",
+          "label": "Health",
+          "description": "Health cards within the Food & Drinks deck.",
+          "sort_order": 6
+        },
+        {
+          "id": "food_drinks:spicy",
+          "facet_id": "food_drinks:taste",
+          "slug": "spicy",
+          "label": "Spicy",
+          "description": "Spicy cards within the Food & Drinks deck.",
+          "sort_order": 7
+        },
+        {
+          "id": "food_drinks:sweets",
+          "facet_id": "food_drinks:taste",
+          "slug": "sweets",
+          "label": "Sweets",
+          "description": "Sweets cards within the Food & Drinks deck.",
+          "sort_order": 8
+        },
+        {
+          "id": "food_drinks:vegetarian",
+          "facet_id": "food_drinks:taste",
+          "slug": "vegetarian",
+          "label": "Vegetarian",
+          "description": "Vegetarian cards within the Food & Drinks deck.",
+          "sort_order": 9
+        }
+      ]
+    },
+    {
+      "deck_id": "deck_travel",
+      "category": "travel",
+      "facets": [
+        {
+          "id": "travel:setting",
+          "key": "setting",
+          "label": "Setting",
+          "description": "The kinds of places a trip centers on.",
+          "sort_order": 0
+        },
+        {
+          "id": "travel:trip_style",
+          "key": "trip_style",
+          "label": "Trip style",
+          "description": "What kind of trip energy someone leans toward.",
+          "sort_order": 1
+        },
+        {
+          "id": "travel:planning",
+          "key": "planning",
+          "label": "Planning",
+          "description": "How structured, flexible, or cost-conscious the trip is.",
+          "sort_order": 2
+        }
+      ],
+      "tags": [
+        {
+          "id": "travel:adventure",
+          "facet_id": "travel:trip_style",
+          "slug": "adventure",
+          "label": "Adventure",
+          "description": "Adventure cards within the Travel deck.",
+          "sort_order": 0
+        },
+        {
+          "id": "travel:beach",
+          "facet_id": "travel:setting",
+          "slug": "beach",
+          "label": "Beach",
+          "description": "Beach cards within the Travel deck.",
+          "sort_order": 1
+        },
+        {
+          "id": "travel:budget",
+          "facet_id": "travel:planning",
+          "slug": "budget",
+          "label": "Budget",
+          "description": "Budget cards within the Travel deck.",
+          "sort_order": 2
+        },
+        {
+          "id": "travel:city",
+          "facet_id": "travel:setting",
+          "slug": "city",
+          "label": "City",
+          "description": "City cards within the Travel deck.",
+          "sort_order": 3
+        },
+        {
+          "id": "travel:culture",
+          "facet_id": "travel:setting",
+          "slug": "culture",
+          "label": "Culture",
+          "description": "Culture cards within the Travel deck.",
+          "sort_order": 4
+        },
+        {
+          "id": "travel:luxury",
+          "facet_id": "travel:trip_style",
+          "slug": "luxury",
+          "label": "Luxury",
+          "description": "Luxury cards within the Travel deck.",
+          "sort_order": 5
+        },
+        {
+          "id": "travel:mountains",
+          "facet_id": "travel:setting",
+          "slug": "mountains",
+          "label": "Mountains",
+          "description": "Mountains cards within the Travel deck.",
+          "sort_order": 6
+        },
+        {
+          "id": "travel:nature",
+          "facet_id": "travel:setting",
+          "slug": "nature",
+          "label": "Nature",
+          "description": "Nature cards within the Travel deck.",
+          "sort_order": 7
+        },
+        {
+          "id": "travel:planning",
+          "facet_id": "travel:planning",
+          "slug": "planning",
+          "label": "Planning",
+          "description": "Planning cards within the Travel deck.",
+          "sort_order": 8
+        },
+        {
+          "id": "travel:relaxation",
+          "facet_id": "travel:trip_style",
+          "slug": "relaxation",
+          "label": "Relaxation",
+          "description": "Relaxation cards within the Travel deck.",
+          "sort_order": 9
+        },
+        {
+          "id": "travel:solo",
+          "facet_id": "travel:trip_style",
+          "slug": "solo",
+          "label": "Solo",
+          "description": "Solo cards within the Travel deck.",
+          "sort_order": 10
+        },
+        {
+          "id": "travel:spontaneous",
+          "facet_id": "travel:planning",
+          "slug": "spontaneous",
+          "label": "Spontaneous",
+          "description": "Spontaneous cards within the Travel deck.",
+          "sort_order": 11
+        }
+      ]
+    },
+    {
+      "deck_id": "deck_lifestyle",
+      "category": "lifestyle",
+      "facets": [
+        {
+          "id": "lifestyle:rhythm",
+          "key": "rhythm",
+          "label": "Rhythm",
+          "description": "Daily cadence and energy patterns.",
+          "sort_order": 0
+        },
+        {
+          "id": "lifestyle:self_management",
+          "key": "self_management",
+          "label": "Self management",
+          "description": "How routines, systems, and follow-through show up.",
+          "sort_order": 1
+        },
+        {
+          "id": "lifestyle:wellbeing",
+          "key": "wellbeing",
+          "label": "Wellbeing",
+          "description": "How balance, fitness, rest, and flexibility show up.",
+          "sort_order": 2
+        }
+      ],
+      "tags": [
+        {
+          "id": "lifestyle:balance",
+          "facet_id": "lifestyle:wellbeing",
+          "slug": "balance",
+          "label": "Balance",
+          "description": "Balance cards within the Lifestyle & Routines deck.",
+          "sort_order": 0
+        },
+        {
+          "id": "lifestyle:energy",
+          "facet_id": "lifestyle:rhythm",
+          "slug": "energy",
+          "label": "Energy",
+          "description": "Energy cards within the Lifestyle & Routines deck.",
+          "sort_order": 1
+        },
+        {
+          "id": "lifestyle:evening",
+          "facet_id": "lifestyle:rhythm",
+          "slug": "evening",
+          "label": "Evening",
+          "description": "Evening cards within the Lifestyle & Routines deck.",
+          "sort_order": 2
+        },
+        {
+          "id": "lifestyle:fitness",
+          "facet_id": "lifestyle:wellbeing",
+          "slug": "fitness",
+          "label": "Fitness",
+          "description": "Fitness cards within the Lifestyle & Routines deck.",
+          "sort_order": 3
+        },
+        {
+          "id": "lifestyle:habits",
+          "facet_id": "lifestyle:self_management",
+          "slug": "habits",
+          "label": "Habits",
+          "description": "Habits cards within the Lifestyle & Routines deck.",
+          "sort_order": 4
+        },
+        {
+          "id": "lifestyle:morning",
+          "facet_id": "lifestyle:rhythm",
+          "slug": "morning",
+          "label": "Morning",
+          "description": "Morning cards within the Lifestyle & Routines deck.",
+          "sort_order": 5
+        },
+        {
+          "id": "lifestyle:organization",
+          "facet_id": "lifestyle:self_management",
+          "slug": "organization",
+          "label": "Organization",
+          "description": "Organization cards within the Lifestyle & Routines deck.",
+          "sort_order": 6
+        },
+        {
+          "id": "lifestyle:productivity",
+          "facet_id": "lifestyle:self_management",
+          "slug": "productivity",
+          "label": "Productivity",
+          "description": "Productivity cards within the Lifestyle & Routines deck.",
+          "sort_order": 7
+        },
+        {
+          "id": "lifestyle:relaxation",
+          "facet_id": "lifestyle:wellbeing",
+          "slug": "relaxation",
+          "label": "Relaxation",
+          "description": "Relaxation cards within the Lifestyle & Routines deck.",
+          "sort_order": 8
+        },
+        {
+          "id": "lifestyle:spontaneity",
+          "facet_id": "lifestyle:wellbeing",
+          "slug": "spontaneity",
+          "label": "Spontaneity",
+          "description": "Spontaneity cards within the Lifestyle & Routines deck.",
+          "sort_order": 9
+        }
+      ]
+    },
+    {
+      "deck_id": "deck_social_habits",
+      "category": "social_habits",
+      "facets": [
+        {
+          "id": "social_habits:energy",
+          "key": "energy",
+          "label": "Energy",
+          "description": "Where someone gets or spends social energy.",
+          "sort_order": 0
+        },
+        {
+          "id": "social_habits:setting",
+          "key": "setting",
+          "label": "Setting",
+          "description": "Preferred group size and social setting.",
+          "sort_order": 1
+        },
+        {
+          "id": "social_habits:connection",
+          "key": "connection",
+          "label": "Connection",
+          "description": "How someone relates to other people socially.",
+          "sort_order": 2
+        }
+      ],
+      "tags": [
+        {
+          "id": "social_habits:boundaries",
+          "facet_id": "social_habits:connection",
+          "slug": "boundaries",
+          "label": "Boundaries",
+          "description": "Boundaries cards within the Social Habits deck.",
+          "sort_order": 0
+        },
+        {
+          "id": "social_habits:deep-talks",
+          "facet_id": "social_habits:connection",
+          "slug": "deep-talks",
+          "label": "Deep talks",
+          "description": "Deep talks cards within the Social Habits deck.",
+          "sort_order": 1
+        },
+        {
+          "id": "social_habits:extrovert",
+          "facet_id": "social_habits:energy",
+          "slug": "extrovert",
+          "label": "Extrovert",
+          "description": "Extrovert cards within the Social Habits deck.",
+          "sort_order": 2
+        },
+        {
+          "id": "social_habits:going-out",
+          "facet_id": "social_habits:setting",
+          "slug": "going-out",
+          "label": "Going Out",
+          "description": "Going Out cards within the Social Habits deck.",
+          "sort_order": 3
+        },
+        {
+          "id": "social_habits:hosting",
+          "facet_id": "social_habits:setting",
+          "slug": "hosting",
+          "label": "Hosting",
+          "description": "Hosting cards within the Social Habits deck.",
+          "sort_order": 4
+        },
+        {
+          "id": "social_habits:introvert",
+          "facet_id": "social_habits:energy",
+          "slug": "introvert",
+          "label": "Introvert",
+          "description": "Introvert cards within the Social Habits deck.",
+          "sort_order": 5
+        },
+        {
+          "id": "social_habits:large-group",
+          "facet_id": "social_habits:setting",
+          "slug": "large-group",
+          "label": "Large group",
+          "description": "Large group cards within the Social Habits deck.",
+          "sort_order": 6
+        },
+        {
+          "id": "social_habits:lighthearted",
+          "facet_id": "social_habits:connection",
+          "slug": "lighthearted",
+          "label": "Lighthearted",
+          "description": "Lighthearted cards within the Social Habits deck.",
+          "sort_order": 7
+        },
+        {
+          "id": "social_habits:networking",
+          "facet_id": "social_habits:connection",
+          "slug": "networking",
+          "label": "Networking",
+          "description": "Networking cards within the Social Habits deck.",
+          "sort_order": 8
+        },
+        {
+          "id": "social_habits:small-group",
+          "facet_id": "social_habits:setting",
+          "slug": "small-group",
+          "label": "Small group",
+          "description": "Small group cards within the Social Habits deck.",
+          "sort_order": 9
+        }
+      ]
+    },
+    {
+      "deck_id": "deck_humor",
+      "category": "humor",
+      "facets": [
+        {
+          "id": "humor:delivery",
+          "key": "delivery",
+          "label": "Delivery",
+          "description": "How the joke is delivered or framed.",
+          "sort_order": 0
+        },
+        {
+          "id": "humor:style",
+          "key": "style",
+          "label": "Style",
+          "description": "The comedic mechanism or shape of the joke.",
+          "sort_order": 1
+        },
+        {
+          "id": "humor:edge",
+          "key": "edge",
+          "label": "Edge",
+          "description": "How sharp, dark, or self-directed the humor feels.",
+          "sort_order": 2
+        }
+      ],
+      "tags": [
+        {
+          "id": "humor:absurd",
+          "facet_id": "humor:style",
+          "slug": "absurd",
+          "label": "Absurd",
+          "description": "Absurd cards within the Humor deck.",
+          "sort_order": 0
+        },
+        {
+          "id": "humor:dark",
+          "facet_id": "humor:edge",
+          "slug": "dark",
+          "label": "Dark",
+          "description": "Dark cards within the Humor deck.",
+          "sort_order": 1
+        },
+        {
+          "id": "humor:dry",
+          "facet_id": "humor:delivery",
+          "slug": "dry",
+          "label": "Dry",
+          "description": "Dry cards within the Humor deck.",
+          "sort_order": 2
+        },
+        {
+          "id": "humor:observational",
+          "facet_id": "humor:delivery",
+          "slug": "observational",
+          "label": "Observational",
+          "description": "Observational cards within the Humor deck.",
+          "sort_order": 3
+        },
+        {
+          "id": "humor:physical",
+          "facet_id": "humor:style",
+          "slug": "physical",
+          "label": "Physical",
+          "description": "Physical cards within the Humor deck.",
+          "sort_order": 4
+        },
+        {
+          "id": "humor:punny",
+          "facet_id": "humor:style",
+          "slug": "punny",
+          "label": "Punny",
+          "description": "Punny cards within the Humor deck.",
+          "sort_order": 5
+        },
+        {
+          "id": "humor:sarcasm",
+          "facet_id": "humor:delivery",
+          "slug": "sarcasm",
+          "label": "Sarcasm",
+          "description": "Sarcasm cards within the Humor deck.",
+          "sort_order": 6
+        },
+        {
+          "id": "humor:self-deprecating",
+          "facet_id": "humor:edge",
+          "slug": "self-deprecating",
+          "label": "Self-deprecating",
+          "description": "Self-deprecating cards within the Humor deck.",
+          "sort_order": 7
+        },
+        {
+          "id": "humor:slapstick",
+          "facet_id": "humor:style",
+          "slug": "slapstick",
+          "label": "Slapstick",
+          "description": "Slapstick cards within the Humor deck.",
+          "sort_order": 8
+        },
+        {
+          "id": "humor:witty",
+          "facet_id": "humor:delivery",
+          "slug": "witty",
+          "label": "Witty",
+          "description": "Witty cards within the Humor deck.",
+          "sort_order": 9
+        }
+      ]
+    },
+    {
+      "deck_id": "deck_relationship_preferences",
+      "category": "relationship_preferences",
+      "facets": [
+        {
+          "id": "relationship_preferences:closeness",
+          "key": "closeness",
+          "label": "Closeness",
+          "description": "What helps a relationship feel warm and secure.",
+          "sort_order": 0
+        },
+        {
+          "id": "relationship_preferences:communication",
+          "key": "communication",
+          "label": "Communication",
+          "description": "How people work through honesty and disagreement together.",
+          "sort_order": 1
+        },
+        {
+          "id": "relationship_preferences:structure",
+          "key": "structure",
+          "label": "Structure",
+          "description": "How autonomy, growth, and limits are handled.",
+          "sort_order": 2
+        }
+      ],
+      "tags": [
+        {
+          "id": "relationship_preferences:affection",
+          "facet_id": "relationship_preferences:closeness",
+          "slug": "affection",
+          "label": "Affection",
+          "description": "Affection cards within the Relationship Preferences deck.",
+          "sort_order": 0
+        },
+        {
+          "id": "relationship_preferences:boundaries",
+          "facet_id": "relationship_preferences:structure",
+          "slug": "boundaries",
+          "label": "Boundaries",
+          "description": "Boundaries cards within the Relationship Preferences deck.",
+          "sort_order": 1
+        },
+        {
+          "id": "relationship_preferences:communication",
+          "facet_id": "relationship_preferences:communication",
+          "slug": "communication",
+          "label": "Communication",
+          "description": "Communication cards within the Relationship Preferences deck.",
+          "sort_order": 2
+        },
+        {
+          "id": "relationship_preferences:conflict",
+          "facet_id": "relationship_preferences:communication",
+          "slug": "conflict",
+          "label": "Conflict",
+          "description": "Conflict cards within the Relationship Preferences deck.",
+          "sort_order": 3
+        },
+        {
+          "id": "relationship_preferences:growth",
+          "facet_id": "relationship_preferences:structure",
+          "slug": "growth",
+          "label": "Growth",
+          "description": "Growth cards within the Relationship Preferences deck.",
+          "sort_order": 4
+        },
+        {
+          "id": "relationship_preferences:honesty",
+          "facet_id": "relationship_preferences:communication",
+          "slug": "honesty",
+          "label": "Honesty",
+          "description": "Honesty cards within the Relationship Preferences deck.",
+          "sort_order": 5
+        },
+        {
+          "id": "relationship_preferences:independence",
+          "facet_id": "relationship_preferences:structure",
+          "slug": "independence",
+          "label": "Independence",
+          "description": "Independence cards within the Relationship Preferences deck.",
+          "sort_order": 6
+        },
+        {
+          "id": "relationship_preferences:quality-time",
+          "facet_id": "relationship_preferences:closeness",
+          "slug": "quality-time",
+          "label": "Quality time",
+          "description": "Quality time cards within the Relationship Preferences deck.",
+          "sort_order": 7
+        },
+        {
+          "id": "relationship_preferences:support",
+          "facet_id": "relationship_preferences:closeness",
+          "slug": "support",
+          "label": "Support",
+          "description": "Support cards within the Relationship Preferences deck.",
+          "sort_order": 8
+        },
+        {
+          "id": "relationship_preferences:trust",
+          "facet_id": "relationship_preferences:closeness",
+          "slug": "trust",
+          "label": "Trust",
+          "description": "Trust cards within the Relationship Preferences deck.",
+          "sort_order": 9
+        }
+      ]
+    },
+    {
+      "deck_id": "deck_values",
+      "category": "values",
+      "facets": [
+        {
+          "id": "values:care",
+          "key": "care",
+          "label": "Care",
+          "description": "Values centered on people, fairness, and loyalty.",
+          "sort_order": 0
+        },
+        {
+          "id": "values:self_direction",
+          "key": "self_direction",
+          "label": "Self direction",
+          "description": "Values tied to ambition, freedom, and self-authorship.",
+          "sort_order": 1
+        },
+        {
+          "id": "values:order",
+          "key": "order",
+          "label": "Order",
+          "description": "Values tied to continuity, change, and social order.",
+          "sort_order": 2
+        }
+      ],
+      "tags": [
+        {
+          "id": "values:ambition",
+          "facet_id": "values:self_direction",
+          "slug": "ambition",
+          "label": "Ambition",
+          "description": "Ambition cards within the Values deck.",
+          "sort_order": 0
+        },
+        {
+          "id": "values:compassion",
+          "facet_id": "values:care",
+          "slug": "compassion",
+          "label": "Compassion",
+          "description": "Compassion cards within the Values deck.",
+          "sort_order": 1
+        },
+        {
+          "id": "values:creativity",
+          "facet_id": "values:self_direction",
+          "slug": "creativity",
+          "label": "Creativity",
+          "description": "Creativity cards within the Values deck.",
+          "sort_order": 2
+        },
+        {
+          "id": "values:family",
+          "facet_id": "values:care",
+          "slug": "family",
+          "label": "Family",
+          "description": "Family cards within the Values deck.",
+          "sort_order": 3
+        },
+        {
+          "id": "values:freedom",
+          "facet_id": "values:self_direction",
+          "slug": "freedom",
+          "label": "Freedom",
+          "description": "Freedom cards within the Values deck.",
+          "sort_order": 4
+        },
+        {
+          "id": "values:growth",
+          "facet_id": "values:self_direction",
+          "slug": "growth",
+          "label": "Growth",
+          "description": "Growth cards within the Values deck.",
+          "sort_order": 5
+        },
+        {
+          "id": "values:honesty",
+          "facet_id": "values:care",
+          "slug": "honesty",
+          "label": "Honesty",
+          "description": "Honesty cards within the Values deck.",
+          "sort_order": 6
+        },
+        {
+          "id": "values:justice",
+          "facet_id": "values:care",
+          "slug": "justice",
+          "label": "Justice",
+          "description": "Justice cards within the Values deck.",
+          "sort_order": 7
+        },
+        {
+          "id": "values:loyalty",
+          "facet_id": "values:care",
+          "slug": "loyalty",
+          "label": "Loyalty",
+          "description": "Loyalty cards within the Values deck.",
+          "sort_order": 8
+        },
+        {
+          "id": "values:progress",
+          "facet_id": "values:order",
+          "slug": "progress",
+          "label": "Progress",
+          "description": "Progress cards within the Values deck.",
+          "sort_order": 9
+        },
+        {
+          "id": "values:stability",
+          "facet_id": "values:order",
+          "slug": "stability",
+          "label": "Stability",
+          "description": "Stability cards within the Values deck.",
+          "sort_order": 10
+        },
+        {
+          "id": "values:tradition",
+          "facet_id": "values:order",
+          "slug": "tradition",
+          "label": "Tradition",
+          "description": "Tradition cards within the Values deck.",
+          "sort_order": 11
+        }
+      ]
+    },
+    {
+      "deck_id": "deck_communication_style",
+      "category": "communication_style",
+      "facets": [
+        {
+          "id": "communication_style:channel",
+          "key": "channel",
+          "label": "Channel",
+          "description": "Preferred communication medium.",
+          "sort_order": 0
+        },
+        {
+          "id": "communication_style:stance",
+          "key": "stance",
+          "label": "Stance",
+          "description": "How direct, forceful, or conflict-ready communication feels.",
+          "sort_order": 1
+        },
+        {
+          "id": "communication_style:processing",
+          "key": "processing",
+          "label": "Processing",
+          "description": "How attention, empathy, reflection, and openness show up.",
+          "sort_order": 2
+        }
+      ],
+      "tags": [
+        {
+          "id": "communication_style:assertive",
+          "facet_id": "communication_style:stance",
+          "slug": "assertive",
+          "label": "Assertive",
+          "description": "Assertive cards within the Communication Style deck.",
+          "sort_order": 0
+        },
+        {
+          "id": "communication_style:calling",
+          "facet_id": "communication_style:channel",
+          "slug": "calling",
+          "label": "Calling",
+          "description": "Calling cards within the Communication Style deck.",
+          "sort_order": 1
+        },
+        {
+          "id": "communication_style:debate",
+          "facet_id": "communication_style:stance",
+          "slug": "debate",
+          "label": "Debate",
+          "description": "Debate cards within the Communication Style deck.",
+          "sort_order": 2
+        },
+        {
+          "id": "communication_style:direct",
+          "facet_id": "communication_style:stance",
+          "slug": "direct",
+          "label": "Direct",
+          "description": "Direct cards within the Communication Style deck.",
+          "sort_order": 3
+        },
+        {
+          "id": "communication_style:empathy",
+          "facet_id": "communication_style:processing",
+          "slug": "empathy",
+          "label": "Empathy",
+          "description": "Empathy cards within the Communication Style deck.",
+          "sort_order": 4
+        },
+        {
+          "id": "communication_style:face-to-face",
+          "facet_id": "communication_style:channel",
+          "slug": "face-to-face",
+          "label": "Face to face",
+          "description": "Face to face cards within the Communication Style deck.",
+          "sort_order": 5
+        },
+        {
+          "id": "communication_style:indirect",
+          "facet_id": "communication_style:stance",
+          "slug": "indirect",
+          "label": "Indirect",
+          "description": "Indirect cards within the Communication Style deck.",
+          "sort_order": 6
+        },
+        {
+          "id": "communication_style:listening",
+          "facet_id": "communication_style:processing",
+          "slug": "listening",
+          "label": "Listening",
+          "description": "Listening cards within the Communication Style deck.",
+          "sort_order": 7
+        },
+        {
+          "id": "communication_style:passive",
+          "facet_id": "communication_style:stance",
+          "slug": "passive",
+          "label": "Passive",
+          "description": "Passive cards within the Communication Style deck.",
+          "sort_order": 8
+        },
+        {
+          "id": "communication_style:processing",
+          "facet_id": "communication_style:processing",
+          "slug": "processing",
+          "label": "Processing",
+          "description": "Processing cards within the Communication Style deck.",
+          "sort_order": 9
+        },
+        {
+          "id": "communication_style:texting",
+          "facet_id": "communication_style:channel",
+          "slug": "texting",
+          "label": "Texting",
+          "description": "Texting cards within the Communication Style deck.",
+          "sort_order": 10
+        },
+        {
+          "id": "communication_style:vulnerability",
+          "facet_id": "communication_style:processing",
+          "slug": "vulnerability",
+          "label": "Vulnerability",
+          "description": "Vulnerability cards within the Communication Style deck.",
+          "sort_order": 11
+        }
+      ]
+    }
+  ]
+}

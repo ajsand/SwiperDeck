@@ -1,0 +1,121 @@
+{
+  "name": "broad_start_representative",
+  "deck": {
+    "id": "deck_movies_tv",
+    "title": "Movies & TV",
+    "category": "movies_tv"
+  },
+  "cards": [
+    {
+      "id": "card_action",
+      "title": "Action anchor",
+      "popularity": 0.92,
+      "sortOrder": 0
+    },
+    {
+      "id": "card_comedy",
+      "title": "Comedy breadth pick",
+      "popularity": 0.76,
+      "sortOrder": 1
+    },
+    {
+      "id": "card_adventure",
+      "title": "Adventure fallback",
+      "popularity": 0.7,
+      "sortOrder": 2
+    }
+  ],
+  "facets": [
+    {
+      "id": "movies_tv:pace",
+      "key": "pace",
+      "sortOrder": 0
+    },
+    {
+      "id": "movies_tv:tone",
+      "key": "tone",
+      "sortOrder": 1
+    }
+  ],
+  "tags": [
+    {
+      "id": "movies_tv:action",
+      "facetId": "movies_tv:pace",
+      "sortOrder": 0
+    },
+    {
+      "id": "movies_tv:comedy",
+      "facetId": "movies_tv:tone",
+      "sortOrder": 1
+    },
+    {
+      "id": "movies_tv:adventure",
+      "facetId": "movies_tv:pace",
+      "sortOrder": 2
+    }
+  ],
+  "tagStates": [
+    {
+      "tagId": "movies_tv:action",
+      "exposureCount": 0,
+      "distinctCardsSeen": 0,
+      "positiveWeight": 0,
+      "negativeWeight": 0,
+      "netWeight": 0,
+      "uncertaintyScore": 1
+    },
+    {
+      "tagId": "movies_tv:comedy",
+      "exposureCount": 0,
+      "distinctCardsSeen": 0,
+      "positiveWeight": 0,
+      "negativeWeight": 0,
+      "netWeight": 0,
+      "uncertaintyScore": 1
+    },
+    {
+      "tagId": "movies_tv:adventure",
+      "exposureCount": 0,
+      "distinctCardsSeen": 0,
+      "positiveWeight": 0,
+      "negativeWeight": 0,
+      "netWeight": 0,
+      "uncertaintyScore": 1
+    }
+  ],
+  "links": [
+    {
+      "cardId": "card_action",
+      "tagId": "movies_tv:action",
+      "role": "primary"
+    },
+    {
+      "cardId": "card_comedy",
+      "tagId": "movies_tv:comedy",
+      "role": "primary"
+    },
+    {
+      "cardId": "card_adventure",
+      "tagId": "movies_tv:adventure",
+      "role": "primary"
+    }
+  ],
+  "expected": {
+    "stage": "broad_start",
+    "selectedCardId": "card_action",
+    "primaryReason": "clarify_low_coverage_tag",
+    "topCardIds": ["card_action", "card_comedy"],
+    "retestReason": null,
+    "winnerChanged": false,
+    "confidenceDrivers": [
+      "new_tag_coverage",
+      "new_facet_coverage",
+      "low_coverage_clarification"
+    ],
+    "summaryIncludes": [
+      "clarify low coverage tag",
+      "undercovered facet pace",
+      "undercovered tag action"
+    ]
+  }
+}

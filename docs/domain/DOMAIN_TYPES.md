@@ -8,16 +8,21 @@
 
 ```text
 types/domain/
-  actions.ts     — SwipeAction unions, weights, labels, guards, assertNever
-  ids.ts         — Branded ID types (EntityId, SessionId, SwipeEventId, SnapshotId, DeckId, DeckCardId)
-  catalog.ts     — CatalogEntityRow, CatalogEntity, entity type union, mappers
-  deckProfile.ts — DeckTagScore, DeckCardAffinity, DeckProfileSnapshot, DeckProfileSummary, stage, confidence
-  decks.ts       — DeckRow, Deck, DeckCardRow, DeckCard, constants, guards, mappers
-  swipes.ts      — SwipeSessionRow/SwipeSession, SwipeEventRow/SwipeEvent, mappers
-  scores.ts      — TasteTagScoreRow/Score, TasteTypeScoreRow/Score, EntityAffinityRow/Affinity, mappers
-  snapshots.ts   — ProfileSnapshotRow/Snapshot, summary types, mappers
-  parsers.ts     — safeJsonParse, parseStringArrayJson, parseRecordJson, isRecord
-  index.ts       — Barrel re-exports (import from '@/types/domain')
+  actions.ts     - SwipeAction unions, weights, labels, guards, assertNever
+  compare.ts     - DeckCompareReadiness, consent draft types, compare export preview vocabulary
+  comparePayload.ts - ComparePayloadV1, minimization policy, evidence-card, and preview types
+  deckCardState.ts - DeckCardStateRow/State, presentation/swipe recency mappers
+  ids.ts         - Branded ID types (EntityId, SessionId, SwipeEventId, SnapshotId, DeckId, DeckCardId, DeckTagFacetId, DeckTagId)
+  catalog.ts     - CatalogEntityRow, CatalogEntity, entity type union, mappers
+  deckProfile.ts - DeckTagScore, DeckCardAffinity, DeckProfileSnapshot, DeckProfileSummary, stage, confidence
+  deckTagState.ts - DeckTagStateRow/State, DeckTagCoverageSummary, coverage summarizer, mappers
+  deckTags.ts    - DeckTagFacetRow/Facet, DeckTagRow/Tag, DeckCardTagLinkRow/Link, role guards, mappers
+  decks.ts       - DeckRow, Deck, DeckCardRow, DeckCard, constants, guards, mappers
+  swipes.ts      - SwipeSessionRow/SwipeSession, SwipeEventRow/SwipeEvent, mappers
+  scores.ts      - TasteTagScoreRow/Score, TasteTypeScoreRow/Score, EntityAffinityRow/Affinity, mappers
+  snapshots.ts   - ProfileSnapshotRow/Snapshot, summary types, mappers
+  parsers.ts     - safeJsonParse, parseStringArrayJson, parseRecordJson, isRecord
+  index.ts       - Barrel re-exports (import from '@/types/domain')
 ```
 
 ## Import Convention
@@ -38,14 +43,14 @@ Avoid importing sub-modules directly unless you are editing `types/domain/` itse
 
 ## Row Types vs Domain Types
 
-| Layer    | Naming                         | Casing            | Used By                        |
-| -------- | ------------------------------ | ----------------- | ------------------------------ |
-| `Row`    | `XRow` (for example `DeckRow`) | snake_case fields | DB boundary code, repositories |
-| `Domain` | `X` (for example `Deck`)       | camelCase fields  | App logic, UI, tests           |
+| Layer    | Naming | Casing            | Used By                        |
+| -------- | ------ | ----------------- | ------------------------------ |
+| `Row`    | `XRow` | snake_case fields | DB boundary code, repositories |
+| `Domain` | `X`    | camelCase fields  | App logic, UI, tests           |
 
 Row types match SQLite column names exactly. Domain types are the app's working vocabulary.
 
-### JSON Columns
+## JSON Columns
 
 | Row Field        | Domain Field | Parsed Type          | Parser                        |
 | ---------------- | ------------ | -------------------- | ----------------------------- |
@@ -59,7 +64,7 @@ All JSON parsers are safe: invalid JSON falls back instead of throwing.
 
 ## Decks and Deck Cards
 
-Iteration 10 introduces first-class deck-scoped types.
+Iteration 10 introduced first-class deck-scoped types.
 
 ### Constants
 
@@ -82,7 +87,7 @@ const DECK_SENSITIVITIES = ['standard', 'sensitive', 'gated'] as const;
 const CARD_KINDS = ['entity', 'statement'] as const;
 ```
 
-### Domain Types
+### Core types
 
 | Type          | Purpose                                                     |
 | ------------- | ----------------------------------------------------------- |
@@ -91,107 +96,111 @@ const CARD_KINDS = ['entity', 'statement'] as const;
 | `DeckCard`    | App-facing deck card with parsed `tags`                     |
 | `DeckCardRow` | SQLite row for `deck_cards`                                 |
 
-### Column -> property mapping
+`DeckCard.tags` remains the UI-facing display-chip projection. For shipped prebuilt decks, canonical sequencing/profile metadata now comes from the normalized taxonomy layer below.
 
-| SQL Column              | Domain Property      |
-| ----------------------- | -------------------- |
-| `card_count`            | `cardCount`          |
-| `compare_eligible`      | `compareEligible`    |
-| `showdown_eligible`     | `showdownEligible`   |
-| `min_cards_for_profile` | `minCardsForProfile` |
-| `min_cards_for_compare` | `minCardsForCompare` |
-| `is_custom`             | `isCustom`           |
-| `cover_tile_key`        | `coverTileKey`       |
-| `deck_id`               | `deckId`             |
-| `description_short`     | `descriptionShort`   |
-| `sort_order`            | `sortOrder`          |
-| `tags_json`             | `tagsJson` / `tags`  |
+## Prebuilt Deck Taxonomy Types
 
-### Mappers
+Iteration 14A adds normalized prebuilt-only taxonomy metadata.
 
-Deck and deck-card modules follow the same boundary pattern as the earlier catalog types:
-
-- `rowToDeck(row)` converts SQLite rows into app-facing `Deck` objects.
-- `deckToRow(deck)` serializes booleans back to SQLite `0` / `1`.
-- `rowToDeckCard(row)` parses `tags_json` and validates `kind`.
-- `deckCardToRow(card)` serializes `tags` back to JSON text.
-
-## Actions
-
-### Canonical values
+### Branded IDs
 
 ```typescript
-const ACTIONS = ['hard_no', 'no', 'skip', 'yes', 'strong_yes'] as const;
+type DeckTagFacetId = string & { readonly __brand: 'DeckTagFacetId' };
+type DeckTagId = string & { readonly __brand: 'DeckTagId' };
 ```
 
-### Core actions
+Helpers:
+
+- `asDeckTagFacetId(...)`
+- `asDeckTagId(...)`
+
+### Canonical taxonomy types
+
+| Type                                     | Purpose                                                             |
+| ---------------------------------------- | ------------------------------------------------------------------- |
+| `DeckTagFacetRow` / `DeckTagFacet`       | Deck-scoped facet groups such as `tone`, `trip_style`, or `channel` |
+| `DeckTagRow` / `DeckTag`                 | Canonical tag definitions such as `drama`, `budget`, or `direct`    |
+| `DeckCardTagLinkRow` / `DeckCardTagLink` | Normalized card-to-tag assignments with semantic roles              |
+
+### Tag roles
 
 ```typescript
-const CORE_ACTIONS = ['hard_no', 'no', 'skip', 'yes', 'strong_yes'] as const;
+const DECK_TAG_ROLES = ['primary', 'secondary', 'supporting'] as const;
+type DeckTagRole = 'primary' | 'secondary' | 'supporting';
 ```
 
-### Weights
-
-```typescript
-const ACTION_WEIGHTS: Record<SwipeAction, number> = {
-  hard_no: -2,
-  no: -1,
-  skip: 0,
-  yes: 1,
-  strong_yes: 2,
-};
-```
-
-The `satisfies Record<SwipeAction, ...>` pattern keeps these tables exhaustive when action values change.
-
-`strong_yes` is the fork's final MVP replacement for TasteDeck's old `love` value. `respect` and `curious` are not part of the canonical DateDeck action set.
-
-## Branded IDs
-
-IDs use TypeScript branding to prevent mixing unrelated identifiers.
-
-```typescript
-type DeckId = string & { readonly __brand: 'DeckId' };
-type DeckCardId = string & { readonly __brand: 'DeckCardId' };
-```
-
-Helpers create branded IDs with zero runtime overhead:
-
-- `asEntityId(...)`
-- `asSessionId(...)`
-- `asSwipeEventId(...)`
-- `asSnapshotId(...)`
-- `asDeckId(...)`
-- `asDeckCardId(...)`
+These roles preserve authorial intent without hard-coding sequencing rules into the card rows themselves.
 
 ## Prebuilt Content Shapes
 
-Iteration 13 adds the bundled prebuilt deck import pipeline in `lib/content/`.
+The bundled prebuilt content pipeline now has two source files:
 
 ```text
 lib/content/
-  validateDeck.ts      — PrebuiltDeckFile, PrebuiltDeckEntry, PrebuiltCardEntry, deck/card validation results
-  contentVersion.ts    — PREBUILT_DECK_VERSION and content-meta helpers
-  loadPrebuiltDecks.ts — startup loader orchestration
+  validateDeck.ts         - PrebuiltDeckFile, PrebuiltDeckEntry, PrebuiltCardEntry, card/tag assignment validation
+  validateDeckTaxonomy.ts - taxonomy file validation plus normalized lookup maps
+  contentVersion.ts       - PREBUILT_DECK_VERSION and content-meta helpers
+  loadPrebuiltDecks.ts    - startup loader orchestration
 ```
 
 ### Validation contract
 
-- `validateDeck(entry, timestamp)` normalizes one deck entry and returns either a typed `Deck` plus its raw card list or a list of validation errors.
-- `validateCard(entry, deck, index, timestamp)` normalizes one bundled card entry into a typed `DeckCard`.
-- Validation trims strings, lowercases categories and tags, clamps popularity to `[0, 1]`, limits tags to 15, and defaults missing optional values.
+- `validateDeck(entry, timestamp)` normalizes one deck entry and returns either a typed `Deck` plus its raw card list or validation errors.
+- `validateDeckTaxonomyFile(file, timestamp)` validates bundled facet/tag definitions and returns normalized `DeckTagFacet` / `DeckTag` objects plus lookup maps for loading.
+- `validateCard(entry, deck, taxonomy, index, timestamp)` returns both a typed `DeckCard` and normalized `DeckCardTagLink[]`.
+
+Validation rules now include:
+
+- trimmed strings and normalized lowercase categories/display tags
+- popularity clamped to `[0, 1]`
+- display tags capped at 15
+- canonical tag assignments capped at `1..3`
+- exactly one `primary` assignment per prebuilt card
+- every display tag must be backed by a canonical assignment
 
 ### Content versioning
 
-`PREBUILT_DECK_VERSION` is the bundled content version constant used by the startup loader and the `__deck_content_meta` table. Bumping this value in a future release triggers a full reimport of the bundled prebuilt decks.
+`PREBUILT_DECK_VERSION` is the bundled content version constant used by the startup loader and the `__deck_content_meta` table. It is now `2` because Iteration 14A adds taxonomy metadata and card-level canonical assignments.
 
-## Swipe Sessions And Events
+## Compare Types
 
-Iteration 14 moves swipe persistence to deck scope.
+Iterations 16 and 17 add deck-scoped compare readiness plus a minimized export contract.
+
+### `compare.ts`
+
+Core compare-flow types:
+
+- `DeckCompareReadiness`
+- `DeckCompareReasonDetail`
+- `DeckCompareConsentDraft`
+- `DeckCompareExportPreviewItem`
+
+These types drive readiness gating, consent copy, and deck-scoped disclosure before any later external compare/report step.
+
+### `comparePayload.ts`
+
+Payload-minimization types:
+
+- `ComparePayloadV1`
+- `ComparePayloadPolicy`
+- `ComparePayloadEvidenceSummary`
+- `ComparePayloadEvidenceCard`
+- `ComparePayloadPreview`
+
+Important boundary:
+
+- compare payloads are deck-scoped
+- compare payloads are prebuilt-deck only for now
+- the payload prefers tag/theme summaries over raw card detail
+- evidence cards are optional, bounded, and included only for grounding when policy says they are needed
+
+## Swipe Sessions and Events
+
+Iteration 14 moved swipe persistence to deck scope.
 
 ### `SwipeSession`
 
-`SwipeSessionRow` now includes:
+`SwipeSessionRow` fields:
 
 - `id`
 - `deck_id`
@@ -199,7 +208,7 @@ Iteration 14 moves swipe persistence to deck scope.
 - `ended_at`
 - `filters_json`
 
-The app-facing `SwipeSession` maps those fields to:
+App-facing `SwipeSession` fields:
 
 - `id: SessionId`
 - `deckId: DeckId`
@@ -209,7 +218,7 @@ The app-facing `SwipeSession` maps those fields to:
 
 ### `SwipeEvent`
 
-`SwipeEventRow` now includes:
+`SwipeEventRow` fields:
 
 - `id`
 - `session_id`
@@ -219,7 +228,7 @@ The app-facing `SwipeSession` maps those fields to:
 - `strength`
 - `created_at`
 
-The app-facing `SwipeEvent` maps those fields to:
+App-facing `SwipeEvent` fields:
 
 - `id: SwipeEventId`
 - `sessionId: SessionId`
@@ -229,11 +238,9 @@ The app-facing `SwipeEvent` maps those fields to:
 - `strength: number`
 - `createdAt: number`
 
-This replaces the old broad-catalog `entityId` event reference with a deck-card `cardId` reference.
+## Deck Profile Types
 
-## Deck Profile Types (Iteration 15)
-
-Deck-scoped profile computation uses new types in `deckProfile.ts`:
+Deck-scoped profile computation lives in `deckProfile.ts`.
 
 ### `DeckProfileStage`
 
@@ -245,36 +252,174 @@ type DeckProfileStage = 'lightweight' | 'meaningful' | 'high_confidence';
 
 ```typescript
 interface DeckProfileConfidence {
-  value: number;        // 0..1
+  value: number;
   label: 'low' | 'medium' | 'high';
   swipeCount: number;
-  cardCoverage: number; // fraction of deck cards swiped
+  cardCoverage: number;
+  components: {
+    swipeSignal: number;
+    cardCoverage: number;
+    tagCoverage: number;
+    facetCoverage: number;
+    stability: number;
+    ambiguityPenalty: number;
+  };
+}
+```
+
+### `DeckProfileCoverageSummary`
+
+```typescript
+interface DeckProfileCoverageSummary {
+  deckId: DeckId;
+  cardsSeen: number;
+  totalCards: number;
+  cardCoverage: number;
+  tags: DeckTagCoverageSummary;
+  facets: {
+    totalFacetCount: number;
+    seenFacetCount: number;
+    unseenFacetCount: number;
+    coverageRatio: number;
+  };
 }
 ```
 
 ### `DeckProfileSummary`
-
-Computed output from `computeDeckProfileSummary`:
 
 ```typescript
 interface DeckProfileSummary {
   deckId: DeckId;
   stage: DeckProfileStage;
   confidence: DeckProfileConfidence;
-  affinities: TagScoreSummary[];   // top positive tags
-  aversions: TagScoreSummary[];     // top negative tags
-  unresolved: string[];             // tags with weak signal
+  coverage: DeckProfileCoverageSummary;
+  stability: {
+    stabilityScore: number;
+    stableTagCount: number;
+    emergingTagCount: number;
+    mixedSignalTagCount: number;
+    retestedTagCount: number;
+    retestPendingCount: number;
+  };
+  affinities: DeckProfileThemeScore[];
+  aversions: DeckProfileThemeScore[];
+  unresolved: DeckProfileUnresolvedArea[];
+  nextSteps: DeckProfileActionHint[];
+  readiness: {
+    compareReady: boolean;
+    blockers: DeckProfileReadinessBlocker[];
+  };
   topCardsLiked: DeckCardId[];
   topCardsDisliked: DeckCardId[];
   generatedAt: number;
 }
 ```
 
-### Row types
+### Row/domain types
 
-- `DeckTagScoreRow` / `DeckTagScore` — deck-scoped tag scores
-- `DeckCardAffinityRow` / `DeckCardAffinity` — deck-scoped card affinity
-- `DeckProfileSnapshotRow` / `DeckProfileSnapshot` — deck-scoped snapshots with `topTags`, `topAversions`, `summary`
+- `DeckTagScoreRow` / `DeckTagScore` - deck-scoped tag scores keyed by canonical `tagId`
+- `DeckCardAffinityRow` / `DeckCardAffinity` - deck-scoped card affinity
+- `DeckProfileSnapshotRow` / `DeckProfileSnapshot` - deck-scoped snapshots with `topTags`, `topAversions`, and `summary`
+
+`DeckProfileSummary` now reflects the deeper within-deck structure added in Iterations 14A-15:
+
+- canonical tag IDs remain the DB source of truth
+- the summary projects human-readable tag and facet labels for UI
+- confidence combines swipe count, card coverage, tag coverage, facet coverage, stability, and ambiguity
+- unresolved areas expose explicit reasons such as `low_coverage`, `mixed_signal`, or `pending_retest`
+- compare readiness is now a structured summary field, not a UI-only heuristic
+
+`deck_profile_snapshots.summary_json` stores a compact projection of this richer summary so later compare/report flows can reuse local profile state without recomputing every screen from scratch.
+
+## Compare Types
+
+Iteration 16 adds the compare-readiness and consent vocabulary in `compare.ts`.
+
+### `DeckCompareReadiness`
+
+This is the deck-scoped local evaluator output that distinguishes:
+
+- `not_started`
+- `early_profile`
+- `needs_more_breadth`
+- `needs_more_stability`
+- `compare_ready`
+- `compare_ready_with_caution`
+- `unavailable`
+
+It also exposes structured reason details such as:
+
+- `not_enough_tag_coverage`
+- `not_enough_facet_coverage`
+- `high_ambiguity`
+- `retest_needed`
+- `custom_deck_not_supported`
+
+### `DeckCompareConsentDraft`
+
+This is the local disclosure model shown before any later compare export/report step.
+
+It includes:
+
+- export preview categories
+- what stays local
+- optional caution copy for sensitive or gated decks
+- required confirmations before approval
+
+## Deck Tag State Types
+
+Iteration 14B adds the canonical runtime state model for prebuilt deck tags.
+
+### `DeckTagState`
+
+Tracks one canonical tag inside one deck:
+
+- `exposureCount`
+- `distinctCardsSeen`
+- `positiveWeight`
+- `negativeWeight`
+- `skipCount`
+- `netWeight`
+- `uncertaintyScore`
+- `firstSeenAt`
+- `lastSeenAt`
+- `lastPositiveAt`
+- `lastNegativeAt`
+- `lastRetestedAt`
+- `updatedAt`
+
+### `DeckTagCoverageSummary`
+
+Aggregates deck-scoped tag coverage:
+
+- `totalTagCount`
+- `seenTagCount`
+- `unseenTagCount`
+- `resolvedTagCount`
+- `uncertainTagCount`
+- `coverageRatio`
+
+Use `summarizeDeckTagCoverage(deckId, tagStates)` to derive this from canonical `DeckTagState[]`.
+
+## Deck Card State Types
+
+Iteration 20B adds durable per-card recency for cross-session sequencing continuity.
+
+### `DeckCardState`
+
+Tracks one card inside one deck:
+
+- `presentationCount`
+- `swipeCount`
+- `lastPresentedAt`
+- `lastSwipedAt`
+- `updatedAt`
+
+This state is intentionally separate from `SwipeSession`:
+
+- sessions remain bounded interaction envelopes
+- `DeckCardState` persists the card-recency facts that should survive session boundaries
+- sequencing can suppress a just-presented card even when the user exits without swiping it
 
 ## DB Boundary Pattern
 
@@ -301,9 +446,9 @@ App code should work with domain types, not raw row types.
 When adding a new DB-backed domain type:
 
 1. Add or update the migration in `lib/db/migrations.ts`.
-2. Add the branded IDs in `ids.ts` if needed.
+2. Add branded IDs in `ids.ts` if needed.
 3. Create the `Row` and domain interfaces.
-4. Add mapper functions and any guards or normalizers.
+4. Add mapper functions and guards/normalizers.
 5. Add repository helpers in `lib/db/`.
 6. Export the module from `types/domain/index.ts`.
 7. Update `docs/db/SCHEMA.md` and this document.

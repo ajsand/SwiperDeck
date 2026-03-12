@@ -1,0 +1,131 @@
+{
+  "name": "retest_stability",
+  "deck": {
+    "id": "deck_movies_tv",
+    "title": "Movies & TV",
+    "category": "movies_tv",
+    "cardCount": 20
+  },
+  "cards": [
+    {
+      "id": "card_reaffirm",
+      "title": "Reaffirm comfort watch",
+      "popularity": 0.55,
+      "sortOrder": 2
+    },
+    {
+      "id": "card_new",
+      "title": "New mainstream probe",
+      "popularity": 0.85,
+      "sortOrder": 0
+    }
+  ],
+  "facets": [
+    {
+      "id": "movies_tv:mood",
+      "key": "mood",
+      "sortOrder": 0
+    },
+    {
+      "id": "movies_tv:audience",
+      "key": "audience",
+      "sortOrder": 1
+    }
+  ],
+  "tags": [
+    {
+      "id": "movies_tv:comfort_watch",
+      "facetId": "movies_tv:mood",
+      "sortOrder": 0
+    },
+    {
+      "id": "movies_tv:mainstream",
+      "facetId": "movies_tv:audience",
+      "sortOrder": 1
+    }
+  ],
+  "tagStates": [
+    {
+      "tagId": "movies_tv:comfort_watch",
+      "exposureCount": 1,
+      "distinctCardsSeen": 1,
+      "positiveWeight": 3,
+      "negativeWeight": 0,
+      "netWeight": 3,
+      "uncertaintyScore": 0.2
+    },
+    {
+      "tagId": "movies_tv:mainstream",
+      "exposureCount": 1,
+      "distinctCardsSeen": 1,
+      "positiveWeight": 0.6,
+      "negativeWeight": 0,
+      "netWeight": 0.6,
+      "uncertaintyScore": 0.35
+    }
+  ],
+  "tagScores": [
+    {
+      "tagId": "movies_tv:comfort_watch",
+      "score": 3.2
+    },
+    {
+      "tagId": "movies_tv:mainstream",
+      "score": 0.4
+    }
+  ],
+  "cardAffinities": [
+    {
+      "cardId": "card_reaffirm",
+      "score": 3
+    },
+    {
+      "cardId": "card_new",
+      "score": 0.2
+    }
+  ],
+  "seenCardIds": ["card_reaffirm", "seen_card_2"],
+  "links": [
+    {
+      "cardId": "card_reaffirm",
+      "tagId": "movies_tv:comfort_watch",
+      "role": "primary"
+    },
+    {
+      "cardId": "card_new",
+      "tagId": "movies_tv:mainstream",
+      "role": "primary"
+    }
+  ],
+  "recentSwipeEvents": [
+    {
+      "cardId": "seen_other_2",
+      "createdAt": 5000,
+      "strength": 1
+    },
+    {
+      "cardId": "seen_other_1",
+      "createdAt": 3500,
+      "strength": 1
+    },
+    {
+      "cardId": "card_reaffirm",
+      "createdAt": 1000,
+      "strength": 1
+    }
+  ],
+  "expected": {
+    "stage": "adaptive",
+    "selectedCardId": "card_reaffirm",
+    "primaryReason": "reaffirm_stability",
+    "topCardIds": ["card_reaffirm", "card_new"],
+    "retestReason": "stability_check",
+    "winnerChanged": false,
+    "confidenceDrivers": ["stability_retest"],
+    "summaryIncludes": [
+      "reaffirm stability",
+      "stability check",
+      "retest stability check card reaffirm"
+    ]
+  }
+}

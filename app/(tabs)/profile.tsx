@@ -13,7 +13,11 @@ import { useDecksWithProfileStatus } from '@/hooks/useDecksWithProfileStatus';
 function formatStage(stage: string): string {
   if (stage === 'lightweight') return 'Lightweight';
   if (stage === 'meaningful') return 'Meaningful';
-  return 'High confidence';
+  return 'High Confidence';
+}
+
+function formatPercent(value: number): string {
+  return `${Math.round(value * 100)}%`;
 }
 
 export default function ProfileScreen() {
@@ -71,48 +75,67 @@ export default function ProfileScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Deck Profiles</Text>
       <Text style={styles.intro}>
-        Each deck builds its own profile as you swipe.
+        Each deck builds its own local profile with coverage, stability, and
+        unresolved areas tracked separately.
       </Text>
       <FlatList
         data={decks}
         keyExtractor={(item) => item.deck.id as string}
         contentContainerStyle={styles.listContent}
-        renderItem={({ item }) => (
-          <Pressable
-            testID={`deck-profile-row-${item.deck.id}`}
-            accessibilityRole="button"
-            accessibilityLabel={`View ${item.deck.title} profile`}
-            accessibilityHint={`Opens the profile for ${item.deck.title}`}
-            onPress={() =>
-              router.push(
-                `/deck/${item.deck.id as string}/profile` as never,
-              )
-            }
-            style={({ pressed }) => [
-              styles.deckRow,
-              pressed ? styles.deckRowPressed : null,
-            ]}
-          >
-            <Text style={styles.deckTitle}>{item.deck.title}</Text>
-            <View style={styles.deckMeta}>
-              <Text style={styles.deckMetaText}>
-                {item.swipeCount} swipes
-              </Text>
-              <View
-                style={[
-                  styles.stageBadge,
-                  item.stage === 'meaningful'
-                    ? styles.stageMeaningful
-                    : styles.stageLightweight,
-                ]}
-              >
-                <Text style={styles.stageBadgeText}>
-                  {formatStage(item.stage)}
-                </Text>
+        renderItem={({ item }) => {
+          const coverage = item.summary?.coverage;
+          const coverageCopy = coverage
+            ? `Cards ${coverage.cardsSeen}/${coverage.totalCards} | Tags ${coverage.tags.seenTagCount}/${coverage.tags.totalTagCount} | Facets ${coverage.facets.seenFacetCount}/${coverage.facets.totalFacetCount}`
+            : 'No local profile signal yet.';
+          const hintCopy = item.compareReady
+            ? 'Ready for a deck-scoped compare once both people consent.'
+            : (item.primaryHint?.detail ??
+              'Swipe more cards to build coverage and confidence inside this deck.');
+
+          return (
+            <Pressable
+              testID={`deck-profile-row-${item.deck.id}`}
+              accessibilityRole="button"
+              accessibilityLabel={`View ${item.deck.title} profile`}
+              accessibilityHint={`Opens the profile for ${item.deck.title}`}
+              onPress={() =>
+                router.push(`/deck/${item.deck.id as string}/profile` as never)
+              }
+              style={({ pressed }) => [
+                styles.deckRow,
+                pressed ? styles.deckRowPressed : null,
+              ]}
+            >
+              <View style={styles.deckRowHeader}>
+                <Text style={styles.deckTitle}>{item.deck.title}</Text>
+                <View
+                  style={[
+                    styles.stageBadge,
+                    item.stage === 'high_confidence'
+                      ? styles.stageHigh
+                      : item.stage === 'meaningful'
+                        ? styles.stageMeaningful
+                        : styles.stageLightweight,
+                  ]}
+                >
+                  <Text style={styles.stageBadgeText}>
+                    {formatStage(item.stage)}
+                  </Text>
+                </View>
               </View>
-            </View>
-          </Pressable>
-        )}
+
+              <Text style={styles.deckMeta}>
+                {item.swipeCount} swipes
+                {item.summary
+                  ? ` | ${formatPercent(item.summary.confidence.value)} confidence`
+                  : ''}
+                {item.compareReady ? ' | compare ready' : ''}
+              </Text>
+              <Text style={styles.deckCoverage}>{coverageCopy}</Text>
+              <Text style={styles.deckHint}>{hintCopy}</Text>
+            </Pressable>
+          );
+        }}
       />
     </View>
   );
@@ -150,20 +173,34 @@ const styles = StyleSheet.create({
   deckRowPressed: {
     opacity: 0.9,
   },
+  deckRowHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
   deckTitle: {
+    flex: 1,
     color: '#FFFFFF',
     fontSize: 17,
     fontWeight: '600',
   },
   deckMeta: {
-    marginTop: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  deckMetaText: {
+    marginTop: 10,
     color: 'rgba(255,255,255,0.65)',
     fontSize: 13,
+  },
+  deckCoverage: {
+    marginTop: 8,
+    color: 'rgba(255,255,255,0.78)',
+    fontSize: 13,
+    lineHeight: 19,
+  },
+  deckHint: {
+    marginTop: 10,
+    color: '#FFFFFF',
+    fontSize: 14,
+    lineHeight: 20,
   },
   stageBadge: {
     borderRadius: 999,
@@ -175,6 +212,9 @@ const styles = StyleSheet.create({
   },
   stageMeaningful: {
     backgroundColor: 'rgba(34,197,94,0.25)',
+  },
+  stageHigh: {
+    backgroundColor: 'rgba(14,165,233,0.28)',
   },
   stageBadgeText: {
     color: '#FFFFFF',

@@ -10,6 +10,7 @@ import {
   type DeckProfileSnapshot,
   type DeckTagScore,
   type DeckId,
+  type DeckTagId,
 } from '@/types/domain';
 
 type DeckProfileDb = Pick<
@@ -27,7 +28,7 @@ export async function upsertDeckTagScore(
     `
       INSERT OR REPLACE INTO deck_tag_scores (
         deck_id,
-        tag,
+        tag_id,
         score,
         pos,
         neg,
@@ -35,7 +36,7 @@ export async function upsertDeckTagScore(
       ) VALUES (?, ?, ?, ?, ?, ?)
     `,
     row.deck_id,
-    row.tag,
+    row.tag_id,
     row.score,
     row.pos,
     row.neg,
@@ -43,26 +44,26 @@ export async function upsertDeckTagScore(
   );
 }
 
-export async function getDeckTagScoreByDeckAndTag(
+export async function getDeckTagScoreByDeckAndTagId(
   db: DeckProfileDb,
   deckId: DeckId,
-  tag: string,
+  tagId: DeckTagId,
 ): Promise<DeckTagScore | null> {
   const row = await db.getFirstAsync<{
     deck_id: string;
-    tag: string;
+    tag_id: string;
     score: number;
     pos: number;
     neg: number;
     last_updated: number;
   }>(
     `
-      SELECT deck_id, tag, score, pos, neg, last_updated
+      SELECT deck_id, tag_id, score, pos, neg, last_updated
       FROM deck_tag_scores
-      WHERE deck_id = ? AND tag = ?
+      WHERE deck_id = ? AND tag_id = ?
     `,
     deckId as string,
-    tag,
+    tagId as string,
   );
 
   if (!row) {
@@ -78,7 +79,7 @@ export async function getDeckTagScoresByDeckId(
 ): Promise<DeckTagScore[]> {
   const rows = await db.getAllAsync<{
     deck_id: string;
-    tag: string;
+    tag_id: string;
     score: number;
     pos: number;
     neg: number;
@@ -87,7 +88,7 @@ export async function getDeckTagScoresByDeckId(
     `
       SELECT
         deck_id,
-        tag,
+        tag_id,
         score,
         pos,
         neg,
@@ -102,7 +103,7 @@ export async function getDeckTagScoresByDeckId(
   return rows.map((r) =>
     rowToDeckTagScore({
       deck_id: r.deck_id,
-      tag: r.tag,
+      tag_id: r.tag_id,
       score: r.score,
       pos: r.pos,
       neg: r.neg,

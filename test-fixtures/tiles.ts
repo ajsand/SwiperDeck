@@ -66,8 +66,8 @@ export const TILE_SNAPSHOT_KEYS: readonly string[] = Object.freeze([
   'unicode:こんにちは',
 ]);
 
-export const TILE_COMPONENT_FIXTURES: readonly TileComponentFixture[] = Object.freeze(
-  [
+export const TILE_COMPONENT_FIXTURES: readonly TileComponentFixture[] =
+  Object.freeze([
     Object.freeze({
       id: 'deck-basic-movie',
       tileKey: 'movie:movie-the-shawshank-redemption',
@@ -107,5 +107,4 @@ export const TILE_COMPONENT_FIXTURES: readonly TileComponentFixture[] = Object.f
       subtitle: 'Dan Carlin',
       variant: 'library',
     }),
-  ],
-);
+  ]);

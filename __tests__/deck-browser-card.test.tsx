@@ -25,7 +25,7 @@ function buildDeck(overrides: Partial<Deck> = {}): Deck {
     cardCount: 42,
     compareEligible: true,
     showdownEligible: false,
-    sensitivity: 'sensitive',
+    sensitivity: 'standard',
     minCardsForProfile: 15,
     minCardsForCompare: 30,
     isCustom: false,
@@ -59,7 +59,7 @@ describe('DeckBrowserCard', () => {
     expect(
       screen.getByTestId(`deck-browser-card-sensitivity-${deck.id}`),
     ).toBeTruthy();
-    expect(screen.getByText('Sensitive topic')).toBeTruthy();
+    expect(screen.getByText('Extra-care compare')).toBeTruthy();
   });
 
   it('applies accessible deck labels for screen readers', () => {

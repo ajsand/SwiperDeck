@@ -17,7 +17,7 @@ import {
 jest.mock('@/lib/content', () => ({
   loadPrebuiltDecksIfNeeded: jest.fn().mockResolvedValue({
     status: 'skipped',
-    version: 1,
+    version: 2,
     deckCount: 0,
     cardCount: 0,
     skippedCardCount: 0,
@@ -32,8 +32,12 @@ type MinimalDb = Pick<
 class FakeDeckProfileDb {
   private decks = new Map<string, Record<string, unknown>>();
   private deckCards = new Map<string, Record<string, unknown>>();
+  private deckTagFacets = new Map<string, Record<string, unknown>>();
+  private deckTags = new Map<string, Record<string, unknown>>();
+  private cardTagLinks = new Array<Record<string, unknown>>();
   private swipeSessions = new Map<string, Record<string, unknown>>();
   private swipeEvents = new Array<Record<string, unknown>>();
+  private deckTagState = new Map<string, Record<string, unknown>>();
   private deckTagScores = new Map<string, Record<string, unknown>>();
   private deckCardAffinity = new Map<string, Record<string, unknown>>();
 
@@ -88,6 +92,92 @@ class FakeDeckProfileDb {
       updated_at: now,
     });
 
+    this.deckTagFacets.set('movies_tv:lane', {
+      id: 'movies_tv:lane',
+      deck_id: 'deck_profile_test',
+      key: 'lane',
+      label: 'Lane',
+      description: '',
+      sort_order: 0,
+      created_at: now,
+      updated_at: now,
+    });
+    this.deckTagFacets.set('movies_tv:tone', {
+      id: 'movies_tv:tone',
+      deck_id: 'deck_profile_test',
+      key: 'tone',
+      label: 'Tone',
+      description: '',
+      sort_order: 1,
+      created_at: now,
+      updated_at: now,
+    });
+
+    this.deckTags.set('movies_tv:action', {
+      id: 'movies_tv:action',
+      deck_id: 'deck_profile_test',
+      facet_id: 'movies_tv:lane',
+      slug: 'action',
+      label: 'Action',
+      description: '',
+      sort_order: 0,
+      created_at: now,
+      updated_at: now,
+    });
+    this.deckTags.set('movies_tv:drama', {
+      id: 'movies_tv:drama',
+      deck_id: 'deck_profile_test',
+      facet_id: 'movies_tv:tone',
+      slug: 'drama',
+      label: 'Drama',
+      description: '',
+      sort_order: 1,
+      created_at: now,
+      updated_at: now,
+    });
+    this.deckTags.set('movies_tv:comedy', {
+      id: 'movies_tv:comedy',
+      deck_id: 'deck_profile_test',
+      facet_id: 'movies_tv:tone',
+      slug: 'comedy',
+      label: 'Comedy',
+      description: '',
+      sort_order: 2,
+      created_at: now,
+      updated_at: now,
+    });
+
+    this.cardTagLinks.push(
+      {
+        card_id: 'card_1',
+        tag_id: 'movies_tv:action',
+        role: 'primary',
+        created_at: now,
+        updated_at: now,
+      },
+      {
+        card_id: 'card_1',
+        tag_id: 'movies_tv:drama',
+        role: 'secondary',
+        created_at: now,
+        updated_at: now,
+      },
+      {
+        card_id: 'card_2',
+        tag_id: 'movies_tv:comedy',
+        role: 'primary',
+        created_at: now,
+        updated_at: now,
+      },
+      {
+        card_id: 'card_2',
+        tag_id: 'movies_tv:drama',
+        role: 'secondary',
+        created_at: now,
+        updated_at: now,
+      },
+    );
+
     this.swipeSessions.set('session_1', {
       id: 'session_1',
       deck_id: 'deck_profile_test',
@@ -97,12 +187,16 @@ class FakeDeckProfileDb {
     });
   }
 
-  private tagKey(deckId: string, tag: string): string {
-    return `${deckId}:${tag}`;
+  private tagKey(deckId: string, tagId: string): string {
+    return `${deckId}:${tagId}`;
   }
 
   private cardKey(deckId: string, cardId: string): string {
     return `${deckId}:${cardId}`;
+  }
+
+  private stateKey(deckId: string, tagId: string): string {
+    return `${deckId}:${tagId}`;
   }
 
   async runAsync(
@@ -110,20 +204,60 @@ class FakeDeckProfileDb {
     ...params: unknown[]
   ): Promise<{ changes: number; lastInsertRowId: number }> {
     const normalized = sql.replace(/\s+/g, ' ').trim();
-    const values = params.length === 1 && Array.isArray(params[0])
-      ? (params[0] as unknown[])
-      : params;
+    const values =
+      params.length === 1 && Array.isArray(params[0])
+        ? (params[0] as unknown[])
+        : params;
 
     if (/INSERT OR REPLACE INTO deck_tag_scores/i.test(normalized)) {
       const row = {
         deck_id: values[0],
-        tag: values[1],
+        tag_id: values[1],
         score: values[2],
         pos: values[3],
         neg: values[4],
         last_updated: values[5],
       };
-      this.deckTagScores.set(this.tagKey(String(values[0]), String(values[1])), row);
+      this.deckTagScores.set(
+        this.tagKey(String(values[0]), String(values[1])),
+        row,
+      );
+      return { changes: 1, lastInsertRowId: 1 };
+    }
+
+    if (/DELETE FROM deck_tag_state/i.test(normalized)) {
+      const deckId = String(values[0]);
+      for (const [key, row] of this.deckTagState.entries()) {
+        if (row.deck_id === deckId) {
+          this.deckTagState.delete(key);
+        }
+      }
+
+      return { changes: 1, lastInsertRowId: 0 };
+    }
+
+    if (/INSERT OR REPLACE INTO deck_tag_state/i.test(normalized)) {
+      const row = {
+        deck_id: values[0],
+        tag_id: values[1],
+        exposure_count: values[2],
+        distinct_cards_seen: values[3],
+        positive_weight: values[4],
+        negative_weight: values[5],
+        skip_count: values[6],
+        net_weight: values[7],
+        uncertainty_score: values[8],
+        first_seen_at: values[9],
+        last_seen_at: values[10],
+        last_positive_at: values[11],
+        last_negative_at: values[12],
+        last_retested_at: values[13],
+        updated_at: values[14],
+      };
+      this.deckTagState.set(
+        this.stateKey(String(values[0]), String(values[1])),
+        row,
+      );
       return { changes: 1, lastInsertRowId: 1 };
     }
 
@@ -141,6 +275,28 @@ class FakeDeckProfileDb {
         row,
       );
       return { changes: 1, lastInsertRowId: 1 };
+    }
+
+    if (/DELETE FROM deck_tag_scores/i.test(normalized)) {
+      const deckId = String(values[0]);
+      for (const [key, row] of this.deckTagScores.entries()) {
+        if (row.deck_id === deckId) {
+          this.deckTagScores.delete(key);
+        }
+      }
+
+      return { changes: 1, lastInsertRowId: 0 };
+    }
+
+    if (/DELETE FROM deck_card_affinity/i.test(normalized)) {
+      const deckId = String(values[0]);
+      for (const [key, row] of this.deckCardAffinity.entries()) {
+        if (row.deck_id === deckId) {
+          this.deckCardAffinity.delete(key);
+        }
+      }
+
+      return { changes: 1, lastInsertRowId: 0 };
     }
 
     if (/INSERT INTO swipe_events/i.test(normalized)) {
@@ -166,9 +322,10 @@ class FakeDeckProfileDb {
 
   async getAllAsync<T>(sql: string, ...params: unknown[]): Promise<T[]> {
     const normalized = sql.replace(/\s+/g, ' ').trim();
-    const p = params.length === 1 && Array.isArray(params[0])
-      ? (params[0] as unknown[])
-      : params;
+    const p =
+      params.length === 1 && Array.isArray(params[0])
+        ? (params[0] as unknown[])
+        : params;
 
     if (/FROM deck_cards WHERE id/i.test(normalized) && p[0]) {
       const row = this.deckCards.get(String(p[0]));
@@ -180,13 +337,32 @@ class FakeDeckProfileDb {
       return (row ? [row] : []) as T[];
     }
 
-    if (/COUNT\(\*\)\s+AS\s+count\s+FROM swipe_events/i.test(normalized) && p[0]) {
+    if (
+      /COUNT\(\*\)\s+AS\s+count\s+FROM swipe_events/i.test(normalized) &&
+      p[0]
+    ) {
       const deckId = String(p[0]);
       const count = this.swipeEvents.filter((e) => e.deck_id === deckId).length;
       return [{ count }] as T[];
     }
 
-    if (/COUNT\(\*\)\s+AS\s+count\s+FROM deck_cards/i.test(normalized) && p[0]) {
+    if (/SELECT DISTINCT card_id FROM swipe_events/i.test(normalized) && p[0]) {
+      const deckId = String(p[0]);
+      const distinctCardIds = Array.from(
+        new Set(
+          this.swipeEvents
+            .filter((event) => event.deck_id === deckId)
+            .map((event) => event.card_id),
+        ),
+      );
+
+      return distinctCardIds.map((card_id) => ({ card_id })) as T[];
+    }
+
+    if (
+      /COUNT\(\*\)\s+AS\s+count\s+FROM deck_cards/i.test(normalized) &&
+      p[0]
+    ) {
       const deckId = String(p[0]);
       const count = Array.from(this.deckCards.values()).filter(
         (c) => c.deck_id === deckId,
@@ -194,8 +370,15 @@ class FakeDeckProfileDb {
       return [{ count }] as T[];
     }
 
-    if (/FROM deck_tag_scores WHERE deck_id = \? AND tag = \?/i.test(normalized) && p.length >= 2) {
-      const row = this.deckTagScores.get(this.tagKey(String(p[0]), String(p[1])));
+    if (
+      /FROM deck_tag_scores WHERE deck_id = \? AND tag_id = \?/i.test(
+        normalized,
+      ) &&
+      p.length >= 2
+    ) {
+      const row = this.deckTagScores.get(
+        this.tagKey(String(p[0]), String(p[1])),
+      );
       return (row ? [row] : []) as T[];
     }
 
@@ -208,14 +391,46 @@ class FakeDeckProfileDb {
       return rows as T[];
     }
 
-    if (/FROM deck_card_affinity WHERE deck_id = \? AND card_id = \?/i.test(normalized) && p.length >= 2) {
+    if (/FROM deck_tag_state WHERE deck_id = \?/i.test(normalized) && p[0]) {
+      const deckId = String(p[0]);
+      const rows = Array.from(this.deckTagState.values()).filter(
+        (row) => row.deck_id === deckId,
+      );
+      rows.sort((left, right) => {
+        if (
+          (left.uncertainty_score as number) !==
+          (right.uncertainty_score as number)
+        ) {
+          return (
+            (right.uncertainty_score as number) -
+            (left.uncertainty_score as number)
+          );
+        }
+
+        return (
+          ((right.last_seen_at as number | null) ?? 0) -
+          ((left.last_seen_at as number | null) ?? 0)
+        );
+      });
+      return rows as T[];
+    }
+
+    if (
+      /FROM deck_card_affinity WHERE deck_id = \? AND card_id = \?/i.test(
+        normalized,
+      ) &&
+      p.length >= 2
+    ) {
       const row = this.deckCardAffinity.get(
         this.cardKey(String(p[0]), String(p[1])),
       );
       return (row ? [row] : []) as T[];
     }
 
-    if (/FROM deck_card_affinity WHERE deck_id = \?/i.test(normalized) && p[0]) {
+    if (
+      /FROM deck_card_affinity WHERE deck_id = \?/i.test(normalized) &&
+      p[0]
+    ) {
       const deckId = String(p[0]);
       const rows = Array.from(this.deckCardAffinity.values()).filter(
         (r) => r.deck_id === deckId,
@@ -232,12 +447,55 @@ class FakeDeckProfileDb {
       return rows as T[];
     }
 
+    if (/FROM deck_card_tag_links WHERE card_id/i.test(normalized) && p[0]) {
+      const cardId = String(p[0]);
+      return this.cardTagLinks.filter((link) => link.card_id === cardId) as T[];
+    }
+
+    if (/FROM deck_tag_facets WHERE deck_id = \?/i.test(normalized) && p[0]) {
+      const deckId = String(p[0]);
+      return Array.from(this.deckTagFacets.values()).filter(
+        (facet) => facet.deck_id === deckId,
+      ) as T[];
+    }
+
+    if (/FROM deck_tag_taxonomy WHERE id = \?/i.test(normalized) && p[0]) {
+      const row = this.deckTags.get(String(p[0]));
+      return row ? ([row] as T[]) : [];
+    }
+
+    if (/FROM deck_tag_taxonomy WHERE deck_id = \?/i.test(normalized) && p[0]) {
+      const deckId = String(p[0]);
+      return Array.from(this.deckTags.values()).filter(
+        (tag) => tag.deck_id === deckId,
+      ) as T[];
+    }
+
     return [];
   }
 }
 
+async function insertSwipeEvent(
+  db: MinimalDb,
+  event: SwipeEvent,
+): Promise<void> {
+  await db.runAsync(
+    `
+      INSERT INTO swipe_events (id, session_id, deck_id, card_id, action, strength, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `,
+    event.id,
+    event.sessionId,
+    event.deckId,
+    event.cardId,
+    event.action,
+    event.strength,
+    event.createdAt,
+  );
+}
+
 describe('deck profile service', () => {
-  it('updateScoresFromSwipeEvent updates tag and card scores', async () => {
+  it('updateScoresFromSwipeEvent builds richer coverage and unresolved areas', async () => {
     const fake = new FakeDeckProfileDb();
     const db = fake as unknown as MinimalDb;
 
@@ -251,20 +509,7 @@ describe('deck profile service', () => {
       createdAt: Date.now(),
     };
 
-    await db.runAsync(
-      `
-        INSERT INTO swipe_events (id, session_id, deck_id, card_id, action, strength, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `,
-      event.id,
-      event.sessionId,
-      event.deckId,
-      event.cardId,
-      event.action,
-      event.strength,
-      event.createdAt,
-    );
-
+    await insertSwipeEvent(db, event);
     await updateScoresFromSwipeEvent(db, event);
 
     const summary = await computeDeckProfileSummary(
@@ -274,11 +519,20 @@ describe('deck profile service', () => {
 
     expect(summary).not.toBeNull();
     expect(summary?.confidence.swipeCount).toBe(1);
-    expect(summary?.affinities.some((a) => a.tag === 'action')).toBe(true);
-    expect(summary?.affinities.some((a) => a.tag === 'drama')).toBe(true);
+    expect(summary?.coverage.tags.totalTagCount).toBe(3);
+    expect(summary?.coverage.tags.seenTagCount).toBe(2);
+    expect(summary?.coverage.facets.seenFacetCount).toBe(2);
+    expect(summary?.affinities.some((a) => a.tag === 'Action')).toBe(true);
+    expect(summary?.affinities.some((a) => a.tag === 'Drama')).toBe(true);
+    expect(
+      summary?.unresolved.some(
+        (area) => area.tag === 'Action' && area.reason === 'pending_retest',
+      ),
+    ).toBe(true);
+    expect(summary?.readiness.blockers).toContain('not_enough_swipes');
   });
 
-  it('computeDeckProfileSummary returns correct stage and confidence', async () => {
+  it('computeDeckProfileSummary returns correct stage, coverage, and blockers with no swipes', async () => {
     const fake = new FakeDeckProfileDb();
     const db = fake as unknown as MinimalDb;
 
@@ -290,7 +544,13 @@ describe('deck profile service', () => {
     expect(summary).not.toBeNull();
     expect(summary?.stage).toBe('lightweight');
     expect(summary?.confidence.swipeCount).toBe(0);
+    expect(summary?.coverage.tags.totalTagCount).toBe(3);
+    expect(summary?.coverage.tags.seenTagCount).toBe(0);
+    expect(summary?.coverage.facets.seenFacetCount).toBe(0);
     expect(summary?.deckId).toBe(asDeckId('deck_profile_test'));
+    expect(summary?.readiness.compareReady).toBe(false);
+    expect(summary?.readiness.blockers).toContain('not_enough_swipes');
+    expect(summary?.confidence.components.tagCoverage).toBe(0);
   });
 
   it('computeDeckProfileSummary returns null for unknown deck', async () => {
@@ -305,37 +565,39 @@ describe('deck profile service', () => {
     expect(summary).toBeNull();
   });
 
-  it('recomputeDeckScoresFromEvents processes events and updates scores', async () => {
+  it('recomputeDeckScoresFromEvents processes events and updates stability-aware coverage', async () => {
     const fake = new FakeDeckProfileDb();
     const db = fake as unknown as MinimalDb;
 
-    await db.runAsync(
-      `
-        INSERT INTO swipe_events (id, session_id, deck_id, card_id, action, strength, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `,
-      'evt_1',
-      'session_1',
-      'deck_profile_test',
-      'card_1',
-      'yes',
-      1,
-      Date.now(),
-    );
+    await insertSwipeEvent(db, {
+      id: asSwipeEventId('evt_1'),
+      sessionId: asSessionId('session_1'),
+      deckId: asDeckId('deck_profile_test'),
+      cardId: asDeckCardId('card_1'),
+      action: 'yes',
+      strength: 1,
+      createdAt: Date.now(),
+    });
 
-    await db.runAsync(
-      `
-        INSERT INTO swipe_events (id, session_id, deck_id, card_id, action, strength, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `,
-      'evt_2',
-      'session_1',
-      'deck_profile_test',
-      'card_2',
-      'hard_no',
-      -2,
-      Date.now() + 1,
-    );
+    await insertSwipeEvent(db, {
+      id: asSwipeEventId('evt_2'),
+      sessionId: asSessionId('session_1'),
+      deckId: asDeckId('deck_profile_test'),
+      cardId: asDeckCardId('card_2'),
+      action: 'hard_no',
+      strength: -2,
+      createdAt: Date.now() + 1,
+    });
+
+    await insertSwipeEvent(db, {
+      id: asSwipeEventId('evt_3'),
+      sessionId: asSessionId('session_1'),
+      deckId: asDeckId('deck_profile_test'),
+      cardId: asDeckCardId('card_2'),
+      action: 'no',
+      strength: -1,
+      createdAt: Date.now() + 2,
+    });
 
     await recomputeDeckScoresFromEvents(db, asDeckId('deck_profile_test'));
 
@@ -345,6 +607,10 @@ describe('deck profile service', () => {
     );
 
     expect(summary).not.toBeNull();
-    expect(summary?.confidence.swipeCount).toBe(2);
+    expect(summary?.confidence.swipeCount).toBe(3);
+    expect(summary?.coverage.tags.seenTagCount).toBe(3);
+    expect(summary?.coverage.facets.seenFacetCount).toBe(2);
+    expect(summary?.stability.retestedTagCount).toBeGreaterThan(0);
+    expect(summary?.aversions.some((area) => area.tag === 'Comedy')).toBe(true);
   });
 });

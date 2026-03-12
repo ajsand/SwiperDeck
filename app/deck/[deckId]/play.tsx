@@ -43,6 +43,14 @@ function DeckPlaySurface({ deck }: { deck: Deck }) {
   const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
+  const goToDeckDetail = useCallback(() => {
+    router.replace(`/deck/${deck.id as string}` as never);
+  }, [deck.id, router]);
+
+  const handleExitSession = useCallback(async () => {
+    await session.endSession();
+    goToDeckDetail();
+  }, [goToDeckDetail, session]);
 
   useEffect(() => {
     if (session.state !== 'ready') {
@@ -132,11 +140,10 @@ function DeckPlaySurface({ deck }: { deck: Deck }) {
     if (session.state === 'complete') {
       return (
         <View testID="deck-play-complete" style={styles.completeContainer}>
-          <Text style={styles.completeTitle}>
-            You have seen all cards in this deck!
-          </Text>
+          <Text style={styles.completeTitle}>Nothing new is due right now</Text>
           <Text style={styles.completeMessage}>
-            Swipe history for {deck.title} is now saved to this deck.
+            Your swipes for {deck.title} are already saved. DateDeck will pick
+            the next useful card for this deck when you come back later.
           </Text>
           <Pressable
             testID="deck-play-view-profile"
@@ -158,7 +165,7 @@ function DeckPlaySurface({ deck }: { deck: Deck }) {
             accessibilityRole="button"
             accessibilityLabel="Back to deck detail"
             accessibilityHint="Returns to the deck detail screen"
-            onPress={() => router.back()}
+            onPress={goToDeckDetail}
             style={({ pressed }) => [
               styles.completeButtonSecondary,
               pressed ? styles.completeButtonPressed : null,
@@ -200,14 +207,33 @@ function DeckPlaySurface({ deck }: { deck: Deck }) {
   return (
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <Text style={styles.title}>{deck.title}</Text>
-        <Text style={styles.subtitle}>
-          {session.state === 'ready'
-            ? cardsRemainingLabel(session.cardsRemaining)
-            : session.state === 'complete'
-              ? '0 cards left'
-              : `${session.totalCards} total cards`}
-        </Text>
+        <View style={styles.headerTopRow}>
+          <View style={styles.headerTextBlock}>
+            <Text style={styles.title}>{deck.title}</Text>
+            <Text style={styles.subtitle}>
+              {session.state === 'ready'
+                ? cardsRemainingLabel(session.cardsRemaining)
+                : session.state === 'complete'
+                  ? 'No cards due right now'
+                  : `${session.totalCards} total cards`}
+            </Text>
+          </View>
+          <Pressable
+            testID="deck-play-exit-session"
+            accessibilityRole="button"
+            accessibilityLabel="Exit swipe session"
+            accessibilityHint="Stops swiping and returns to the deck detail screen"
+            onPress={() => {
+              void handleExitSession();
+            }}
+            style={({ pressed }) => [
+              styles.exitButton,
+              pressed ? styles.exitButtonPressed : null,
+            ]}
+          >
+            <Text style={styles.exitButtonText}>Exit</Text>
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.viewport}>{renderBody()}</View>
@@ -289,6 +315,15 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
   },
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  headerTextBlock: {
+    flex: 1,
+  },
   title: {
     fontSize: 24,
     fontWeight: '700',
@@ -298,6 +333,20 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontSize: 15,
     color: 'rgba(255,255,255,0.68)',
+  },
+  exitButton: {
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+  },
+  exitButtonPressed: {
+    opacity: 0.8,
+  },
+  exitButtonText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
   },
   viewport: {
     flex: 1,

@@ -10,13 +10,13 @@ Replace the inherited TasteDeck action vocabulary with the fork's canonical 5-st
 
 After this iteration, the action model is:
 
-| Value | Weight | Gesture mapping | Label |
-|-------|--------|-----------------|-------|
-| `hard_no` | -2 | Strong left swipe | Hard No |
-| `no` | -1 | Normal left swipe | No |
-| `skip` | 0 | Button only | Skip |
-| `yes` | +1 | Normal right swipe | Yes |
-| `strong_yes` | +2 | Strong right swipe | Strong Yes |
+| Value        | Weight | Gesture mapping    | Label      |
+| ------------ | ------ | ------------------ | ---------- |
+| `hard_no`    | -2     | Strong left swipe  | Hard No    |
+| `no`         | -1     | Normal left swipe  | No         |
+| `skip`       | 0      | Button only        | Skip       |
+| `yes`        | +1     | Normal right swipe | Yes        |
+| `strong_yes` | +2     | Strong right swipe | Strong Yes |
 
 No other values exist. The callback contract shapes (`DeckActionHandler`, `DeckActionPayload`, `DeckActionMeta`, `dispatchDeckAction` lock semantics) are preserved. Only the literal string values emitted through those interfaces change.
 
@@ -56,25 +56,25 @@ CLAUDE.md Section 20 explicitly calls out "Action semantics drift" as the #1 des
 
 ### Relationship to old TasteDeck code
 
-| Category | What happens |
-|----------|--------------|
-| **Replaced** | `ACTIONS` array contents (7 values → 5), `CORE_ACTIONS` contents (love → strong_yes), `ACTION_LABELS` (love/respect/curious entries removed, strong_yes added), `ACTION_WEIGHTS` (same), `ACTION_VISUAL_CONFIG.love` → `.strong_yes`, gesture string literals `'love'` → `'strong_yes'` |
+| Category                   | What happens                                                                                                                                                                                                                                                                                                     |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Replaced**               | `ACTIONS` array contents (7 values → 5), `CORE_ACTIONS` contents (love → strong_yes), `ACTION_LABELS` (love/respect/curious entries removed, strong_yes added), `ACTION_WEIGHTS` (same), `ACTION_VISUAL_CONFIG.love` → `.strong_yes`, gesture string literals `'love'` → `'strong_yes'`                          |
 | **Preserved structurally** | `DeckActionHandler` type signature, `DeckActionPayload` interface shape, `DeckActionMeta` interface, `dispatchDeckAction` lock logic, `createDeckActionPayload` factory, `DeckActionBar` rendering loop, gesture physics constants, `GestureSwipeAction` derivation pattern (`Exclude<CoreSwipeAction, 'skip'>`) |
-| **Migrated** | `swipe_events.action` CHECK constraint (migration 004), any existing rows with `action = 'love'` normalized to `'strong_yes'`, any rows with `action = 'respect'`/`'curious'` normalized to `'skip'` |
+| **Migrated**               | `swipe_events.action` CHECK constraint (migration 004), any existing rows with `action = 'love'` normalized to `'strong_yes'`, any rows with `action = 'respect'`/`'curious'` normalized to `'skip'`                                                                                                             |
 
 ## 4. Multi-model execution strategy
 
-| Step | Model | Task |
-|------|-------|------|
-| 1 | Claude Opus 4.6 | Write this iteration file with exact before/after for every affected value (done) |
-| 2 | GPT-5.4 | Update `types/domain/actions.ts` first — this triggers compile errors everywhere else |
-| 3 | GPT-5.4 | Fix every compile error (TypeScript `satisfies` exhaustiveness catches them all) |
-| 4 | GPT-5.4 | Update gesture string literals in `useDeckGestures.ts` |
-| 5 | GPT-5.4 | Add migration 004 to `lib/db/migrations.ts` |
-| 6 | GPT-5.4 | Update all test assertions |
-| 7 | GPT-5.4 | Update documentation |
-| 8 | GPT-5.4 | Run full validation suite |
-| 9 | Claude Opus 4.6 | Review for completeness — no `love`/`respect`/`curious` remnants anywhere |
+| Step | Model           | Task                                                                                  |
+| ---- | --------------- | ------------------------------------------------------------------------------------- |
+| 1    | Claude Opus 4.6 | Write this iteration file with exact before/after for every affected value (done)     |
+| 2    | GPT-5.4         | Update `types/domain/actions.ts` first — this triggers compile errors everywhere else |
+| 3    | GPT-5.4         | Fix every compile error (TypeScript `satisfies` exhaustiveness catches them all)      |
+| 4    | GPT-5.4         | Update gesture string literals in `useDeckGestures.ts`                                |
+| 5    | GPT-5.4         | Add migration 004 to `lib/db/migrations.ts`                                           |
+| 6    | GPT-5.4         | Update all test assertions                                                            |
+| 7    | GPT-5.4         | Update documentation                                                                  |
+| 8    | GPT-5.4         | Run full validation suite                                                             |
+| 9    | Claude Opus 4.6 | Review for completeness — no `love`/`respect`/`curious` remnants anywhere             |
 
 ### Recommended implementation order
 
@@ -91,45 +91,45 @@ The safest sequence leverages TypeScript's compile-time safety:
 
 ### Source-of-truth references
 
-| Document | Relevant sections |
-|----------|-------------------|
-| `/CLAUDE.md` Section 7 | Canonical action system: `hard_no`, `no`, `skip`, `yes`, `strong_yes`. Semantics for entity vs statement cards. UI label adaptation rule. Deferred signals list. |
-| `/CLAUDE.md` Section 1.6 | Product principle: "Universal action system — all decks use the same core action semantics" |
-| `/CLAUDE.md` Section 20.1 | Design risk: "Action semantics drift" — this iteration eliminates it |
-| `/iterations/10-...md` Section 12 | Handoff notes: schema at version 3, migration 004 is next, CARD_KINDS pattern for dynamic CHECK |
+| Document                          | Relevant sections                                                                                                                                                |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/CLAUDE.md` Section 7            | Canonical action system: `hard_no`, `no`, `skip`, `yes`, `strong_yes`. Semantics for entity vs statement cards. UI label adaptation rule. Deferred signals list. |
+| `/CLAUDE.md` Section 1.6          | Product principle: "Universal action system — all decks use the same core action semantics"                                                                      |
+| `/CLAUDE.md` Section 20.1         | Design risk: "Action semantics drift" — this iteration eliminates it                                                                                             |
+| `/iterations/10-...md` Section 12 | Handoff notes: schema at version 3, migration 004 is next, CARD_KINDS pattern for dynamic CHECK                                                                  |
 
 ### Current repo implementation anchors — full before/after map
 
 #### `types/domain/actions.ts` — THE source of truth for action values
 
-| Constant | Before (TasteDeck) | After (DateDeck) |
-|----------|---------------------|-------------------|
-| `ACTIONS` | `['hard_no','no','skip','yes','love','respect','curious']` | `['hard_no','no','skip','yes','strong_yes']` |
-| `SwipeAction` | 7-member union | 5-member union |
-| `CORE_ACTIONS` | `['hard_no','no','skip','yes','love']` | `['hard_no','no','skip','yes','strong_yes']` |
-| `CoreSwipeAction` | 5-member union (includes `love`) | 5-member union (includes `strong_yes`) |
-| `ACTION_LABELS.love` | `'Love'` | *(removed)* |
-| `ACTION_LABELS.respect` | `'Respect'` | *(removed)* |
-| `ACTION_LABELS.curious` | `'Curious'` | *(removed)* |
-| `ACTION_LABELS.strong_yes` | *(did not exist)* | `'Strong Yes'` |
-| `ACTION_WEIGHTS.love` | `2` | *(removed)* |
-| `ACTION_WEIGHTS.respect` | `0.5` | *(removed)* |
-| `ACTION_WEIGHTS.curious` | `0.25` | *(removed)* |
-| `ACTION_WEIGHTS.strong_yes` | *(did not exist)* | `2` |
+| Constant                    | Before (TasteDeck)                                         | After (DateDeck)                             |
+| --------------------------- | ---------------------------------------------------------- | -------------------------------------------- |
+| `ACTIONS`                   | `['hard_no','no','skip','yes','love','respect','curious']` | `['hard_no','no','skip','yes','strong_yes']` |
+| `SwipeAction`               | 7-member union                                             | 5-member union                               |
+| `CORE_ACTIONS`              | `['hard_no','no','skip','yes','love']`                     | `['hard_no','no','skip','yes','strong_yes']` |
+| `CoreSwipeAction`           | 5-member union (includes `love`)                           | 5-member union (includes `strong_yes`)       |
+| `ACTION_LABELS.love`        | `'Love'`                                                   | _(removed)_                                  |
+| `ACTION_LABELS.respect`     | `'Respect'`                                                | _(removed)_                                  |
+| `ACTION_LABELS.curious`     | `'Curious'`                                                | _(removed)_                                  |
+| `ACTION_LABELS.strong_yes`  | _(did not exist)_                                          | `'Strong Yes'`                               |
+| `ACTION_WEIGHTS.love`       | `2`                                                        | _(removed)_                                  |
+| `ACTION_WEIGHTS.respect`    | `0.5`                                                      | _(removed)_                                  |
+| `ACTION_WEIGHTS.curious`    | `0.25`                                                     | _(removed)_                                  |
+| `ACTION_WEIGHTS.strong_yes` | _(did not exist)_                                          | `2`                                          |
 
 The `satisfies Record<SwipeAction, ...>` constraint on `ACTION_LABELS` and `ACTION_WEIGHTS` means TypeScript will error immediately after changing `ACTIONS` — this is the compile-time safety net.
 
 #### `components/deck/DeckActionButton.tsx` — UI visual config
 
-| Key in `ACTION_VISUAL_CONFIG` | Before | After |
-|-------------------------------|--------|-------|
-| `love` | `{ iconName: 'heart-outline', iconColor: '#EC4899', ... }` | *(removed)* |
-| `strong_yes` | *(did not exist)* | `{ iconName: 'star-outline', iconColor: '#EC4899', borderColor: '#EC4899', backgroundColor: 'rgba(255,255,255,0.08)', size: 52, iconSize: 26 }` |
+| Key in `ACTION_VISUAL_CONFIG` | Before                                                     | After                                                                                                                                           |
+| ----------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `love`                        | `{ iconName: 'heart-outline', iconColor: '#EC4899', ... }` | _(removed)_                                                                                                                                     |
+| `strong_yes`                  | _(did not exist)_                                          | `{ iconName: 'star-outline', iconColor: '#EC4899', borderColor: '#EC4899', backgroundColor: 'rgba(255,255,255,0.08)', size: 52, iconSize: 26 }` |
 
-| Key in `ACTION_HINTS` | Before | After |
-|------------------------|--------|-------|
-| `love` | `'Strongly like this and move to next'` | *(removed)* |
-| `strong_yes` | *(did not exist)* | `'Strongly positive — move to next'` |
+| Key in `ACTION_HINTS` | Before                                  | After                                |
+| --------------------- | --------------------------------------- | ------------------------------------ |
+| `love`                | `'Strongly like this and move to next'` | _(removed)_                          |
+| `strong_yes`          | _(did not exist)_                       | `'Strongly positive — move to next'` |
 
 Icon choice: `star-outline` (Ionicons) replaces `heart-outline` to match the more neutral `strong_yes` semantics. The pink color (`#EC4899`) is preserved for visual continuity. The icon could alternatively remain `heart-outline` if preferred — both are valid. The implementation model should use `star-outline` unless it renders poorly, in which case `heart-outline` is acceptable.
 
@@ -155,66 +155,71 @@ The `ACTION_SQL_VALUES` constant at the top of the file is already computed from
 
 #### Files that auto-update via the type system (no manual changes needed)
 
-| File | Why it auto-updates |
-|------|---------------------|
-| `components/deck/deckActionPayload.ts` | Imports `CoreSwipeAction` type — the type changes, but the code doesn't reference any literal action strings |
-| `components/deck/dispatchDeckAction.ts` | Same — imports type, no literals |
-| `components/deck/DeckActionBar.tsx` | Iterates `CORE_ACTIONS` — the array changes, but the iteration logic doesn't |
-| `types/domain/swipes.ts` | `normalizeSwipeAction` validates against the updated `ACTIONS` set automatically |
-| `types/domain/snapshots.ts` | `parseSwipeAction` validates against the updated set automatically |
+| File                                    | Why it auto-updates                                                                                          |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `components/deck/deckActionPayload.ts`  | Imports `CoreSwipeAction` type — the type changes, but the code doesn't reference any literal action strings |
+| `components/deck/dispatchDeckAction.ts` | Same — imports type, no literals                                                                             |
+| `components/deck/DeckActionBar.tsx`     | Iterates `CORE_ACTIONS` — the array changes, but the iteration logic doesn't                                 |
+| `types/domain/swipes.ts`                | `normalizeSwipeAction` validates against the updated `ACTIONS` set automatically                             |
+| `types/domain/snapshots.ts`             | `parseSwipeAction` validates against the updated set automatically                                           |
 
 #### Files to PRESERVE (do not modify)
 
-| File | Why |
-|------|-----|
-| `hooks/useDeckGestures.constants.ts` | Gesture physics thresholds — not related to action values |
-| `types/domain/catalog.ts` | Entity types — unrelated |
-| `types/domain/scores.ts` | Score structures — unrelated (scoring logic is Iteration 15) |
-| `types/domain/ids.ts` | Branded IDs — unrelated |
-| `types/domain/parsers.ts` | JSON parsers — unrelated |
-| `types/domain/decks.ts` | Deck/DeckCard types from Iteration 10 — unrelated |
-| `lib/db/deckRepository.ts` | Deck CRUD from Iteration 10 — unrelated |
-| `lib/db/deckCardRepository.ts` | DeckCard CRUD from Iteration 10 — unrelated |
-| `lib/db/catalogRepository.ts` | Old catalog repo — unrelated |
-| `lib/db/client.ts` | DB client — unrelated |
-| All `app/` screen files | No screen changes in this iteration |
+| File                                 | Why                                                          |
+| ------------------------------------ | ------------------------------------------------------------ |
+| `hooks/useDeckGestures.constants.ts` | Gesture physics thresholds — not related to action values    |
+| `types/domain/catalog.ts`            | Entity types — unrelated                                     |
+| `types/domain/scores.ts`             | Score structures — unrelated (scoring logic is Iteration 15) |
+| `types/domain/ids.ts`                | Branded IDs — unrelated                                      |
+| `types/domain/parsers.ts`            | JSON parsers — unrelated                                     |
+| `types/domain/decks.ts`              | Deck/DeckCard types from Iteration 10 — unrelated            |
+| `lib/db/deckRepository.ts`           | Deck CRUD from Iteration 10 — unrelated                      |
+| `lib/db/deckCardRepository.ts`       | DeckCard CRUD from Iteration 10 — unrelated                  |
+| `lib/db/catalogRepository.ts`        | Old catalog repo — unrelated                                 |
+| `lib/db/client.ts`                   | DB client — unrelated                                        |
+| All `app/` screen files              | No screen changes in this iteration                          |
 
 ### External troubleshooting and learning resources
 
 #### Official docs
+
 - [SQLite ALTER TABLE limitations](https://www.sqlite.org/lang_altertable.html) — explains why CHECK constraints require table rebuild
 - [SQLite foreign key support](https://www.sqlite.org/foreignkeys.html) — FK behavior during table rebuild
 - [TypeScript `satisfies` operator](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html) — how exhaustiveness checking catches missed renames
 
 #### Step-by-step guides
+
 - [SQLite table rebuild pattern](https://www.sqlite.org/lang_altertable.html#otheralter) — the recommended 12-step ALTER TABLE process
 - [Expo SQLite exec/run/transaction API](https://docs.expo.dev/versions/latest/sdk/sqlite/)
 
 #### YouTube
+
 - Search "SQLite table rebuild migration" for visual walkthrough of the CREATE-copy-DROP-RENAME pattern
 - Search "TypeScript satisfies exhaustive" for how `satisfies Record<UnionType, ...>` catches missing keys
 
 #### GitHub repos
+
 - This repo's `lib/db/migrations.ts` — migration 002 is the canonical pattern for multi-statement schema creation
 - This repo's `types/domain/actions.ts` — the file being refactored; read current state before changing
 
 #### Stack Overflow / discussion boards
+
 - [SQLite change CHECK constraint](https://stackoverflow.com/questions/tagged/sqlite+alter-table+check-constraints) — confirms table rebuild is required
 - [expo-sqlite tag](https://stackoverflow.com/questions/tagged/expo-sqlite)
 
 ## 6. When stuck
 
-| Problem | Resolution |
-|---------|------------|
-| TypeScript errors after changing ACTIONS | This is expected and desirable. Every `satisfies Record<SwipeAction, ...>` will error because the record keys no longer match the union. Fix each one by adding `strong_yes` and removing `love`/`respect`/`curious`. |
-| `GestureSwipeAction` type error | The type is `Exclude<CoreSwipeAction, 'skip'>`. If `CoreSwipeAction` now includes `strong_yes` but the gesture code still returns `'love'`, TypeScript will catch it. Change the two `'love'` literals in `resolveDeckSwipeAction`. |
-| Migration 004 fails in transaction | SQLite supports DDL (CREATE TABLE, DROP TABLE, ALTER TABLE) inside transactions. If you get an error, check that you're using `execAsync` for multi-statement SQL, not `runAsync` (which is single-statement). |
-| FK constraint error during table rebuild | The INSERT INTO ... SELECT copies valid FK references from the existing table. If FKs fail, it means the source data has orphan references (unlikely). Check `PRAGMA foreign_key_check` before and after. |
-| Test expecting `'love'` still passes (stale cache) | Run `npm test -- --clearCache` to ensure Jest picks up the new constant values. |
-| `ACTION_VISUAL_CONFIG` type error | This is `Record<CoreSwipeAction, DeckActionVisualConfig>`. After changing `CoreSwipeAction`, you must rename the `love` key to `strong_yes`. |
-| Icon `star-outline` doesn't render | Verify the icon name exists in Ionicons. Check at [icons.expo.fyi](https://icons.expo.fyi/?search=star-outline). If it doesn't exist in the bundled version, use `star` or fall back to `heart-outline`. |
-| Unsure if migration 004 is needed on fresh install | Yes, it's still needed for correctness. On a fresh install, migration 002 already creates `swipe_events` with the *new* ACTIONS-derived CHECK (since ACTIONS was updated). Migration 004 runs after that and is effectively a no-op (rebuilds the same table). This is safe. |
-| `respect`/`curious` appear in schema-check test | The schema-check test smoke CRUD uses `eventAction = 'yes'` which is valid in both old and new. But if any test data uses `'love'`, `'respect'`, or `'curious'`, update it. |
+| Problem                                            | Resolution                                                                                                                                                                                                                                                                   |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TypeScript errors after changing ACTIONS           | This is expected and desirable. Every `satisfies Record<SwipeAction, ...>` will error because the record keys no longer match the union. Fix each one by adding `strong_yes` and removing `love`/`respect`/`curious`.                                                        |
+| `GestureSwipeAction` type error                    | The type is `Exclude<CoreSwipeAction, 'skip'>`. If `CoreSwipeAction` now includes `strong_yes` but the gesture code still returns `'love'`, TypeScript will catch it. Change the two `'love'` literals in `resolveDeckSwipeAction`.                                          |
+| Migration 004 fails in transaction                 | SQLite supports DDL (CREATE TABLE, DROP TABLE, ALTER TABLE) inside transactions. If you get an error, check that you're using `execAsync` for multi-statement SQL, not `runAsync` (which is single-statement).                                                               |
+| FK constraint error during table rebuild           | The INSERT INTO ... SELECT copies valid FK references from the existing table. If FKs fail, it means the source data has orphan references (unlikely). Check `PRAGMA foreign_key_check` before and after.                                                                    |
+| Test expecting `'love'` still passes (stale cache) | Run `npm test -- --clearCache` to ensure Jest picks up the new constant values.                                                                                                                                                                                              |
+| `ACTION_VISUAL_CONFIG` type error                  | This is `Record<CoreSwipeAction, DeckActionVisualConfig>`. After changing `CoreSwipeAction`, you must rename the `love` key to `strong_yes`.                                                                                                                                 |
+| Icon `star-outline` doesn't render                 | Verify the icon name exists in Ionicons. Check at [icons.expo.fyi](https://icons.expo.fyi/?search=star-outline). If it doesn't exist in the bundled version, use `star` or fall back to `heart-outline`.                                                                     |
+| Unsure if migration 004 is needed on fresh install | Yes, it's still needed for correctness. On a fresh install, migration 002 already creates `swipe_events` with the _new_ ACTIONS-derived CHECK (since ACTIONS was updated). Migration 004 runs after that and is effectively a no-op (rebuilds the same table). This is safe. |
+| `respect`/`curious` appear in schema-check test    | The schema-check test smoke CRUD uses `eventAction = 'yes'` which is valid in both old and new. But if any test data uses `'love'`, `'respect'`, or `'curious'`, update it.                                                                                                  |
 
 ## 7. Implementation checklist
 
@@ -225,24 +230,41 @@ The `ACTION_SQL_VALUES` constant at the top of the file is already computed from
 Replace the entire file's constant definitions. Keep all function signatures identical — only the constant values change.
 
 **ACTIONS:**
+
 ```typescript
 // Before
-export const ACTIONS = ['hard_no', 'no', 'skip', 'yes', 'love', 'respect', 'curious'] as const;
+export const ACTIONS = [
+  'hard_no',
+  'no',
+  'skip',
+  'yes',
+  'love',
+  'respect',
+  'curious',
+] as const;
 
 // After
 export const ACTIONS = ['hard_no', 'no', 'skip', 'yes', 'strong_yes'] as const;
 ```
 
 **CORE_ACTIONS:**
+
 ```typescript
 // Before
 export const CORE_ACTIONS = ['hard_no', 'no', 'skip', 'yes', 'love'] as const;
 
 // After
-export const CORE_ACTIONS = ['hard_no', 'no', 'skip', 'yes', 'strong_yes'] as const;
+export const CORE_ACTIONS = [
+  'hard_no',
+  'no',
+  'skip',
+  'yes',
+  'strong_yes',
+] as const;
 ```
 
 **ACTION_LABELS:**
+
 ```typescript
 // After
 export const ACTION_LABELS = {
@@ -255,6 +277,7 @@ export const ACTION_LABELS = {
 ```
 
 **CORE_ACTION_LABELS:**
+
 ```typescript
 // After
 export const CORE_ACTION_LABELS = {
@@ -267,6 +290,7 @@ export const CORE_ACTION_LABELS = {
 ```
 
 **ACTION_WEIGHTS:**
+
 ```typescript
 // After
 export const ACTION_WEIGHTS = {
@@ -400,19 +424,20 @@ Every test file that asserts on action string values needs updating. The changes
 
 #### `__tests__/actions.test.ts`
 
-| Assertion | Before | After |
-|-----------|--------|-------|
-| `ACTIONS` array | `['hard_no','no','skip','yes','love','respect','curious']` | `['hard_no','no','skip','yes','strong_yes']` |
-| `CORE_ACTIONS` array | `['hard_no','no','skip','yes','love']` | `['hard_no','no','skip','yes','strong_yes']` |
-| `isCoreSwipeAction('love')` | `true` | Remove this assertion |
-| `isCoreSwipeAction('respect')` | `false` | Remove this assertion |
-| `ACTION_LABELS.love` | `'Love'` | Replace with `ACTION_LABELS.strong_yes` → `'Strong Yes'` |
-| `ACTION_WEIGHTS.respect` | `0.5` | Remove |
-| `ACTION_WEIGHTS.curious` | `0.25` | Remove |
-| `actionToDbStrength('respect')` | `1` | Remove |
-| `actionToDbStrength('curious')` | `0` | Remove |
+| Assertion                       | Before                                                     | After                                                    |
+| ------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------- |
+| `ACTIONS` array                 | `['hard_no','no','skip','yes','love','respect','curious']` | `['hard_no','no','skip','yes','strong_yes']`             |
+| `CORE_ACTIONS` array            | `['hard_no','no','skip','yes','love']`                     | `['hard_no','no','skip','yes','strong_yes']`             |
+| `isCoreSwipeAction('love')`     | `true`                                                     | Remove this assertion                                    |
+| `isCoreSwipeAction('respect')`  | `false`                                                    | Remove this assertion                                    |
+| `ACTION_LABELS.love`            | `'Love'`                                                   | Replace with `ACTION_LABELS.strong_yes` → `'Strong Yes'` |
+| `ACTION_WEIGHTS.respect`        | `0.5`                                                      | Remove                                                   |
+| `ACTION_WEIGHTS.curious`        | `0.25`                                                     | Remove                                                   |
+| `actionToDbStrength('respect')` | `1`                                                        | Remove                                                   |
+| `actionToDbStrength('curious')` | `0`                                                        | Remove                                                   |
 
 Add new assertions:
+
 - `isCoreSwipeAction('strong_yes')` → `true`
 - `isCoreSwipeAction('love')` → `false` (it's no longer a valid action)
 - `ACTION_LABELS.strong_yes` → `'Strong Yes'`
@@ -421,46 +446,46 @@ Add new assertions:
 
 #### `__tests__/use-deck-gestures.test.ts`
 
-| Test description | Value change |
-|-----------------|-------------|
+| Test description                  | Value change                                                     |
+| --------------------------------- | ---------------------------------------------------------------- |
 | "maps strong right swipe to love" | Description: "...to strong_yes". Expected action: `'strong_yes'` |
-| Strong right swipe assertion | `action: 'love'` → `action: 'strong_yes'` |
+| Strong right swipe assertion      | `action: 'love'` → `action: 'strong_yes'`                        |
 
 All other tests (`'yes'`, `'no'`, `'hard_no'`, cancel) remain unchanged.
 
 #### `__tests__/deck-action-dispatch-parity.test.ts`
 
-| Test | Value change |
-|------|-------------|
+| Test                           | Value change                                          |
+| ------------------------------ | ----------------------------------------------------- |
 | Strong gesture resolved action | `resolved?.action` expected `'love'` → `'strong_yes'` |
-| Payload assertion | `action: 'love'` → `action: 'strong_yes'` |
+| Payload assertion              | `action: 'love'` → `action: 'strong_yes'`             |
 
 Tests for `'yes'`/`'no'` and "skip never from gesture" remain unchanged.
 
 #### `__tests__/deck-action-bar.test.tsx`
 
-| Constant | Before | After |
-|----------|--------|-------|
-| `EXPECTED_ACTIONS` | `['hard_no','no','skip','yes','love']` | `['hard_no','no','skip','yes','strong_yes']` |
-| `onAction.mock.calls` | Last entry `['love', { source: 'button' }]` | `['strong_yes', { source: 'button' }]` |
+| Constant              | Before                                      | After                                        |
+| --------------------- | ------------------------------------------- | -------------------------------------------- |
+| `EXPECTED_ACTIONS`    | `['hard_no','no','skip','yes','love']`      | `['hard_no','no','skip','yes','strong_yes']` |
+| `onAction.mock.calls` | Last entry `['love', { source: 'button' }]` | `['strong_yes', { source: 'button' }]`       |
 
 #### `__tests__/db-migrations.test.ts`
 
 Update expected schema version:
 
-| Assertion | Before (after Iteration 10) | After |
-|-----------|----------------------------|-------|
-| `firstStartup.userVersion` | `3` | `4` |
-| `firstStartup.targetVersion` | `3` | `4` |
-| `secondStartup.userVersion` | `3` | `4` |
-| `secondStartup.targetVersion` | `3` | `4` |
-| `firstRun.toVersion` | `3` | `4` |
-| `firstRun.appliedMigrations` | `3` | `4` |
-| `secondRun.fromVersion` | `3` | `4` |
-| `secondRun.toVersion` | `3` | `4` |
-| `db.userVersion` (final) | `3` | `4` |
-| `status.userVersion` | `3` | `4` |
-| `status.targetVersion` | `3` | `4` |
+| Assertion                     | Before (after Iteration 10) | After |
+| ----------------------------- | --------------------------- | ----- |
+| `firstStartup.userVersion`    | `3`                         | `4`   |
+| `firstStartup.targetVersion`  | `3`                         | `4`   |
+| `secondStartup.userVersion`   | `3`                         | `4`   |
+| `secondStartup.targetVersion` | `3`                         | `4`   |
+| `firstRun.toVersion`          | `3`                         | `4`   |
+| `firstRun.appliedMigrations`  | `3`                         | `4`   |
+| `secondRun.fromVersion`       | `3`                         | `4`   |
+| `secondRun.toVersion`         | `3`                         | `4`   |
+| `db.userVersion` (final)      | `3`                         | `4`   |
+| `status.userVersion`          | `3`                         | `4`   |
+| `status.targetVersion`        | `3`                         | `4`   |
 
 #### `__tests__/schema-check.test.ts`
 
@@ -541,22 +566,22 @@ All four must exit 0.
 
 ## 10. Definition of done evidence
 
-| Evidence | Verification command |
-|----------|---------------------|
-| ACTIONS is the 5-value set | `rg "ACTIONS = \[" types/domain/actions.ts` — shows `strong_yes`, no `love`/`respect`/`curious` |
-| No `'love'` as action value | `rg "'love'" types/ components/ hooks/ lib/ __tests__/` returns 0 action-context hits |
-| No `'respect'` as action value | `rg "'respect'" types/ components/ hooks/ lib/ __tests__/` returns 0 hits |
-| No `'curious'` as action value | `rg "'curious'" types/ components/ hooks/ lib/ __tests__/` returns 0 hits |
-| Gesture maps strong right to strong_yes | `rg "strong_yes.*hard_no\|hard_no.*strong_yes" hooks/useDeckGestures.ts` — confirms ternary |
-| Migration 004 exists | `rg "004_standardize" lib/db/migrations.ts` |
-| Schema version 4 | `npm test -- db-migrations` passes with version 4 assertions |
-| Callback types unchanged | `git diff components/deck/deckActionPayload.ts` — only possible change is type import auto-update |
-| Dispatch logic unchanged | `git diff components/deck/dispatchDeckAction.ts` — no changes expected |
-| Gesture constants unchanged | `git diff hooks/useDeckGestures.constants.ts` — empty |
-| All tests pass | `npm test` exit code 0 |
-| Typecheck passes | `npm run typecheck` exit code 0 |
-| Lint passes | `npm run lint` exit code 0 |
-| Format passes | `npm run format -- --check` exit code 0 |
+| Evidence                                | Verification command                                                                              |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| ACTIONS is the 5-value set              | `rg "ACTIONS = \[" types/domain/actions.ts` — shows `strong_yes`, no `love`/`respect`/`curious`   |
+| No `'love'` as action value             | `rg "'love'" types/ components/ hooks/ lib/ __tests__/` returns 0 action-context hits             |
+| No `'respect'` as action value          | `rg "'respect'" types/ components/ hooks/ lib/ __tests__/` returns 0 hits                         |
+| No `'curious'` as action value          | `rg "'curious'" types/ components/ hooks/ lib/ __tests__/` returns 0 hits                         |
+| Gesture maps strong right to strong_yes | `rg "strong_yes.*hard_no\|hard_no.*strong_yes" hooks/useDeckGestures.ts` — confirms ternary       |
+| Migration 004 exists                    | `rg "004_standardize" lib/db/migrations.ts`                                                       |
+| Schema version 4                        | `npm test -- db-migrations` passes with version 4 assertions                                      |
+| Callback types unchanged                | `git diff components/deck/deckActionPayload.ts` — only possible change is type import auto-update |
+| Dispatch logic unchanged                | `git diff components/deck/dispatchDeckAction.ts` — no changes expected                            |
+| Gesture constants unchanged             | `git diff hooks/useDeckGestures.constants.ts` — empty                                             |
+| All tests pass                          | `npm test` exit code 0                                                                            |
+| Typecheck passes                        | `npm run typecheck` exit code 0                                                                   |
+| Lint passes                             | `npm run lint` exit code 0                                                                        |
+| Format passes                           | `npm run format -- --check` exit code 0                                                           |
 
 ## 11. Validation commands
 

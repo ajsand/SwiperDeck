@@ -1,9 +1,12 @@
 import {
   asDeckCardId,
   asDeckId,
+  type DeckCardTagLink,
+  type DeckTagRole,
   DECK_CATEGORIES,
   DECK_SENSITIVITIES,
   DECK_TIERS,
+  isDeckTagRole,
   isCardKind,
   isDeckSensitivity,
   isDeckTier,
@@ -11,6 +14,7 @@ import {
   type DeckCard,
 } from '@/types/domain';
 import { isRecord, parseStringArray } from '@/types/domain';
+import type { NormalizedDeckTaxonomy } from './validateDeckTaxonomy';
 
 const MAX_TAGS_PER_CARD = 15;
 const MAX_TITLE_LENGTH = 200;
@@ -46,9 +50,15 @@ export interface PrebuiltCardEntry {
   subtitle?: string;
   description_short?: string;
   tags?: string[];
+  tag_assignments?: PrebuiltCardTagAssignmentEntry[];
   popularity?: number;
   sort_order?: number;
   tile_key?: string;
+}
+
+export interface PrebuiltCardTagAssignmentEntry {
+  tag_id: string;
+  role: DeckTagRole;
 }
 
 export type DeckValidationResult =
@@ -56,7 +66,7 @@ export type DeckValidationResult =
   | { valid: false; errors: string[] };
 
 export type CardValidationResult =
-  | { valid: true; card: DeckCard }
+  | { valid: true; card: DeckCard; tagLinks: DeckCardTagLink[] }
   | { valid: false; errors: string[] };
 
 function normalizeString(value: unknown, maxLength: number): string {
@@ -234,6 +244,7 @@ export function validateDeck(
 export function validateCard(
   entry: unknown,
   deck: Pick<Deck, 'id' | 'category'>,
+  deckTaxonomy: NormalizedDeckTaxonomy | null,
   index: number,
   timestamp: number = Date.now(),
 ): CardValidationResult {
@@ -253,6 +264,9 @@ export function validateCard(
     entry.description_short,
     MAX_DESCRIPTION_LENGTH,
   );
+  const rawAssignments = Array.isArray(entry.tag_assignments)
+    ? entry.tag_assignments
+    : [];
 
   if (!id) {
     errors.push(`Card ${index + 1} in ${deck.id} is missing an id.`);
@@ -270,6 +284,72 @@ export function validateCard(
     );
   }
 
+  if (!deckTaxonomy) {
+    errors.push(
+      `Card "${id || `${deck.id}#${index + 1}`}" in ${deck.id} is missing taxonomy metadata.`,
+    );
+  }
+
+  const normalizedAssignments = rawAssignments
+    .filter((assignment): assignment is Record<string, unknown> =>
+      isRecord(assignment),
+    )
+    .map((assignment) => ({
+      tagId: normalizeString(assignment.tag_id, MAX_TITLE_LENGTH),
+      role: normalizeString(assignment.role, MAX_TITLE_LENGTH).toLowerCase(),
+    }));
+
+  if (normalizedAssignments.length < 1 || normalizedAssignments.length > 3) {
+    errors.push(
+      `Card "${id || `${deck.id}#${index + 1}`}" in ${deck.id} must include 1-3 tag assignments.`,
+    );
+  }
+
+  const primaryAssignments = normalizedAssignments.filter(
+    (assignment) => assignment.role === 'primary',
+  );
+  if (primaryAssignments.length !== 1) {
+    errors.push(
+      `Card "${id || `${deck.id}#${index + 1}`}" in ${deck.id} must include exactly one primary tag assignment.`,
+    );
+  }
+
+  const seenTagIds = new Set<string>();
+  normalizedAssignments.forEach((assignment) => {
+    if (!assignment.tagId) {
+      errors.push(
+        `Card "${id || `${deck.id}#${index + 1}`}" in ${deck.id} contains a tag assignment with a missing tag_id.`,
+      );
+      return;
+    }
+
+    if (!isDeckTagRole(assignment.role)) {
+      errors.push(
+        `Card "${id || `${deck.id}#${index + 1}`}" in ${deck.id} contains an invalid tag role "${assignment.role}".`,
+      );
+      return;
+    }
+
+    if (seenTagIds.has(assignment.tagId)) {
+      errors.push(
+        `Card "${id || `${deck.id}#${index + 1}`}" in ${deck.id} contains duplicate tag assignment "${assignment.tagId}".`,
+      );
+      return;
+    }
+
+    seenTagIds.add(assignment.tagId);
+  });
+
+  if (deckTaxonomy) {
+    normalizedAssignments.forEach((assignment) => {
+      if (!deckTaxonomy.tagsById.has(assignment.tagId)) {
+        errors.push(
+          `Card "${id || `${deck.id}#${index + 1}`}" in ${deck.id} references unknown tag "${assignment.tagId}".`,
+        );
+      }
+    });
+  }
+
   if (errors.length > 0) {
     return {
       valid: false,
@@ -278,6 +358,39 @@ export function validateCard(
   }
 
   const explicitTileKey = normalizeOptionalTileKey(entry.tile_key);
+  const assignedTags = normalizedAssignments.map((assignment) => {
+    const tag = deckTaxonomy?.tagsById.get(assignment.tagId);
+    if (!tag) {
+      throw new Error(
+        `Missing taxonomy tag "${assignment.tagId}" for ${String(deck.id)}.`,
+      );
+    }
+
+    return { tag, role: assignment.role as DeckTagRole };
+  });
+  const derivedTags = assignedTags.map(({ tag }) => tag.slug);
+  const normalizedDisplayTags = normalizeTags(entry.tags);
+  const cardTags =
+    normalizedDisplayTags.length > 0 ? normalizedDisplayTags : derivedTags;
+  const derivedTagSet = new Set(derivedTags);
+
+  const invalidDisplayTag = cardTags.find((tag) => !derivedTagSet.has(tag));
+  if (invalidDisplayTag) {
+    return {
+      valid: false,
+      errors: [
+        `Card "${id}" in ${deck.id} uses display tag "${invalidDisplayTag}" that is not backed by a canonical assignment.`,
+      ],
+    };
+  }
+
+  const tagLinks: DeckCardTagLink[] = assignedTags.map(({ tag, role }) => ({
+    cardId: asDeckCardId(id),
+    tagId: tag.id,
+    role,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  }));
 
   return {
     valid: true,
@@ -288,12 +401,13 @@ export function validateCard(
       title,
       subtitle,
       descriptionShort,
-      tags: normalizeTags(entry.tags),
+      tags: cardTags,
       popularity: normalizePopularity(entry.popularity),
       tileKey: explicitTileKey ?? `${deck.category}:${id}`,
       sortOrder: normalizeSortOrder(entry.sort_order, index),
       createdAt: timestamp,
       updatedAt: timestamp,
     },
+    tagLinks,
   };
 }

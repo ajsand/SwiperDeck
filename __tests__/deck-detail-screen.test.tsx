@@ -56,7 +56,7 @@ function buildDeck(overrides: Partial<Deck> = {}): Deck {
     cardCount: 32,
     compareEligible: true,
     showdownEligible: false,
-    sensitivity: 'sensitive',
+    sensitivity: 'standard',
     minCardsForProfile: 12,
     minCardsForCompare: 24,
     isCustom: false,
@@ -118,14 +118,22 @@ describe('DeckDetailScreen', () => {
     expect(screen.getByText('32 cards')).toBeTruthy();
     expect(screen.getByText('Compare eligible')).toBeTruthy();
     expect(screen.getByText('Showdown unavailable')).toBeTruthy();
-    expect(screen.getByText('Sensitive topic')).toBeTruthy();
+    expect(screen.getByText('Extra-care compare')).toBeTruthy();
     expect(
       screen.getByText('At least 12 cards for a basic profile'),
     ).toBeTruthy();
-    expect(screen.getByText('At least 24 cards for comparison')).toBeTruthy();
+    expect(
+      screen.getByText(
+        'At least 24 swipes before compare readiness can be considered. Coverage, ambiguity, and stability still matter. This deck touches worldview and value priorities, so compare needs stronger confidence and lower ambiguity than a standard deck.',
+      ),
+    ).toBeTruthy();
+    expect(screen.getByTestId('deck-detail-compare-readiness')).toBeTruthy();
 
     fireEvent.press(screen.getByTestId('deck-detail-start-swiping'));
     expect(mockPush).toHaveBeenCalledWith('/deck/deck_values/play');
+
+    fireEvent.press(screen.getByTestId('deck-detail-compare-readiness'));
+    expect(mockPush).toHaveBeenCalledWith('/deck/deck_values/compare');
   });
 
   it('shows an error state and retries loading', () => {
@@ -142,5 +150,53 @@ describe('DeckDetailScreen', () => {
     expect(screen.getByText('Unable to load deck')).toBeTruthy();
     fireEvent.press(screen.getByTestId('deck-browser-retry'));
     expect(refresh).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps compare status visible for custom decks even when compare is unavailable', () => {
+    mockUseDeckById.mockReturnValue({
+      deck: buildDeck({
+        id: asDeckId('deck_custom_values'),
+        title: 'Custom Values',
+        compareEligible: false,
+        isCustom: true,
+      }),
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    render(<DeckDetailScreen />);
+
+    expect(
+      screen.getByText(
+        'Custom decks stay local-first and are not compare-eligible under the current product scope.',
+      ),
+    ).toBeTruthy();
+    expect(screen.getByTestId('deck-detail-compare-readiness')).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId('deck-detail-compare-readiness'));
+    expect(mockPush).toHaveBeenCalledWith('/deck/deck_custom_values/compare');
+  });
+
+  it('offers a showdown entry point only for eligible decks', () => {
+    mockUseDeckById.mockReturnValue({
+      deck: buildDeck({
+        id: asDeckId('deck_movies_tv'),
+        title: 'Movies & TV',
+        category: 'movies_tv',
+        showdownEligible: true,
+      }),
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    render(<DeckDetailScreen />);
+
+    expect(screen.getByTestId('deck-detail-start-showdown')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('deck-detail-start-showdown'));
+    expect(mockPush).toHaveBeenCalledWith(
+      '/showdown/create?deckId=deck_movies_tv',
+    );
   });
 });

@@ -22,7 +22,9 @@ describe('tile token contract', () => {
   it('keeps unicode hashing deterministic without implicit normalization', () => {
     expect(hashTileKey('unicode:café')).toBe(119925020);
     expect(hashTileKey('unicode:cafe\u0301')).toBe(756723148);
-    expect(hashTileKey('unicode:café')).not.toBe(hashTileKey('unicode:cafe\u0301'));
+    expect(hashTileKey('unicode:café')).not.toBe(
+      hashTileKey('unicode:cafe\u0301'),
+    );
   });
 
   it('freezes palette list and ids', () => {

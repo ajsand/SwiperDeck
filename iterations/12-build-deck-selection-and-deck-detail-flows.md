@@ -42,22 +42,22 @@ CLAUDE.md Section 4.2 defines exactly what the deck browser must show. Section 5
 
 ### Relationship to old TasteDeck code
 
-| Category | What happens |
-|----------|--------------|
-| **Replaced** | `app/(tabs)/index.tsx` content — the inline swipe UI with `SAMPLE_DECK_ENTITIES` is removed from this route. The "Decks" tab becomes a true deck browser. |
-| **Reused** | Tab shell (`app/(tabs)/_layout.tsx`), root Stack navigator (`app/_layout.tsx`), `DeterministicTile` component (used for deck cover art on browser cards), `DeckStatePlaceholder` patterns (loading/empty/error), existing dark theme and styling conventions, `useColorScheme`, safe-area handling |
-| **Preserved (not modified)** | All swipe components (`components/deck/*`), gesture hooks (`hooks/useDeckGestures*`), action types, domain types, repositories, tile utilities, all other screens (profile, history, settings) |
-| **New** | Deck browser components, deck detail screen, data hooks, deck-detail route registration |
+| Category                     | What happens                                                                                                                                                                                                                                                                                       |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Replaced**                 | `app/(tabs)/index.tsx` content — the inline swipe UI with `SAMPLE_DECK_ENTITIES` is removed from this route. The "Decks" tab becomes a true deck browser.                                                                                                                                          |
+| **Reused**                   | Tab shell (`app/(tabs)/_layout.tsx`), root Stack navigator (`app/_layout.tsx`), `DeterministicTile` component (used for deck cover art on browser cards), `DeckStatePlaceholder` patterns (loading/empty/error), existing dark theme and styling conventions, `useColorScheme`, safe-area handling |
+| **Preserved (not modified)** | All swipe components (`components/deck/*`), gesture hooks (`hooks/useDeckGestures*`), action types, domain types, repositories, tile utilities, all other screens (profile, history, settings)                                                                                                     |
+| **New**                      | Deck browser components, deck detail screen, data hooks, deck-detail route registration                                                                                                                                                                                                            |
 
 ## 4. Multi-model execution strategy
 
-| Step | Model | Task |
-|------|-------|------|
-| 1 | Claude Opus 4.6 | Write this iteration file with screen specs, component contracts, navigation design (done) |
-| 2 | GPT-5.4 | Implement data hooks, browser components, and deck detail screen |
-| 3 | GPT-5.4 | Replace index tab content, register new route, write tests |
-| 4 | GPT-5.4 | Run full validation suite |
-| 5 | Claude Opus 4.6 | Review for spec alignment, accessibility, and state handling |
+| Step | Model           | Task                                                                                       |
+| ---- | --------------- | ------------------------------------------------------------------------------------------ |
+| 1    | Claude Opus 4.6 | Write this iteration file with screen specs, component contracts, navigation design (done) |
+| 2    | GPT-5.4         | Implement data hooks, browser components, and deck detail screen                           |
+| 3    | GPT-5.4         | Replace index tab content, register new route, write tests                                 |
+| 4    | GPT-5.4         | Run full validation suite                                                                  |
+| 5    | Claude Opus 4.6 | Review for spec alignment, accessibility, and state handling                               |
 
 This is a UI-heavy iteration. GPT-5.4 handles all implementation. If the grid/scroll layout is proving tricky, a Gemini layout reasoning pass could be helpful — but try GPT-5.4 first since the layout is a standard scrollable list.
 
@@ -69,16 +69,16 @@ If the deck browser needs a complex grid layout with varying card sizes (e.g., f
 
 ### Source-of-truth references
 
-| Document | Relevant sections |
-|----------|-------------------|
-| `/CLAUDE.md` Section 4.1 | Onboarding: starting paths (explore recommended decks, continue a prior deck) |
-| `/CLAUDE.md` Section 4.2 | Choosing a deck: browser grouping, metadata to show per deck |
-| `/CLAUDE.md` Section 5.1 | Core deck model: one category, one card set, one profile space |
-| `/CLAUDE.md` Section 5.2 | Recommended launch categories with tier groupings |
-| `/CLAUDE.md` Section 5.3 | Prebuilt vs custom deck distinction |
-| `/CLAUDE.md` Section 11.6 | Sensitive deck safeguards (gating, warnings) |
-| `/CLAUDE.md` Section 14.4 | Compare eligibility threshold (min cards) |
-| `/CLAUDE.md` Section 15 | UX, accessibility, and performance requirements |
+| Document                          | Relevant sections                                                                  |
+| --------------------------------- | ---------------------------------------------------------------------------------- |
+| `/CLAUDE.md` Section 4.1          | Onboarding: starting paths (explore recommended decks, continue a prior deck)      |
+| `/CLAUDE.md` Section 4.2          | Choosing a deck: browser grouping, metadata to show per deck                       |
+| `/CLAUDE.md` Section 5.1          | Core deck model: one category, one card set, one profile space                     |
+| `/CLAUDE.md` Section 5.2          | Recommended launch categories with tier groupings                                  |
+| `/CLAUDE.md` Section 5.3          | Prebuilt vs custom deck distinction                                                |
+| `/CLAUDE.md` Section 11.6         | Sensitive deck safeguards (gating, warnings)                                       |
+| `/CLAUDE.md` Section 14.4         | Compare eligibility threshold (min cards)                                          |
+| `/CLAUDE.md` Section 15           | UX, accessibility, and performance requirements                                    |
 | `/iterations/11-...md` Section 12 | Handoff: schema v4, action model finalized, DeckCard component takes CatalogEntity |
 
 ### Current route structure (before this iteration)
@@ -123,35 +123,35 @@ app/
 
 ### New files to CREATE
 
-| File | Purpose |
-|------|---------|
-| `app/deck/[deckId].tsx` | Deck detail screen |
-| `components/deck-browser/DeckBrowserCard.tsx` | Visual card for each deck in the browser list |
-| `components/deck-browser/DeckBrowserEmpty.tsx` | Empty state when no decks exist |
-| `components/deck-browser/index.ts` | Barrel export |
-| `hooks/useDecks.ts` | Hook to query all decks from DB |
-| `hooks/useDeckById.ts` | Hook to query a single deck by ID |
-| `__tests__/deck-browser-card.test.tsx` | Component test |
-| `__tests__/use-decks.test.ts` | Hook test (mock repository) |
+| File                                           | Purpose                                       |
+| ---------------------------------------------- | --------------------------------------------- |
+| `app/deck/[deckId].tsx`                        | Deck detail screen                            |
+| `components/deck-browser/DeckBrowserCard.tsx`  | Visual card for each deck in the browser list |
+| `components/deck-browser/DeckBrowserEmpty.tsx` | Empty state when no decks exist               |
+| `components/deck-browser/index.ts`             | Barrel export                                 |
+| `hooks/useDecks.ts`                            | Hook to query all decks from DB               |
+| `hooks/useDeckById.ts`                         | Hook to query a single deck by ID             |
+| `__tests__/deck-browser-card.test.tsx`         | Component test                                |
+| `__tests__/use-decks.test.ts`                  | Hook test (mock repository)                   |
 
 ### Files to MODIFY
 
-| File | What changes |
-|------|--------------|
+| File                   | What changes                                       |
+| ---------------------- | -------------------------------------------------- |
 | `app/(tabs)/index.tsx` | REWRITE: replace inline swipe UI with deck browser |
-| `app/_layout.tsx` | Register `deck/[deckId]` Stack.Screen |
+| `app/_layout.tsx`      | Register `deck/[deckId]` Stack.Screen              |
 
 ### Files to PRESERVE (do not modify)
 
-| File | Why |
-|------|-----|
-| All `components/deck/*` | Swipe UI components — used by Iteration 14 |
-| All `hooks/useDeckGestures*` | Gesture system — used by Iteration 14 |
-| `types/domain/*` | Domain types — stable |
-| `lib/db/*` | Repositories and migrations — stable |
-| `app/(tabs)/profile.tsx` | Unchanged |
-| `app/(tabs)/library.tsx` | Unchanged |
-| `app/(tabs)/settings.tsx` | Unchanged |
+| File                         | Why                                        |
+| ---------------------------- | ------------------------------------------ |
+| All `components/deck/*`      | Swipe UI components — used by Iteration 14 |
+| All `hooks/useDeckGestures*` | Gesture system — used by Iteration 14      |
+| `types/domain/*`             | Domain types — stable                      |
+| `lib/db/*`                   | Repositories and migrations — stable       |
+| `app/(tabs)/profile.tsx`     | Unchanged                                  |
+| `app/(tabs)/library.tsx`     | Unchanged                                  |
+| `app/(tabs)/settings.tsx`    | Unchanged                                  |
 
 ### Deck domain type reminder (from Iteration 10)
 
@@ -180,6 +180,7 @@ The `getAllDecks()` and `getDeckById()` functions in `lib/db/deckRepository.ts` 
 ### External troubleshooting and learning resources
 
 #### Official docs
+
 - [Expo Router — Dynamic routes](https://docs.expo.dev/router/create-pages/#dynamic-routes) — `[deckId].tsx` pattern
 - [Expo Router — Navigate between pages](https://docs.expo.dev/router/navigating-pages/)
 - [Expo Router — Stack.Screen options](https://docs.expo.dev/router/layouts/stack/)
@@ -188,33 +189,37 @@ The `getAllDecks()` and `getDeckById()` functions in `lib/db/deckRepository.ts` 
 - [React Native Accessibility](https://reactnative.dev/docs/accessibility) — labels, roles, hints
 
 #### Step-by-step guides
+
 - [Expo Router dynamic routes tutorial](https://docs.expo.dev/tutorial/create-pages/)
 - [Expo icon directory](https://icons.expo.fyi/) — for deck category icons
 
 #### YouTube
+
 - Search "Expo Router dynamic routes 2025/2026" for file-based routing with `[param].tsx`
 - Search "React Native FlatList performance" for list rendering best practices
 
 #### GitHub repos
+
 - [expo/expo router examples](https://github.com/expo/router/tree/main/apps)
 - This repo's `app/details/[id].tsx` — the existing dynamic route pattern to follow
 
 #### Stack Overflow / discussion boards
+
 - [expo-router dynamic routes](https://stackoverflow.com/questions/tagged/expo-router)
 
 ## 6. When stuck
 
-| Problem | Resolution |
-|---------|------------|
-| Route `deck/[deckId]` not resolving | Create `app/deck/[deckId].tsx` (the directory `app/deck/` must exist). Expo Router auto-discovers it. You do NOT need to manually register it in the Stack for the route to work, but add a `Stack.Screen name="deck/[deckId]"` entry in `app/_layout.tsx` if you want custom header options. |
-| Navigation from browser to detail fails | Use `router.push(\`/deck/${deck.id}\`)` from `expo-router`. The `useRouter` hook provides `push`. Ensure the deck ID is a plain string (not a branded type) when passed to the URL. |
-| Deck list is empty | This is expected until Iteration 13 loads content. The empty state should display a helpful message. For development testing, you can temporarily insert a test deck in the `useDecks` hook or in a dev seed script. |
-| `getDb()` returns uninitialized DB | The DB is initialized in `app/_layout.tsx` before the tabs mount. If the hook runs before DB init, add a guard. The `isDbReady` state in root layout ensures children only render after init. |
-| FlatList renders blank | Ensure `data` is not `undefined` (use `data ?? []`). Ensure `keyExtractor` returns a string. Ensure `renderItem` returns a valid React element. |
-| Dark theme not applying to new screens | Use `useColorScheme` and the project's `Colors` constants or the `Themed` component wrappers. The deck browser background should match the app's dark theme (`#0B0B10`). |
+| Problem                                   | Resolution                                                                                                                                                                                                                                                                                     |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Route `deck/[deckId]` not resolving       | Create `app/deck/[deckId].tsx` (the directory `app/deck/` must exist). Expo Router auto-discovers it. You do NOT need to manually register it in the Stack for the route to work, but add a `Stack.Screen name="deck/[deckId]"` entry in `app/_layout.tsx` if you want custom header options.  |
+| Navigation from browser to detail fails   | Use `router.push(\`/deck/${deck.id}\`)`from`expo-router`. The `useRouter`hook provides`push`. Ensure the deck ID is a plain string (not a branded type) when passed to the URL.                                                                                                                |
+| Deck list is empty                        | This is expected until Iteration 13 loads content. The empty state should display a helpful message. For development testing, you can temporarily insert a test deck in the `useDecks` hook or in a dev seed script.                                                                           |
+| `getDb()` returns uninitialized DB        | The DB is initialized in `app/_layout.tsx` before the tabs mount. If the hook runs before DB init, add a guard. The `isDbReady` state in root layout ensures children only render after init.                                                                                                  |
+| FlatList renders blank                    | Ensure `data` is not `undefined` (use `data ?? []`). Ensure `keyExtractor` returns a string. Ensure `renderItem` returns a valid React element.                                                                                                                                                |
+| Dark theme not applying to new screens    | Use `useColorScheme` and the project's `Colors` constants or the `Themed` component wrappers. The deck browser background should match the app's dark theme (`#0B0B10`).                                                                                                                       |
 | DeterministicTile needs a `type` for icon | For deck cover tiles, pass the deck's `category` as the `type` prop. The `iconForEntityType` function will return the fallback icon if the category isn't in the entity type map. Consider adding a `iconForDeckCategory` helper in `lib/tiles/` for better icons, or extend the existing map. |
-| TypeScript error importing Deck type | Import from the barrel: `import type { Deck, DeckId } from '@/types/domain'`. Never import from `types/domain/decks` directly (per the barrel convention). |
-| Accessibility for deck browser cards | Each card should have `accessibilityRole="button"`, `accessibilityLabel` with the deck title and category, and `accessibilityHint="Opens deck detail"`. |
+| TypeScript error importing Deck type      | Import from the barrel: `import type { Deck, DeckId } from '@/types/domain'`. Never import from `types/domain/decks` directly (per the barrel convention).                                                                                                                                     |
+| Accessibility for deck browser cards      | Each card should have `accessibilityRole="button"`, `accessibilityLabel` with the deck title and category, and `accessibilityHint="Opens deck detail"`.                                                                                                                                        |
 
 ## 7. Implementation checklist
 
@@ -234,6 +239,7 @@ interface UseDecksResult {
 ```
 
 Implementation:
+
 - On mount, call `getDb()` then `getAllDecks(db)` from `lib/db/deckRepository`
 - Manage `loading`, `error`, and `decks` state
 - Expose a `refresh()` callback for pull-to-refresh
@@ -252,6 +258,7 @@ interface UseDeckByIdResult {
 ```
 
 Implementation:
+
 - Accept `deckId: DeckId` parameter
 - Call `getDeckById(db, deckId)` from `deckRepository`
 - Handle not-found (return `deck: null` with `loading: false`, `error: null`)
@@ -272,6 +279,7 @@ interface DeckBrowserCardProps {
 ```
 
 **Visual design:**
+
 - Dark card surface (`rgba(255,255,255,0.06)`) matching the app's dark theme
 - Rounded corners (16px border radius)
 - Deck title — bold, white, prominent
@@ -282,6 +290,7 @@ interface DeckBrowserCardProps {
 - Pressable with press feedback (opacity change)
 
 **Accessibility:**
+
 - `accessibilityRole="button"`
 - `accessibilityLabel` = `"${deck.title}, ${deck.category}, ${deck.cardCount} cards"`
 - `accessibilityHint="View deck details"`
@@ -293,17 +302,20 @@ interface DeckBrowserCardProps {
 Rendered when `decks.length === 0` after loading completes.
 
 **Content:**
+
 - Title: "No decks yet"
 - Subtitle: "Prebuilt decks will appear here once they're loaded."
 - Optional: A subtle icon or illustration
 
 **Accessibility:**
+
 - `accessibilityRole="text"`
 - `accessibilityLabel="No decks available. Prebuilt decks will appear here once loaded."`
 
 #### `components/deck-browser/index.ts`
 
 Barrel exports:
+
 ```typescript
 export * from './DeckBrowserCard';
 export * from './DeckBrowserEmpty';
@@ -318,6 +330,7 @@ Replace the entire file content. Remove the inline swipe UI, the `SAMPLE_DECK_EN
 The new content is a deck browser screen:
 
 **Structure:**
+
 ```
 SafeAreaView
   ├── Header (title "Decks", subtitle "Choose a deck to explore")
@@ -330,6 +343,7 @@ SafeAreaView
 ```
 
 **Behavior:**
+
 - Use `useDecks()` hook to load deck list
 - Render a `FlatList` with `DeckBrowserCard` items
 - On card press: `router.push(\`/deck/${deck.id}\`)`
@@ -338,11 +352,13 @@ SafeAreaView
 - Show error state with retry button when `error !== null`
 
 **Styling:**
+
 - Background: `#0B0B10` (matches current dark theme)
 - Header padding with safe area insets (same pattern as current index.tsx)
 - FlatList with `contentContainerStyle` padding
 
 **What gets removed from this file:**
+
 - `SAMPLE_DECK_ENTITIES` array
 - All `DeckActionBar`, `DeckCard`, `DeckStatePlaceholder`, `dispatchDeckAction` imports
 - All `useDeckGestures` usage
@@ -356,6 +372,7 @@ SafeAreaView
 A full Stack screen that displays comprehensive deck metadata.
 
 **Data loading:**
+
 - Extract `deckId` from route params via `useLocalSearchParams<{ deckId: string }>()`
 - Convert to branded ID: `asDeckId(deckId)`
 - Use `useDeckById(asDeckId(deckId))` hook to load the deck
@@ -363,18 +380,18 @@ A full Stack screen that displays comprehensive deck metadata.
 
 **Metadata to display** (from CLAUDE.md Section 4.2):
 
-| Datum | Source field | Display |
-|-------|-------------|---------|
-| Title | `deck.title` | Large heading |
-| Description | `deck.description` | Body text below heading |
-| Category | `deck.category` | Subtitle or chip |
-| Card count | `deck.cardCount` | "45 cards" |
-| Profile threshold | `deck.minCardsForProfile` | "At least 15 cards for a basic profile" |
-| Compare threshold | `deck.minCardsForCompare` | "At least 30 cards for comparison" |
-| Compare eligible | `deck.compareEligible` | Badge or chip: "Compare-eligible" or hidden |
-| Showdown eligible | `deck.showdownEligible` | Badge or chip: "Showdown-eligible" or hidden |
-| Sensitivity | `deck.sensitivity` | If not 'standard': warning chip ("Sensitive topic") |
-| Custom flag | `deck.isCustom` | If true: "Custom deck" badge |
+| Datum             | Source field              | Display                                             |
+| ----------------- | ------------------------- | --------------------------------------------------- |
+| Title             | `deck.title`              | Large heading                                       |
+| Description       | `deck.description`        | Body text below heading                             |
+| Category          | `deck.category`           | Subtitle or chip                                    |
+| Card count        | `deck.cardCount`          | "45 cards"                                          |
+| Profile threshold | `deck.minCardsForProfile` | "At least 15 cards for a basic profile"             |
+| Compare threshold | `deck.minCardsForCompare` | "At least 30 cards for comparison"                  |
+| Compare eligible  | `deck.compareEligible`    | Badge or chip: "Compare-eligible" or hidden         |
+| Showdown eligible | `deck.showdownEligible`   | Badge or chip: "Showdown-eligible" or hidden        |
+| Sensitivity       | `deck.sensitivity`        | If not 'standard': warning chip ("Sensitive topic") |
+| Custom flag       | `deck.isCustom`           | If true: "Custom deck" badge                        |
 
 **Visual layout (top to bottom):**
 
@@ -386,6 +403,7 @@ A full Stack screen that displays comprehensive deck metadata.
 
 **CTA behavior for this iteration:**
 The "Start Swiping" button is present and visible, but since swipe session wiring is Iteration 14, it should either:
+
 - (Option A) Show a brief toast/alert: "Swipe sessions coming in a future update" — simplest
 - (Option B) Navigate to a placeholder screen that says "Swipe session for [deck title] — coming soon"
 - (Option C) Be visually present but disabled with helper text "Available once deck content is loaded"
@@ -399,6 +417,7 @@ Recommend **Option A** (toast/alert) for minimal code. The CTA must be clearly v
 **Error state:** Error message with "Retry" button.
 
 **Accessibility:**
+
 - Screen reader should announce the deck title when the screen mounts
 - All metadata chips should have `accessibilityLabel`s
 - The CTA button needs `accessibilityRole="button"` and a clear hint
@@ -446,6 +465,7 @@ This helps both the browser card and the detail screen show meaningful icons per
 #### `__tests__/use-decks.test.ts`
 
 Test the `useDecks` hook with a mocked database:
+
 - Returns empty array when no decks exist
 - Returns deck list when decks exist
 - Sets `loading: true` then `false`
@@ -455,6 +475,7 @@ Test the `useDecks` hook with a mocked database:
 #### `__tests__/deck-browser-card.test.tsx`
 
 Test `DeckBrowserCard`:
+
 - Renders deck title and category
 - Calls `onPress` with deck ID when pressed
 - Shows sensitivity indicator for non-standard decks
@@ -463,6 +484,7 @@ Test `DeckBrowserCard`:
 #### `__tests__/deck-detail-screen.test.tsx` (optional but recommended)
 
 Test the deck detail screen:
+
 - Shows loading state initially
 - Renders deck metadata after loading
 - Shows "not found" for invalid ID
@@ -515,20 +537,20 @@ npm test
 
 ## 10. Definition of done evidence
 
-| Evidence | Verification command |
-|----------|---------------------|
-| Deck browser is the index tab | Open the app → "Decks" tab shows a list or empty state, not swipe UI |
-| SAMPLE_DECK_ENTITIES removed | `rg "SAMPLE_DECK_ENTITIES" app/` returns 0 hits |
-| Deck detail route exists | `ls app/deck/` shows `[deckId].tsx` |
-| Route registered in root layout | `rg "deck/\\[deckId\\]" app/_layout.tsx` returns a hit |
-| Swipe components untouched | `git diff components/deck/` — empty |
-| Gesture hooks untouched | `git diff hooks/useDeckGestures.ts hooks/useDeckGestures.constants.ts` — empty |
-| New hooks exist | `ls hooks/useDecks.ts hooks/useDeckById.ts` — both exist |
-| New browser components exist | `ls components/deck-browser/` — shows DeckBrowserCard, DeckBrowserEmpty, index |
-| Tests pass | `npm test` exit code 0 |
-| Typecheck passes | `npm run typecheck` exit code 0 |
-| Lint passes | `npm run lint` exit code 0 |
-| Format passes | `npm run format -- --check` exit code 0 |
+| Evidence                        | Verification command                                                           |
+| ------------------------------- | ------------------------------------------------------------------------------ |
+| Deck browser is the index tab   | Open the app → "Decks" tab shows a list or empty state, not swipe UI           |
+| SAMPLE_DECK_ENTITIES removed    | `rg "SAMPLE_DECK_ENTITIES" app/` returns 0 hits                                |
+| Deck detail route exists        | `ls app/deck/` shows `[deckId].tsx`                                            |
+| Route registered in root layout | `rg "deck/\\[deckId\\]" app/_layout.tsx` returns a hit                         |
+| Swipe components untouched      | `git diff components/deck/` — empty                                            |
+| Gesture hooks untouched         | `git diff hooks/useDeckGestures.ts hooks/useDeckGestures.constants.ts` — empty |
+| New hooks exist                 | `ls hooks/useDecks.ts hooks/useDeckById.ts` — both exist                       |
+| New browser components exist    | `ls components/deck-browser/` — shows DeckBrowserCard, DeckBrowserEmpty, index |
+| Tests pass                      | `npm test` exit code 0                                                         |
+| Typecheck passes                | `npm run typecheck` exit code 0                                                |
+| Lint passes                     | `npm run lint` exit code 0                                                     |
+| Format passes                   | `npm run format -- --check` exit code 0                                        |
 
 ## 11. Validation commands
 

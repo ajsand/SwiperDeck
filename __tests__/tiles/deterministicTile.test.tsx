@@ -91,7 +91,9 @@ describe('DeterministicTile contract', () => {
     );
     expect(unknownTypeFixture).toBeDefined();
 
-    const snapshot = toRenderSnapshot(unknownTypeFixture as TileComponentFixture);
+    const snapshot = toRenderSnapshot(
+      unknownTypeFixture as TileComponentFixture,
+    );
     expect(snapshot.iconName).toBe(TILE_CONTRACT.fallbackIcon);
   });
 

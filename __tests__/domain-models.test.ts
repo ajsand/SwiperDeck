@@ -3,19 +3,37 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 import {
   asDeckCardId,
   asDeckId,
+  asDeckTagFacetId,
+  asDeckTagId,
   asEntityId,
   asSessionId,
   asSnapshotId,
   asSwipeEventId,
+  deckCardTagLinkToRow,
+  deckCardStateToRow,
+  deckTagStateToRow,
+  deckTagFacetToRow,
+  deckTagToRow,
   catalogEntityToRow,
+  rowToDeckCardTagLink,
+  rowToDeckCardState,
+  rowToDeckTag,
+  rowToDeckTagFacet,
+  rowToDeckTagState,
   rowToCatalogEntity,
   rowToProfileSnapshot,
   rowToSwipeEvent,
   rowToSwipeSession,
+  summarizeDeckTagCoverage,
   swipeEventToRow,
   swipeSessionToRow,
   type CatalogEntity,
   type CatalogEntityRow,
+  type DeckCardTagLinkRow,
+  type DeckCardStateRow,
+  type DeckTagFacetRow,
+  type DeckTagStateRow,
+  type DeckTagRow,
   type SwipeEventRow,
   type SwipeSessionRow,
 } from '@/types/domain';
@@ -152,6 +170,105 @@ describe('domain row/domain models and mappers', () => {
     expect(swipeEventToRow(event)).toEqual(eventRow);
   });
 
+  it('roundtrips deck taxonomy facet, tag, and card-tag link rows', () => {
+    const facetRow: DeckTagFacetRow = {
+      id: 'movies_tv:tone',
+      deck_id: 'deck_movies_tv',
+      key: 'tone',
+      label: 'Tone',
+      description: 'Mood lane',
+      sort_order: 0,
+      created_at: 1700000000000,
+      updated_at: 1700000000000,
+    };
+    const facet = rowToDeckTagFacet(facetRow);
+
+    expect(facet.id).toBe(asDeckTagFacetId('movies_tv:tone'));
+    expect(deckTagFacetToRow(facet)).toEqual(facetRow);
+
+    const tagRow: DeckTagRow = {
+      id: 'movies_tv:drama',
+      deck_id: 'deck_movies_tv',
+      facet_id: 'movies_tv:tone',
+      slug: 'drama',
+      label: 'Drama',
+      description: 'Drama cards',
+      sort_order: 1,
+      created_at: 1700000000000,
+      updated_at: 1700000000000,
+    };
+    const tag = rowToDeckTag(tagRow);
+
+    expect(tag.id).toBe(asDeckTagId('movies_tv:drama'));
+    expect(deckTagToRow(tag)).toEqual(tagRow);
+
+    const linkRow: DeckCardTagLinkRow = {
+      card_id: 'movies_tv_001',
+      tag_id: 'movies_tv:drama',
+      role: 'primary',
+      created_at: 1700000000000,
+      updated_at: 1700000000000,
+    };
+    const link = rowToDeckCardTagLink(linkRow);
+
+    expect(link.cardId).toBe(asDeckCardId('movies_tv_001'));
+    expect(link.tagId).toBe(asDeckTagId('movies_tv:drama'));
+    expect(deckCardTagLinkToRow(link)).toEqual(linkRow);
+  });
+
+  it('roundtrips deck tag state rows and preserves nullable timestamps', () => {
+    const stateRow: DeckTagStateRow = {
+      deck_id: 'deck_movies_tv',
+      tag_id: 'movies_tv:drama',
+      exposure_count: 3,
+      distinct_cards_seen: 2,
+      positive_weight: 1,
+      negative_weight: 2,
+      skip_count: 1,
+      net_weight: -1,
+      uncertainty_score: 0.78,
+      first_seen_at: 1700000000000,
+      last_seen_at: 1700000003000,
+      last_positive_at: 1700000000000,
+      last_negative_at: 1700000002000,
+      last_retested_at: null,
+      updated_at: 1700000004000,
+    };
+    const state = rowToDeckTagState(stateRow);
+
+    expect(state.deckId).toBe(asDeckId('deck_movies_tv'));
+    expect(state.tagId).toBe(asDeckTagId('movies_tv:drama'));
+    expect(deckTagStateToRow(state)).toEqual(stateRow);
+    expect(
+      summarizeDeckTagCoverage(asDeckId('deck_movies_tv'), [state]),
+    ).toEqual({
+      deckId: asDeckId('deck_movies_tv'),
+      totalTagCount: 1,
+      seenTagCount: 1,
+      unseenTagCount: 0,
+      resolvedTagCount: 0,
+      uncertainTagCount: 1,
+      coverageRatio: 1,
+    });
+  });
+
+  it('roundtrips deck card state rows and preserves presentation/swipe timestamps', () => {
+    const stateRow: DeckCardStateRow = {
+      deck_id: 'deck_movies_tv',
+      card_id: 'movies_tv_001',
+      presentation_count: 3,
+      swipe_count: 2,
+      last_presented_at: 1700000003000,
+      last_swiped_at: 1700000004000,
+      updated_at: 1700000005000,
+    };
+    const state = rowToDeckCardState(stateRow);
+
+    expect(state.deckId).toBe(asDeckId('deck_movies_tv'));
+    expect(state.cardId).toBe(asDeckCardId('movies_tv_001'));
+    expect(deckCardStateToRow(state)).toEqual(stateRow);
+  });
+
   it('parses profile snapshot JSON with safe fallbacks', () => {
     const snapshot = rowToProfileSnapshot({
       id: 'snapshot_1',
@@ -202,6 +319,8 @@ describe('id branding helpers', () => {
     expect(asEntityId('entity_2')).toBe('entity_2');
     expect(asDeckId('deck_2')).toBe('deck_2');
     expect(asDeckCardId('card_2')).toBe('card_2');
+    expect(asDeckTagFacetId('deck_2:tone')).toBe('deck_2:tone');
+    expect(asDeckTagId('deck_2:drama')).toBe('deck_2:drama');
     expect(asSessionId('session_2')).toBe('session_2');
     expect(asSwipeEventId('event_2')).toBe('event_2');
     expect(asSnapshotId('snapshot_2')).toBe('snapshot_2');
