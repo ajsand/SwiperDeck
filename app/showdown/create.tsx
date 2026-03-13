@@ -21,6 +21,7 @@ import {
   getDeckSafetyBadgeLabel,
   getDeckSafetyPolicy,
 } from '@/lib/policy/deckSafetyPolicy';
+import { getDeckBrowserRoute } from '@/lib/navigation/appShell';
 import {
   selectShowdownCards,
   type ShowdownCardSelectionResult,
@@ -83,10 +84,20 @@ export default function ShowdownCreateScreen() {
     responseSeconds: 30,
     participantCount: 3,
   });
-  const [selectionResult, setSelectionResult] =
-    useState<ShowdownCardSelectionResult | null>(null);
-  const [selectionLoading, setSelectionLoading] = useState(false);
-  const [selectionError, setSelectionError] = useState<string | null>(null);
+  const selectionStateKey = deck
+    ? `${deck.id as string}|${config.cardCount}`
+    : null;
+  const [selectionState, setSelectionState] = useState<{
+    key: string | null;
+    result: ShowdownCardSelectionResult | null;
+    loading: boolean;
+    error: string | null;
+  }>({
+    key: null,
+    result: null,
+    loading: false,
+    error: null,
+  });
   const [starting, setStarting] = useState(false);
 
   const safetyPolicy = useMemo(
@@ -97,32 +108,79 @@ export default function ShowdownCreateScreen() {
     () => (deck ? getDeckSafetyBadgeLabel(deck) : null),
     [deck],
   );
+  const currentSelectionState = useMemo(() => {
+    if (selectionState.key === selectionStateKey) {
+      return selectionState;
+    }
+
+    if (!deck || !safetyPolicy) {
+      return {
+        key: selectionStateKey,
+        result: null,
+        loading: false,
+        error: null,
+      };
+    }
+
+    if (!safetyPolicy.showdown.allowed) {
+      return {
+        key: selectionStateKey,
+        result: {
+          available: false,
+          reason:
+            safetyPolicy.showdown.reason ??
+            'This deck is not eligible for showdown.',
+          selectedCards: [],
+          excludedCardCount: 0,
+        },
+        loading: false,
+        error: null,
+      };
+    }
+
+    return {
+      key: selectionStateKey,
+      result: null,
+      loading: true,
+      error: null,
+    };
+  }, [deck, safetyPolicy, selectionState, selectionStateKey]);
 
   useEffect(() => {
     if (!deck || !safetyPolicy) {
-      setSelectionResult(null);
-      setSelectionError(null);
-      setSelectionLoading(false);
+      setSelectionState({
+        key: selectionStateKey,
+        result: null,
+        loading: false,
+        error: null,
+      });
       return;
     }
 
     if (!safetyPolicy.showdown.allowed) {
-      setSelectionResult({
-        available: false,
-        reason:
-          safetyPolicy.showdown.reason ??
-          'This deck is not eligible for showdown.',
-        selectedCards: [],
-        excludedCardCount: 0,
+      setSelectionState({
+        key: selectionStateKey,
+        result: {
+          available: false,
+          reason:
+            safetyPolicy.showdown.reason ??
+            'This deck is not eligible for showdown.',
+          selectedCards: [],
+          excludedCardCount: 0,
+        },
+        loading: false,
+        error: null,
       });
-      setSelectionLoading(false);
-      setSelectionError(null);
       return;
     }
 
     let cancelled = false;
-    setSelectionLoading(true);
-    setSelectionError(null);
+    setSelectionState({
+      key: selectionStateKey,
+      result: null,
+      loading: true,
+      error: null,
+    });
 
     const loadSelection = async () => {
       try {
@@ -162,21 +220,26 @@ export default function ShowdownCreateScreen() {
           return;
         }
 
-        setSelectionResult(nextResult);
+        setSelectionState({
+          key: selectionStateKey,
+          result: nextResult,
+          loading: false,
+          error: null,
+        });
       } catch (loadError) {
         if (cancelled) {
           return;
         }
 
-        setSelectionError(
-          loadError instanceof Error
-            ? loadError.message
-            : 'Unable to build a showdown card set for this deck.',
-        );
-      } finally {
-        if (!cancelled) {
-          setSelectionLoading(false);
-        }
+        setSelectionState({
+          key: selectionStateKey,
+          result: null,
+          loading: false,
+          error:
+            loadError instanceof Error
+              ? loadError.message
+              : 'Unable to build a showdown card set for this deck.',
+        });
       }
     };
 
@@ -185,10 +248,10 @@ export default function ShowdownCreateScreen() {
     return () => {
       cancelled = true;
     };
-  }, [config.cardCount, deck, safetyPolicy]);
+  }, [deck, safetyPolicy, selectionStateKey, config.cardCount]);
 
   const startShowdown = () => {
-    if (!deck || !selectionResult?.available) {
+    if (!deck || !currentSelectionState.result?.available) {
       return;
     }
 
@@ -203,7 +266,7 @@ export default function ShowdownCreateScreen() {
         participants: createDefaultShowdownParticipants(
           config.participantCount,
         ),
-        selectedCards: selectionResult.selectedCards,
+        selectedCards: currentSelectionState.result.selectedCards,
       });
 
       router.push(`/showdown/${session.id as string}` as never);
@@ -239,6 +302,16 @@ export default function ShowdownCreateScreen() {
       ) : !deck ? (
         <View style={styles.stateContainer}>
           <Text style={styles.stateTitle}>No deck selected</Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.replace(getDeckBrowserRoute() as never)}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              pressed ? styles.buttonPressed : null,
+            ]}
+          >
+            <Text style={styles.primaryButtonText}>Back to Decks</Text>
+          </Pressable>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.content}>
@@ -339,47 +412,52 @@ export default function ShowdownCreateScreen() {
               The host card set stays fair and broad across the deck instead of
               following one person&apos;s profile too narrowly.
             </Text>
-            {selectionLoading ? (
+            {currentSelectionState.loading ? (
               <View style={styles.selectionLoadingCard}>
                 <ActivityIndicator size="small" color="#FFFFFF" />
                 <Text style={styles.selectionLoadingText}>
                   Building a showdown-safe card set...
                 </Text>
               </View>
-            ) : selectionError ? (
+            ) : currentSelectionState.error ? (
               <View style={styles.warningCard}>
                 <Text style={styles.warningTitle}>Selection failed</Text>
-                <Text style={styles.warningBody}>{selectionError}</Text>
+                <Text style={styles.warningBody}>
+                  {currentSelectionState.error}
+                </Text>
               </View>
-            ) : selectionResult?.available ? (
+            ) : currentSelectionState.result?.available ? (
               <>
                 <Text style={styles.sectionBody}>
-                  {selectionResult.selectedCards.length} cards selected.
-                  {selectionResult.excludedCardCount > 0
-                    ? ` ${selectionResult.excludedCardCount} cards were excluded by deck safety rules.`
+                  {currentSelectionState.result.selectedCards.length} cards
+                  selected.
+                  {currentSelectionState.result.excludedCardCount > 0
+                    ? ` ${currentSelectionState.result.excludedCardCount} cards were excluded by deck safety rules.`
                     : ' Sensitive tags were not needed for this set.'}
                 </Text>
-                {selectionResult.selectedCards.map((card, index) => (
-                  <View
-                    key={card.cardId}
-                    testID={`showdown-preview-card-${index + 1}`}
-                    style={styles.previewCard}
-                  >
-                    <Text style={styles.previewTitle}>
-                      {index + 1}. {card.title}
-                    </Text>
-                    <Text style={styles.previewMeta}>
-                      {card.facetLabel ?? 'Unscoped facet'} |{' '}
-                      {card.primaryTagLabel ?? 'General'}
-                    </Text>
-                  </View>
-                ))}
+                {currentSelectionState.result.selectedCards.map(
+                  (card, index) => (
+                    <View
+                      key={card.cardId}
+                      testID={`showdown-preview-card-${index + 1}`}
+                      style={styles.previewCard}
+                    >
+                      <Text style={styles.previewTitle}>
+                        {index + 1}. {card.title}
+                      </Text>
+                      <Text style={styles.previewMeta}>
+                        {card.facetLabel ?? 'Unscoped facet'} |{' '}
+                        {card.primaryTagLabel ?? 'General'}
+                      </Text>
+                    </View>
+                  ),
+                )}
               </>
             ) : (
               <View style={styles.warningCard}>
                 <Text style={styles.warningTitle}>No safe card set yet</Text>
                 <Text style={styles.warningBody}>
-                  {selectionResult?.reason ??
+                  {currentSelectionState.result?.reason ??
                     'This deck did not produce a showdown-safe card set.'}
                 </Text>
               </View>
@@ -391,11 +469,11 @@ export default function ShowdownCreateScreen() {
               testID="showdown-create-start"
               accessibilityRole="button"
               accessibilityLabel="Start showdown"
-              disabled={!selectionResult?.available || starting}
+              disabled={!currentSelectionState.result?.available || starting}
               onPress={startShowdown}
               style={({ pressed }) => [
                 styles.primaryButton,
-                !selectionResult?.available || starting
+                !currentSelectionState.result?.available || starting
                   ? styles.disabledButton
                   : null,
                 pressed ? styles.buttonPressed : null,
@@ -407,7 +485,9 @@ export default function ShowdownCreateScreen() {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Back to deck"
-              onPress={() => router.push(`/deck/${deck.id as string}` as never)}
+              onPress={() =>
+                router.replace(`/deck/${deck.id as string}` as never)
+              }
               style={({ pressed }) => [
                 styles.secondaryButton,
                 pressed ? styles.buttonPressed : null,

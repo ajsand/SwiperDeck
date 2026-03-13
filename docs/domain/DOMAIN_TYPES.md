@@ -11,6 +11,7 @@ types/domain/
   actions.ts     - SwipeAction unions, weights, labels, guards, assertNever
   compare.ts     - DeckCompareReadiness, consent draft types, compare export preview vocabulary
   comparePayload.ts - ComparePayloadV1, minimization policy, evidence-card, and preview types
+  customDecks.ts - CustomDeckInput, CreateCustomDeckDraft, local custom deck source shapes
   deckCardState.ts - DeckCardStateRow/State, presentation/swipe recency mappers
   ids.ts         - Branded ID types (EntityId, SessionId, SwipeEventId, SnapshotId, DeckId, DeckCardId, DeckTagFacetId, DeckTagId)
   catalog.ts     - CatalogEntityRow, CatalogEntity, entity type union, mappers
@@ -193,6 +194,22 @@ Important boundary:
 - compare payloads are prebuilt-deck only for now
 - the payload prefers tag/theme summaries over raw card detail
 - evidence cards are optional, bounded, and included only for grounding when policy says they are needed
+
+## Custom Deck Input Types
+
+Iteration 21 adds the local custom-deck authoring/import vocabulary in `customDecks.ts`.
+
+### Core types
+
+- `CustomDeckCardInput`
+- `CustomDeckInput`
+- `CreateCustomDeckDraft`
+
+Important boundary:
+
+- these types describe local authoring/import input, not the richer prebuilt taxonomy system
+- custom decks still persist into the existing `Deck` / `DeckCard` storage model
+- custom decks do not silently inherit prebuilt compare/report guarantees
 
 ## Swipe Sessions and Events
 

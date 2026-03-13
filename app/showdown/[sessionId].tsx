@@ -5,6 +5,10 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SwipeCard } from '@/components/deck';
 import { useShowdownSession } from '@/hooks/useShowdownSession';
 import {
+  getDeckBrowserRoute,
+  getDeckDetailRoute,
+} from '@/lib/navigation/appShell';
+import {
   ACTIONS,
   ACTION_LABELS,
   asShowdownSessionId,
@@ -123,6 +127,7 @@ export default function ShowdownSessionScreen() {
   const sessionId = routeSessionId ? asShowdownSessionId(routeSessionId) : null;
   const {
     session,
+    lastKnownDeckId,
     loading,
     error,
     timeRemainingMs,
@@ -132,6 +137,10 @@ export default function ShowdownSessionScreen() {
   } = useShowdownSession(sessionId);
   const currentRound = session?.rounds[session.currentCardIndex] ?? null;
   const currentCard = session?.selectedCards[session.currentCardIndex] ?? null;
+  const recoveryRoute = lastKnownDeckId
+    ? getDeckDetailRoute(lastKnownDeckId as string)
+    : getDeckBrowserRoute();
+  const recoveryLabel = lastKnownDeckId ? 'Back to Deck' : 'Back to Decks';
   const responseMap = useMemo(
     () =>
       new Map(
@@ -170,10 +179,35 @@ export default function ShowdownSessionScreen() {
           >
             <Text style={styles.primaryButtonText}>Retry</Text>
           </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={recoveryLabel}
+            onPress={() => router.replace(recoveryRoute as never)}
+            style={({ pressed }) => [
+              styles.secondaryButton,
+              pressed ? styles.buttonPressed : null,
+            ]}
+          >
+            <Text style={styles.secondaryButtonText}>{recoveryLabel}</Text>
+          </Pressable>
         </View>
       ) : !session ? (
         <View style={styles.stateContainer}>
           <Text style={styles.stateTitle}>No showdown session</Text>
+          <Text style={styles.stateMessage}>
+            Start a new local showdown from an eligible deck.
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={recoveryLabel}
+            onPress={() => router.replace(recoveryRoute as never)}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              pressed ? styles.buttonPressed : null,
+            ]}
+          >
+            <Text style={styles.primaryButtonText}>{recoveryLabel}</Text>
+          </Pressable>
         </View>
       ) : session.completedAt || session.summary ? (
         <ScrollView
@@ -204,7 +238,7 @@ export default function ShowdownSessionScreen() {
             accessibilityRole="button"
             accessibilityLabel="Back to deck"
             onPress={() =>
-              router.push(`/deck/${session.deckId as string}` as never)
+              router.replace(`/deck/${session.deckId as string}` as never)
             }
             style={({ pressed }) => [
               styles.primaryButton,
@@ -312,6 +346,25 @@ export default function ShowdownSessionScreen() {
       ) : (
         <View style={styles.stateContainer}>
           <Text style={styles.stateTitle}>Showdown round missing</Text>
+          <Text style={styles.stateMessage}>
+            This session lost its current round. Return to the deck and start a
+            fresh showdown if needed.
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Back to deck"
+            onPress={() =>
+              router.replace(
+                getDeckDetailRoute(session.deckId as string) as never,
+              )
+            }
+            style={({ pressed }) => [
+              styles.primaryButton,
+              pressed ? styles.buttonPressed : null,
+            ]}
+          >
+            <Text style={styles.primaryButtonText}>Back to Deck</Text>
+          </Pressable>
         </View>
       )}
     </View>
@@ -474,6 +527,20 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: '#0B0B10',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  secondaryButton: {
+    marginTop: 12,
+    borderRadius: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.12)',
+  },
+  secondaryButtonText: {
+    color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '700',
   },

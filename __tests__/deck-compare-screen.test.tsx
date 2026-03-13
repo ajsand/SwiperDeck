@@ -5,15 +5,18 @@ import DeckCompareReadinessScreen from '../app/deck/[deckId]/compare';
 import { asDeckId, type DeckCompareReadiness } from '@/types/domain';
 
 const mockPush = jest.fn();
+const mockReplace = jest.fn();
 const mockUseDeckCompareReadiness = jest.fn();
+const mockUseLocalSearchParams = jest.fn();
 
 jest.mock('expo-router', () => ({
   Stack: {
     Screen: () => null,
   },
-  useLocalSearchParams: () => ({ deckId: 'deck_movies_tv' }),
+  useLocalSearchParams: () => mockUseLocalSearchParams(),
   useRouter: () => ({
     push: mockPush,
+    replace: mockReplace,
   }),
 }));
 
@@ -42,6 +45,7 @@ function buildReadiness(
 describe('DeckCompareReadinessScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseLocalSearchParams.mockReturnValue({ deckId: 'deck_movies_tv' });
     mockUseDeckCompareReadiness.mockReturnValue({
       deck: {
         id: asDeckId('deck_movies_tv'),
@@ -72,7 +76,9 @@ describe('DeckCompareReadinessScreen', () => {
     render(<DeckCompareReadinessScreen />);
 
     fireEvent.press(screen.getByTestId('deck-compare-swipe-more'));
-    expect(mockPush).toHaveBeenCalledWith('/deck/deck_movies_tv/play');
+    expect(mockPush).toHaveBeenCalledWith(
+      '/deck/deck_movies_tv/play?returnTo=%2Fdeck%2Fdeck_movies_tv%2Fcompare',
+    );
   });
 
   it('uses Browse Decks when compare is unavailable for the deck', () => {
@@ -113,6 +119,16 @@ describe('DeckCompareReadinessScreen', () => {
 
     expect(screen.getByTestId('deck-compare-open-decks')).toBeTruthy();
     fireEvent.press(screen.getByTestId('deck-compare-open-decks'));
-    expect(mockPush).toHaveBeenCalledWith('/');
+    expect(mockReplace).toHaveBeenCalledWith('/');
+  });
+
+  it('recovers to decks when no deck id is present', () => {
+    mockUseLocalSearchParams.mockReturnValue({});
+
+    render(<DeckCompareReadinessScreen />);
+
+    fireEvent.press(screen.getByText('Back to Decks'));
+
+    expect(mockReplace).toHaveBeenCalledWith('/');
   });
 });

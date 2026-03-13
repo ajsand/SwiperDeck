@@ -71,6 +71,8 @@ describe('DeckScreen', () => {
     expect(screen.getByTestId('deck-browser-loading')).toBeTruthy();
     expect(screen.getByText('Decks')).toBeTruthy();
     expect(screen.getByText('Choose a deck to explore.')).toBeTruthy();
+    expect(screen.getByTestId('deck-browser-create-custom')).toBeTruthy();
+    expect(screen.getByTestId('deck-browser-import-custom')).toBeTruthy();
   });
 
   it('renders an empty state when no decks are available', () => {
@@ -116,5 +118,22 @@ describe('DeckScreen', () => {
 
     fireEvent.press(screen.getByTestId(`deck-browser-card-${deck.id}`));
     expect(mockPush).toHaveBeenCalledWith(`/deck/${deck.id}`);
+  });
+
+  it('navigates to the local custom deck create and import flows', () => {
+    mockUseDecks.mockReturnValue({
+      decks: [buildDeck()],
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    render(<DeckScreen />);
+
+    fireEvent.press(screen.getByTestId('deck-browser-create-custom'));
+    fireEvent.press(screen.getByTestId('deck-browser-import-custom'));
+
+    expect(mockPush).toHaveBeenNthCalledWith(1, '/deck/custom/new');
+    expect(mockPush).toHaveBeenNthCalledWith(2, '/deck/custom/import');
   });
 });

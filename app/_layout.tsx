@@ -129,6 +129,14 @@ function RootLayoutNav() {
                 options={{ title: 'Deck Detail', headerShown: true }}
               />
               <Stack.Screen
+                name="deck/custom/new"
+                options={{ title: 'Create Custom Deck' }}
+              />
+              <Stack.Screen
+                name="deck/custom/import"
+                options={{ title: 'Import Custom Deck' }}
+              />
+              <Stack.Screen
                 name="deck/[deckId]/play"
                 options={{ headerShown: false, gestureEnabled: false }}
               />

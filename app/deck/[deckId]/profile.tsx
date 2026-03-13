@@ -11,6 +11,10 @@ import {
 import { useDeckById } from '@/hooks/useDeckById';
 import { useDeckProfileSummary } from '@/hooks/useDeckProfileSummary';
 import {
+  getDeckBrowserRoute,
+  getDeckCompareRoute,
+} from '@/lib/navigation/appShell';
+import {
   asDeckId,
   type DeckProfileActionHint,
   type DeckProfileThemeScore,
@@ -66,6 +70,10 @@ function compareStatusCopy(
   }
 
   return 'This deck still needs more local evidence before compare should unlock.';
+}
+
+function buildPlayRoute(deckId: string, returnTo: string): string {
+  return `/deck/${deckId}/play?returnTo=${encodeURIComponent(returnTo)}`;
 }
 
 function ThemeScoreRow({
@@ -161,13 +169,13 @@ function DeckProfileContent({ deckId }: { deckId: string }) {
         <Text style={styles.stateTitle}>Deck not found</Text>
         <Pressable
           accessibilityRole="button"
-          onPress={() => router.back()}
+          onPress={() => router.replace(getDeckBrowserRoute() as never)}
           style={({ pressed }) => [
             styles.primaryButton,
             pressed ? styles.primaryButtonPressed : null,
           ]}
         >
-          <Text style={styles.primaryButtonText}>Go back</Text>
+          <Text style={styles.primaryButtonText}>Back to Decks</Text>
         </Pressable>
       </View>
     );
@@ -184,7 +192,11 @@ function DeckProfileContent({ deckId }: { deckId: string }) {
           testID="deck-profile-start-swiping"
           accessibilityRole="button"
           accessibilityLabel="Start swiping"
-          onPress={() => router.push(`/deck/${deckId}/play` as never)}
+          onPress={() =>
+            router.push(
+              buildPlayRoute(deckId, `/deck/${deckId}/profile`) as never,
+            )
+          }
           style={({ pressed }) => [
             styles.primaryButton,
             pressed ? styles.primaryButtonPressed : null,
@@ -428,7 +440,11 @@ function DeckProfileContent({ deckId }: { deckId: string }) {
           testID="deck-profile-swipe-more"
           accessibilityRole="button"
           accessibilityLabel="Swipe more cards"
-          onPress={() => router.push(`/deck/${deckId}/play` as never)}
+          onPress={() =>
+            router.push(
+              buildPlayRoute(deckId, `/deck/${deckId}/profile`) as never,
+            )
+          }
           style={({ pressed }) => [
             styles.secondaryButton,
             pressed ? styles.buttonPressed : null,
@@ -447,7 +463,7 @@ function DeckProfileContent({ deckId }: { deckId: string }) {
           accessibilityLabel={
             isCompareReady ? 'Compare with someone' : 'Review compare readiness'
           }
-          onPress={() => router.push(`/deck/${deckId}/compare` as never)}
+          onPress={() => router.push(getDeckCompareRoute(deckId) as never)}
           style={({ pressed }) => [
             styles.primaryButton,
             pressed ? styles.primaryButtonPressed : null,
@@ -461,6 +477,7 @@ function DeckProfileContent({ deckId }: { deckId: string }) {
 }
 
 export default function DeckProfileScreen() {
+  const router = useRouter();
   const params = useLocalSearchParams<{ deckId?: string | string[] }>();
   const routeDeckId = Array.isArray(params.deckId)
     ? params.deckId[0]
@@ -472,6 +489,19 @@ export default function DeckProfileScreen() {
         <Stack.Screen options={{ title: 'Deck Profile' }} />
         <View style={styles.stateContainer}>
           <Text style={styles.stateTitle}>No deck selected</Text>
+          <Text style={styles.stateMessage}>
+            Choose a deck first to view a deck-specific profile.
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.replace(getDeckBrowserRoute() as never)}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              pressed ? styles.primaryButtonPressed : null,
+            ]}
+          >
+            <Text style={styles.primaryButtonText}>Back to Decks</Text>
+          </Pressable>
         </View>
       </View>
     );

@@ -8,6 +8,16 @@ import {
   type DeckProfileSummary,
 } from '@/types/domain';
 
+jest.mock('expo-router', () => {
+  const React = jest.requireActual('react');
+
+  return {
+    useFocusEffect: (effect: () => void | (() => void)) => {
+      React.useEffect(() => effect(), [effect]);
+    },
+  };
+});
+
 const mockGetDb = jest.fn();
 const mockGetAllDecks = jest.fn();
 const mockComputeDeckProfileSummary = jest.fn();
@@ -264,5 +274,41 @@ describe('useDecksWithProfileStatus', () => {
     expect(result.current.decks[0]?.compareState).toBe('needs_more_stability');
 
     expect(mockComputeDeckProfileSummary).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps healthy decks visible when one deck summary fails', async () => {
+    const healthyDeck = buildDeck();
+    const brokenDeck = buildDeck({
+      id: asDeckId('deck_values'),
+      title: 'Values',
+      category: 'values',
+      showdownEligible: false,
+    });
+
+    mockGetAllDecks.mockResolvedValue([healthyDeck, brokenDeck]);
+    mockComputeDeckProfileSummary
+      .mockResolvedValueOnce(buildSummary())
+      .mockRejectedValueOnce(new Error('Tag state mismatch.'));
+
+    const { result } = renderHook(() => useDecksWithProfileStatus());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.error).toBeNull();
+    expect(result.current.decks).toHaveLength(2);
+    expect(result.current.decks[0]?.deck.id).toBe(healthyDeck.id);
+    expect(result.current.decks[0]?.compareState).toBe('needs_more_stability');
+
+    expect(result.current.decks[1]?.deck.id).toBe(brokenDeck.id);
+    expect(result.current.decks[1]?.summary).toBeNull();
+    expect(result.current.decks[1]?.compareState).toBe('unavailable');
+    expect(result.current.decks[1]?.primaryHint?.title).toBe(
+      'Profile unavailable',
+    );
+    expect(result.current.decks[1]?.compareDetail).toContain(
+      'Tag state mismatch.',
+    );
   });
 });

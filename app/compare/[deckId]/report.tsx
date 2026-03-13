@@ -1,5 +1,5 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -12,8 +12,16 @@ import {
 
 import { useDeckCompareReadiness } from '@/hooks/useDeckCompareReadiness';
 import { generateCompareReport } from '@/lib/ai/compareReportClient';
-import { hasDeckCompareConsentApproval } from '@/lib/compare/compareConsentSession';
+import {
+  buildDeckCompareConsentApprovalBasis,
+  hasDeckCompareConsentApproval,
+} from '@/lib/compare/compareConsentSession';
 import { parseComparePayloadInput } from '@/lib/compare/parseComparePayloadInput';
+import {
+  getCompareConsentRoute,
+  getDeckBrowserRoute,
+  getDeckCompareRoute,
+} from '@/lib/navigation/appShell';
 import {
   asDeckId,
   type ComparePayloadV1,
@@ -53,6 +61,12 @@ export default function CompareReportScreen() {
   const [report, setReport] = useState<DeckCompareReport | null>(null);
   const [reportLoading, setReportLoading] = useState(false);
   const [reportError, setReportError] = useState<string | null>(null);
+  const activeReportRequestRef = useRef(0);
+  const isMountedRef = useRef(true);
+  const consentApprovalBasis = useMemo(
+    () => buildDeckCompareConsentApprovalBasis(payload),
+    [payload],
+  );
 
   const consentApproved = useMemo(() => {
     if (!deckId) {
@@ -62,8 +76,9 @@ export default function CompareReportScreen() {
     return hasDeckCompareConsentApproval({
       deckId,
       approvalId: routeApprovalId ?? null,
+      basis: consentApprovalBasis,
     });
-  }, [deckId, routeApprovalId]);
+  }, [consentApprovalBasis, deckId, routeApprovalId]);
 
   const localPayloadText = useMemo(
     () => (payload ? JSON.stringify(payload, null, 2) : ''),
@@ -117,6 +132,39 @@ export default function CompareReportScreen() {
     return null;
   }, [partnerPayloadPreview.payload, payload]);
 
+  useEffect(() => {
+    setPartnerPayloadText('');
+    setShowLocalPayload(false);
+  }, [deckId, routeDeckId]);
+
+  useEffect(() => {
+    activeReportRequestRef.current += 1;
+    setReport(null);
+    setReportError(null);
+    setReportLoading(false);
+  }, [
+    deckId,
+    consentApproved,
+    deck?.id,
+    payload?.generatedAt,
+    payload?.profileGeneratedAt,
+    routeApprovalId,
+  ]);
+
+  useEffect(() => {
+    activeReportRequestRef.current += 1;
+    setReport(null);
+    setReportError(null);
+    setReportLoading(false);
+  }, [partnerPayloadText]);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      activeReportRequestRef.current += 1;
+    };
+  }, []);
+
   const handleGenerateReport = async () => {
     if (!payload || !deck) {
       setReport(null);
@@ -157,14 +205,31 @@ export default function CompareReportScreen() {
     setReportLoading(true);
     setReport(null);
     setReportError(null);
+    const requestId = activeReportRequestRef.current + 1;
+    activeReportRequestRef.current = requestId;
 
     try {
       const nextReport = await generateCompareReport({
         selfPayload: payload,
         otherPayload: partnerPayloadPreview.payload,
       });
+
+      if (
+        !isMountedRef.current ||
+        activeReportRequestRef.current !== requestId
+      ) {
+        return;
+      }
+
       setReport(nextReport);
     } catch (nextError) {
+      if (
+        !isMountedRef.current ||
+        activeReportRequestRef.current !== requestId
+      ) {
+        return;
+      }
+
       setReport(null);
       setReportError(
         nextError instanceof Error
@@ -172,6 +237,13 @@ export default function CompareReportScreen() {
           : 'Unable to generate the compare report.',
       );
     } finally {
+      if (
+        !isMountedRef.current ||
+        activeReportRequestRef.current !== requestId
+      ) {
+        return;
+      }
+
       setReportLoading(false);
     }
   };
@@ -182,6 +254,16 @@ export default function CompareReportScreen() {
         <Stack.Screen options={{ title: 'Compare Report' }} />
         <View style={styles.stateContainer}>
           <Text style={styles.stateTitle}>No deck selected</Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.replace(getDeckBrowserRoute() as never)}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              pressed ? styles.buttonPressed : null,
+            ]}
+          >
+            <Text style={styles.primaryButtonText}>Back to Decks</Text>
+          </Pressable>
         </View>
       </View>
     );
@@ -237,7 +319,9 @@ export default function CompareReportScreen() {
           </Text>
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.push(`/deck/${routeDeckId}/compare` as never)}
+            onPress={() =>
+              router.replace(getDeckCompareRoute(routeDeckId) as never)
+            }
             style={({ pressed }) => [
               styles.primaryButton,
               pressed ? styles.buttonPressed : null,
@@ -265,7 +349,7 @@ export default function CompareReportScreen() {
             testID="compare-report-back-to-consent"
             accessibilityRole="button"
             onPress={() =>
-              router.push(`/compare/${routeDeckId}/consent` as never)
+              router.replace(getCompareConsentRoute(routeDeckId) as never)
             }
             style={({ pressed }) => [
               styles.primaryButton,
@@ -363,11 +447,7 @@ export default function CompareReportScreen() {
             placeholderTextColor="rgba(255,255,255,0.35)"
             style={styles.input}
             value={partnerPayloadText}
-            onChangeText={(value) => {
-              setPartnerPayloadText(value);
-              setReport(null);
-              setReportError(null);
-            }}
+            onChangeText={setPartnerPayloadText}
           />
           {partnerPayloadPreview.error || partnerPayloadIssue ? (
             <Text style={styles.inlineError}>
@@ -533,7 +613,7 @@ export default function CompareReportScreen() {
           accessibilityRole="button"
           accessibilityLabel="Back to compare consent"
           onPress={() =>
-            router.push(`/compare/${deck.id as string}/consent` as never)
+            router.replace(getCompareConsentRoute(deck.id as string) as never)
           }
           style={({ pressed }) => [
             styles.secondaryButton,

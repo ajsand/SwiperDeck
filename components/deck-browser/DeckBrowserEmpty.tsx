@@ -16,7 +16,8 @@ function DeckBrowserEmptyImpl() {
       </View>
       <Text style={styles.title}>No decks yet</Text>
       <Text style={styles.message}>
-        Prebuilt decks will appear here once they are loaded.
+        Prebuilt decks and your local custom decks will appear here once they
+        are available.
       </Text>
     </View>
   );

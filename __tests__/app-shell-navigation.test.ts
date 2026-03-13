@@ -10,6 +10,8 @@ describe('app shell navigation', () => {
     expect(shouldShowAppBottomNav('/deck/deck_movies_tv')).toBe(true);
     expect(shouldShowAppBottomNav('/deck/deck_movies_tv/profile')).toBe(true);
     expect(shouldShowAppBottomNav('/deck/deck_movies_tv/compare')).toBe(true);
+    expect(shouldShowAppBottomNav('/deck/custom/new')).toBe(true);
+    expect(shouldShowAppBottomNav('/deck/custom/import')).toBe(true);
     expect(shouldShowAppBottomNav('/compare/deck_movies_tv/consent')).toBe(
       true,
     );

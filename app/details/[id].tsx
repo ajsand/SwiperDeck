@@ -10,6 +10,7 @@ import {
 
 import { DeterministicTile } from '@/components/tiles';
 import { useDeckCardDetails } from '@/hooks/useDeckCardDetails';
+import { getDeckBrowserRoute } from '@/lib/navigation/appShell';
 import { asDeckCardId } from '@/types/domain';
 
 export default function DetailScreen() {
@@ -50,6 +51,17 @@ export default function DetailScreen() {
           >
             <Text style={styles.primaryButtonText}>Retry</Text>
           </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Back to decks"
+            onPress={() => router.replace(getDeckBrowserRoute() as never)}
+            style={({ pressed }) => [
+              styles.secondaryButton,
+              pressed ? styles.buttonPressed : null,
+            ]}
+          >
+            <Text style={styles.secondaryButtonText}>Back to Decks</Text>
+          </Pressable>
         </View>
       </View>
     );
@@ -64,6 +76,17 @@ export default function DetailScreen() {
           <Text style={styles.stateMessage}>
             That card is not available on this device.
           </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Back to decks"
+            onPress={() => router.replace(getDeckBrowserRoute() as never)}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              pressed ? styles.buttonPressed : null,
+            ]}
+          >
+            <Text style={styles.primaryButtonText}>Back to Decks</Text>
+          </Pressable>
         </View>
       </View>
     );
@@ -241,6 +264,20 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: '#0B0B10',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  secondaryButton: {
+    marginTop: 12,
+    borderRadius: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.12)',
+  },
+  secondaryButtonText: {
+    color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '700',
   },

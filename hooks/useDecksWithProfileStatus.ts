@@ -1,3 +1,4 @@
+import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { evaluateDeckCompareReadiness } from '@/lib/compare/deckCompareReadiness';
@@ -59,22 +60,46 @@ export function useDecksWithProfileStatus(): UseDecksWithProfileStatusResult {
 
       const withStatus: DeckWithProfileStatus[] = await Promise.all(
         allDecks.map(async (deck) => {
-          const summary = await computeDeckProfileSummary(db, deck.id);
-          const readiness = evaluateDeckCompareReadiness({
-            deck,
-            summary,
-          });
+          try {
+            const summary = await computeDeckProfileSummary(db, deck.id);
+            const readiness = evaluateDeckCompareReadiness({
+              deck,
+              summary,
+            });
 
-          return {
-            deck,
-            summary,
-            swipeCount: summary?.confidence.swipeCount ?? 0,
-            stage: summary?.stage ?? 'lightweight',
-            compareReady: readiness.ready,
-            compareState: readiness.state,
-            compareDetail: readiness.detail,
-            primaryHint: summary?.nextSteps[0] ?? null,
-          };
+            return {
+              deck,
+              summary,
+              swipeCount: summary?.confidence.swipeCount ?? 0,
+              stage: summary?.stage ?? 'lightweight',
+              compareReady: readiness.ready,
+              compareState: readiness.state,
+              compareDetail: readiness.detail,
+              primaryHint: summary?.nextSteps[0] ?? null,
+            };
+          } catch (summaryError) {
+            const fallbackDetail =
+              summaryError instanceof Error &&
+              summaryError.message.trim().length > 0
+                ? `Profile data for this deck is temporarily unavailable. ${summaryError.message}`
+                : 'Profile data for this deck is temporarily unavailable. Open the deck and retry after more local activity.';
+
+            return {
+              deck,
+              summary: null,
+              swipeCount: 0,
+              stage: 'lightweight',
+              compareReady: false,
+              compareState: 'unavailable',
+              compareDetail: fallbackDetail,
+              primaryHint: {
+                kind: 'keep_swiping',
+                title: 'Profile unavailable',
+                detail: fallbackDetail,
+                priority: 0,
+              },
+            };
+          }
         }),
       );
 
@@ -101,9 +126,11 @@ export function useDecksWithProfileStatus(): UseDecksWithProfileStatusResult {
     }
   }, []);
 
-  useEffect(() => {
-    void fetch();
-  }, [fetch]);
+  useFocusEffect(
+    useCallback(() => {
+      void fetch();
+    }, [fetch]),
+  );
 
   return {
     decks,

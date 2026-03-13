@@ -14,6 +14,7 @@ import {
 import { DeckBrowserError } from '@/components/deck-browser';
 import { DeterministicTile } from '@/components/tiles';
 import { useDeckById } from '@/hooks/useDeckById';
+import { getDeckBrowserRoute } from '@/lib/navigation/appShell';
 import {
   getDeckSafetyBadgeLabel,
   getDeckSafetyPolicy,
@@ -95,6 +96,10 @@ function showdownStatusCopy(args: {
   );
 }
 
+function buildPlayRoute(deckId: string, returnTo: string): string {
+  return `/deck/${deckId}/play?returnTo=${encodeURIComponent(returnTo)}`;
+}
+
 export default function DeckDetailScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ deckId?: string | string[] }>();
@@ -125,7 +130,9 @@ export default function DeckDetailScreen() {
       return;
     }
 
-    router.push(`/deck/${deck.id as string}/play` as never);
+    router.push(
+      buildPlayRoute(deck.id as string, `/deck/${deck.id as string}`) as never,
+    );
   };
 
   return (
@@ -161,15 +168,15 @@ export default function DeckDetailScreen() {
           <Pressable
             testID="deck-detail-go-back"
             accessibilityRole="button"
-            accessibilityLabel="Go back"
+            accessibilityLabel="Back to decks"
             accessibilityHint="Returns to the deck browser"
-            onPress={() => router.back()}
+            onPress={() => router.replace(getDeckBrowserRoute() as never)}
             style={({ pressed }) => [
               styles.primaryButton,
               pressed ? styles.primaryButtonPressed : null,
             ]}
           >
-            <Text style={styles.primaryButtonText}>Go back</Text>
+            <Text style={styles.primaryButtonText}>Back to Decks</Text>
           </Pressable>
         </View>
       ) : (
@@ -289,6 +296,18 @@ export default function DeckDetailScreen() {
               </Text>
             </View>
           </View>
+
+          {deck.isCustom ? (
+            <View style={styles.customDeckNotice}>
+              <Text style={styles.customDeckNoticeTitle}>Custom deck mode</Text>
+              <Text style={styles.customDeckNoticeBody}>
+                Custom decks stay local on this device. They can be swiped and
+                profiled, but they do not yet use the richer prebuilt taxonomy,
+                coverage-aware sequencing, compare flow, or report quality
+                guarantees.
+              </Text>
+            </View>
+          ) : null}
 
           <Pressable
             testID="deck-detail-start-swiping"
@@ -484,6 +503,23 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     lineHeight: 23,
+  },
+  customDeckNotice: {
+    marginTop: 20,
+    borderRadius: 16,
+    padding: 16,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  customDeckNoticeTitle: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  customDeckNoticeBody: {
+    marginTop: 8,
+    color: 'rgba(255,255,255,0.74)',
+    fontSize: 14,
+    lineHeight: 22,
   },
   primaryButton: {
     marginTop: 28,

@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Pressable,
   RefreshControl,
   StyleSheet,
   Text,
@@ -85,6 +86,36 @@ export default function DeckScreen() {
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <Text style={styles.title}>Decks</Text>
         <Text style={styles.subtitle}>Choose a deck to explore.</Text>
+        <View style={styles.headerActions}>
+          <Pressable
+            testID="deck-browser-create-custom"
+            accessibilityRole="button"
+            accessibilityLabel="Create a custom deck"
+            accessibilityHint="Opens the local custom deck creation form"
+            onPress={() => router.push('/deck/custom/new' as never)}
+            style={({ pressed }) => [
+              styles.headerActionButton,
+              pressed ? styles.headerActionButtonPressed : null,
+            ]}
+          >
+            <Text style={styles.headerActionButtonText}>Create Custom</Text>
+          </Pressable>
+          <Pressable
+            testID="deck-browser-import-custom"
+            accessibilityRole="button"
+            accessibilityLabel="Import a custom deck"
+            accessibilityHint="Opens the local custom deck import screen"
+            onPress={() => router.push('/deck/custom/import' as never)}
+            style={({ pressed }) => [
+              styles.headerActionButtonSecondary,
+              pressed ? styles.headerActionButtonPressed : null,
+            ]}
+          >
+            <Text style={styles.headerActionButtonSecondaryText}>
+              Import JSON
+            </Text>
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.content}>{body}</View>
@@ -114,6 +145,36 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontSize: 15,
     color: 'rgba(255,255,255,0.68)',
+  },
+  headerActions: {
+    marginTop: 16,
+    flexDirection: 'row',
+    gap: 10,
+  },
+  headerActionButton: {
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    backgroundColor: '#FFFFFF',
+  },
+  headerActionButtonSecondary: {
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+  },
+  headerActionButtonPressed: {
+    opacity: 0.8,
+  },
+  headerActionButtonText: {
+    color: '#0B0B10',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  headerActionButtonSecondaryText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
   },
   content: {
     flex: 1,

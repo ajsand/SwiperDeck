@@ -86,6 +86,17 @@ function buildQueueEntry(
   };
 }
 
+function createDeferred<T>() {
+  let resolve: (value: T | PromiseLike<T>) => void = () => {};
+  let reject: (reason?: unknown) => void = () => {};
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return { promise, resolve, reject };
+}
+
 describe('useDeckSwipeSession', () => {
   const fakeDb = { label: 'db' };
 
@@ -278,5 +289,78 @@ describe('useDeckSwipeSession', () => {
     });
 
     expect(mockCreateSwipeSession).not.toHaveBeenCalled();
+  });
+
+  it('suppresses stale deck state immediately when the deck route changes', async () => {
+    const deckA = asDeckId('deck_values');
+    const deckB = asDeckId('deck_movies');
+    const cardA = buildCard({ id: asDeckCardId('values_001'), deckId: deckA });
+    const cardB = buildCard({
+      id: asDeckCardId('movies_001'),
+      deckId: deckB,
+      title: 'I will always choose a thriller over a prestige drama',
+      tileKey: 'movies:001',
+    });
+    const deferredCards = createDeferred<DeckCard[]>();
+
+    mockGetDeckCardsByDeckId
+      .mockResolvedValueOnce([cardA])
+      .mockImplementationOnce(() => deferredCards.promise);
+    mockBuildDeckSequenceQueue
+      .mockResolvedValueOnce([buildQueueEntry(cardA)])
+      .mockResolvedValueOnce([buildQueueEntry(cardB)]);
+
+    const { result, rerender } = renderHook(
+      ({
+        deckId,
+        deckCategory,
+      }: {
+        deckId: typeof deckA;
+        deckCategory: string;
+      }) =>
+        useDeckSwipeSession({
+          deckId,
+          deckCategory,
+        }),
+      {
+        initialProps: {
+          deckId: deckA,
+          deckCategory: 'values',
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current.state).toBe('ready');
+    });
+
+    await waitFor(() => {
+      expect(result.current.currentCard?.id).toBe(asDeckCardId('values_001'));
+    });
+
+    mockRecordDeckCardPresentation.mockClear();
+
+    rerender({
+      deckId: deckB,
+      deckCategory: 'movies_tv',
+    });
+
+    expect(result.current.state).toBe('loading');
+    expect(result.current.currentCard).toBeNull();
+    expect(result.current.currentDecision).toBeNull();
+    expect(result.current.cardsRemaining).toBe(0);
+    expect(result.current.totalCards).toBe(0);
+    expect(mockRecordDeckCardPresentation).not.toHaveBeenCalled();
+
+    deferredCards.resolve([cardB]);
+
+    await waitFor(() => {
+      expect(result.current.state).toBe('ready');
+    });
+
+    expect(result.current.currentCard?.id).toBe(asDeckCardId('movies_001'));
+    expect(mockCreateSwipeSession).toHaveBeenLastCalledWith(fakeDb, deckB, {
+      category: 'movies_tv',
+    });
   });
 });

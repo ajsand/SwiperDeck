@@ -1,3 +1,4 @@
+import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { getDb } from '@/lib/db';
@@ -14,11 +15,14 @@ export interface UseDeckProfileSummaryResult {
 export function useDeckProfileSummary(
   deckId: DeckId | null,
 ): UseDeckProfileSummaryResult {
+  const requestedDeckKey = deckId ? (deckId as string) : null;
   const [summary, setSummary] = useState<DeckProfileSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const activeRequestRef = useRef(0);
   const isMountedRef = useRef(true);
+  const lastDeckIdRef = useRef<DeckId | null>(null);
+  const stateDeckKeyRef = useRef<string | null>(requestedDeckKey);
 
   useEffect(() => {
     return () => {
@@ -29,12 +33,14 @@ export function useDeckProfileSummary(
   const fetchSummary = useCallback(async () => {
     const requestId = activeRequestRef.current + 1;
     activeRequestRef.current = requestId;
+    stateDeckKeyRef.current = requestedDeckKey;
 
     if (!deckId) {
       if (!isMountedRef.current) {
         return;
       }
 
+      lastDeckIdRef.current = null;
       setSummary(null);
       setLoading(false);
       setError(null);
@@ -45,8 +51,14 @@ export function useDeckProfileSummary(
       return;
     }
 
+    const deckChanged = lastDeckIdRef.current !== deckId;
+    lastDeckIdRef.current = deckId;
+
     setLoading(true);
     setError(null);
+    if (deckChanged) {
+      setSummary(null);
+    }
 
     try {
       const db = await getDb();
@@ -75,16 +87,20 @@ export function useDeckProfileSummary(
 
       setLoading(false);
     }
-  }, [deckId]);
+  }, [deckId, requestedDeckKey]);
 
-  useEffect(() => {
-    void fetchSummary();
-  }, [fetchSummary]);
+  useFocusEffect(
+    useCallback(() => {
+      void fetchSummary();
+    }, [fetchSummary]),
+  );
+
+  const isCurrentDeckState = stateDeckKeyRef.current === requestedDeckKey;
 
   return {
-    summary,
-    loading,
-    error,
+    summary: isCurrentDeckState ? summary : null,
+    loading: isCurrentDeckState ? loading : requestedDeckKey !== null,
+    error: isCurrentDeckState ? error : null,
     refetch: fetchSummary,
   };
 }

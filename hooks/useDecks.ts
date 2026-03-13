@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { getAllDecks, getDb } from '@/lib/db';
 import type { Deck } from '@/types/domain';
@@ -14,50 +15,62 @@ export function useDecks(): UseDecksResult {
   const [decks, setDecks] = useState<Deck[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [refreshCount, setRefreshCount] = useState(0);
-
-  const refresh = useCallback(() => {
-    setRefreshCount((current) => current + 1);
-  }, []);
+  const activeRequestRef = useRef(0);
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
-    let cancelled = false;
-
-    const loadDecks = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const db = await getDb();
-        const nextDecks = await getAllDecks(db);
-
-        if (cancelled) {
-          return;
-        }
-
-        setDecks(nextDecks);
-      } catch (loadError) {
-        if (cancelled) {
-          return;
-        }
-
-        const normalizedError =
-          loadError instanceof Error ? loadError : new Error(String(loadError));
-        setDecks([]);
-        setError(normalizedError);
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void loadDecks();
-
     return () => {
-      cancelled = true;
+      isMountedRef.current = false;
     };
-  }, [refreshCount]);
+  }, []);
+
+  const loadDecks = useCallback(async () => {
+    const requestId = activeRequestRef.current + 1;
+    activeRequestRef.current = requestId;
+
+    if (!isMountedRef.current) {
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const db = await getDb();
+      const nextDecks = await getAllDecks(db);
+
+      if (!isMountedRef.current || activeRequestRef.current !== requestId) {
+        return;
+      }
+
+      setDecks(nextDecks);
+    } catch (loadError) {
+      if (!isMountedRef.current || activeRequestRef.current !== requestId) {
+        return;
+      }
+
+      const normalizedError =
+        loadError instanceof Error ? loadError : new Error(String(loadError));
+      setDecks([]);
+      setError(normalizedError);
+    } finally {
+      if (!isMountedRef.current || activeRequestRef.current !== requestId) {
+        return;
+      }
+
+      setLoading(false);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      void loadDecks();
+    }, [loadDecks]),
+  );
+
+  const refresh = useCallback(() => {
+    void loadDecks();
+  }, [loadDecks]);
 
   return {
     decks,

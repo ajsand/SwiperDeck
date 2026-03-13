@@ -9,6 +9,8 @@ import {
   View,
 } from 'react-native';
 
+import { getDeckBrowserRoute } from '@/lib/navigation/appShell';
+
 export default function ModalScreen() {
   const router = useRouter();
 
@@ -48,7 +50,7 @@ export default function ModalScreen() {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Back to decks"
-        onPress={() => router.back()}
+        onPress={() => router.replace(getDeckBrowserRoute() as never)}
         style={({ pressed }) => [
           styles.primaryButton,
           pressed ? styles.buttonPressed : null,

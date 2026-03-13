@@ -11,6 +11,11 @@ import {
 
 import { useDeckCompareReadiness } from '@/hooks/useDeckCompareReadiness';
 import {
+  getDeckBrowserRoute,
+  getDeckCompareRoute,
+} from '@/lib/navigation/appShell';
+import {
+  buildDeckCompareConsentApprovalBasis,
   clearDeckCompareConsentApproval,
   createDeckCompareConsentApproval,
 } from '@/lib/compare/compareConsentSession';
@@ -31,6 +36,22 @@ function createInitialConsentState(): Record<
   };
 }
 
+interface LocalConsentUiState {
+  key: string;
+  confirmed: Record<DeckCompareConsentConfirmationId, boolean>;
+  approved: boolean;
+  approvalId: string | null;
+}
+
+function createInitialLocalConsentUiState(key: string): LocalConsentUiState {
+  return {
+    key,
+    confirmed: createInitialConsentState(),
+    approved: false,
+    approvalId: null,
+  };
+}
+
 export default function CompareConsentScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ deckId?: string | string[] }>();
@@ -42,6 +63,7 @@ export default function CompareConsentScreen() {
     deck,
     readiness,
     consentDraft,
+    payload,
     payloadPreview,
     loading,
     error,
@@ -49,9 +71,19 @@ export default function CompareConsentScreen() {
     payloadError,
     refetch,
   } = useDeckCompareReadiness(deckId);
-  const [confirmed, setConfirmed] = useState(createInitialConsentState);
-  const [approved, setApproved] = useState(false);
-  const [approvalId, setApprovalId] = useState<string | null>(null);
+  const consentApprovalBasis = useMemo(
+    () => buildDeckCompareConsentApprovalBasis(payload),
+    [payload],
+  );
+  const localConsentStateKey = `${deckId ?? 'none'}|${consentApprovalBasis ?? 'none'}`;
+  const [localConsentUiState, setLocalConsentUiState] = useState(() =>
+    createInitialLocalConsentUiState(localConsentStateKey),
+  );
+  const currentLocalConsentUiState =
+    localConsentUiState.key === localConsentStateKey
+      ? localConsentUiState
+      : createInitialLocalConsentUiState(localConsentStateKey);
+  const { confirmed, approved, approvalId } = currentLocalConsentUiState;
 
   const allConfirmed = useMemo(
     () => DECK_COMPARE_CONSENT_CONFIRMATION_IDS.every((id) => confirmed[id]),
@@ -59,30 +91,40 @@ export default function CompareConsentScreen() {
   );
 
   useEffect(() => {
-    setConfirmed(createInitialConsentState());
-    setApproved(false);
-    setApprovalId(null);
+    setLocalConsentUiState(
+      createInitialLocalConsentUiState(localConsentStateKey),
+    );
 
     if (deckId) {
       clearDeckCompareConsentApproval(deckId);
     }
-  }, [deckId, routeDeckId]);
+  }, [deckId, localConsentStateKey, routeDeckId]);
 
   const handleToggleConfirmation = (
     confirmationId: DeckCompareConsentConfirmationId,
   ) => {
-    if (approved) {
-      setApproved(false);
-      setApprovalId(null);
-      if (deckId) {
-        clearDeckCompareConsentApproval(deckId);
-      }
+    const shouldClearApproval = currentLocalConsentUiState.approved;
+
+    if (shouldClearApproval && deckId) {
+      clearDeckCompareConsentApproval(deckId);
     }
 
-    setConfirmed((current) => ({
-      ...current,
-      [confirmationId]: !current[confirmationId],
-    }));
+    setLocalConsentUiState((current) => {
+      const nextState =
+        current.key === localConsentStateKey
+          ? current
+          : createInitialLocalConsentUiState(localConsentStateKey);
+
+      return {
+        ...nextState,
+        approved: false,
+        approvalId: null,
+        confirmed: {
+          ...nextState.confirmed,
+          [confirmationId]: !nextState.confirmed[confirmationId],
+        },
+      };
+    });
   };
 
   if (!routeDeckId) {
@@ -91,6 +133,16 @@ export default function CompareConsentScreen() {
         <Stack.Screen options={{ title: 'Compare Consent' }} />
         <View style={styles.stateContainer}>
           <Text style={styles.stateTitle}>No deck selected</Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.replace(getDeckBrowserRoute() as never)}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              pressed ? styles.buttonPressed : null,
+            ]}
+          >
+            <Text style={styles.primaryButtonText}>Back to Decks</Text>
+          </Pressable>
         </View>
       </View>
     );
@@ -147,7 +199,9 @@ export default function CompareConsentScreen() {
           <Pressable
             testID="compare-consent-back-to-readiness"
             accessibilityRole="button"
-            onPress={() => router.push(`/deck/${routeDeckId}/compare` as never)}
+            onPress={() =>
+              router.replace(getDeckCompareRoute(routeDeckId) as never)
+            }
             style={({ pressed }) => [
               styles.primaryButton,
               pressed ? styles.buttonPressed : null,
@@ -163,13 +217,20 @@ export default function CompareConsentScreen() {
   const exportPreview =
     payloadPreview?.categories ?? consentDraft.exportPreview;
   const handleApprove = () => {
-    if (!allConfirmed || !deckId) {
+    if (!allConfirmed || !deckId || !consentApprovalBasis) {
       return;
     }
 
-    const nextApprovalId = createDeckCompareConsentApproval(deckId);
-    setApprovalId(nextApprovalId);
-    setApproved(true);
+    const nextApprovalId = createDeckCompareConsentApproval({
+      deckId,
+      basis: consentApprovalBasis,
+    });
+    setLocalConsentUiState({
+      key: localConsentStateKey,
+      confirmed,
+      approved: true,
+      approvalId: nextApprovalId,
+    });
   };
 
   return (
@@ -299,7 +360,7 @@ export default function CompareConsentScreen() {
           accessibilityRole="button"
           accessibilityLabel="Back to compare readiness"
           onPress={() =>
-            router.push(`/deck/${deck.id as string}/compare` as never)
+            router.replace(getDeckCompareRoute(deck.id as string) as never)
           }
           style={({ pressed }) => [
             styles.secondaryButton,

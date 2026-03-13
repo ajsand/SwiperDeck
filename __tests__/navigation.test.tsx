@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import DeckScreen from '../app/(tabs)/index';
 import ProfileScreen from '../app/(tabs)/profile';
@@ -10,6 +10,7 @@ import ModalScreen from '../app/modal';
 import { asDeckId, type Deck } from '@/types/domain';
 
 const mockPush = jest.fn();
+const mockReplace = jest.fn();
 const mockUseDecks = jest.fn();
 const mockUseDecksWithProfileStatus = jest.fn();
 const mockUseDeckCardDetails = jest.fn();
@@ -20,7 +21,7 @@ jest.mock('expo-router', () => ({
     Screen: () => null,
   },
   useLocalSearchParams: () => ({ id: 'test-id' }),
-  useRouter: () => ({ push: mockPush }),
+  useRouter: () => ({ push: mockPush, replace: mockReplace }),
 }));
 
 jest.mock('expo-status-bar', () => ({
@@ -245,6 +246,24 @@ describe('Detail and modal screens render without crash', () => {
       ).length,
     ).toBeGreaterThan(0);
     expect(screen.getByText('Comfort watch')).toBeTruthy();
+  });
+
+  it('recovers to decks when the requested card is missing', () => {
+    mockUseDeckCardDetails.mockReturnValue({
+      card: null,
+      deck: null,
+      tagLabels: [],
+      loading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    render(<DetailScreen />);
+
+    expect(screen.getByText('Card not found')).toBeTruthy();
+    fireEvent.press(screen.getByText('Back to Decks'));
+
+    expect(mockReplace).toHaveBeenCalledWith('/');
   });
 
   it('renders Modal screen', () => {

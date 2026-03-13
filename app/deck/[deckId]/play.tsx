@@ -22,13 +22,49 @@ import {
 import { useDeckById } from '@/hooks/useDeckById';
 import { useDeckGestures } from '@/hooks/useDeckGestures';
 import { useDeckSwipeSession } from '@/hooks/useDeckSwipeSession';
+import { getDeckBrowserRoute } from '@/lib/navigation/appShell';
 import { asDeckId, type Deck } from '@/types/domain';
 
 function cardsRemainingLabel(count: number): string {
   return count === 1 ? '1 card left' : `${count} cards left`;
 }
 
-function DeckPlaySurface({ deck }: { deck: Deck }) {
+function normalizeReturnToPath(
+  value: string | string[] | undefined,
+): string | null {
+  const rawValue = Array.isArray(value) ? value[0] : value;
+
+  if (!rawValue || rawValue.length === 0) {
+    return null;
+  }
+
+  try {
+    const decoded = decodeURIComponent(rawValue);
+    return decoded.startsWith('/') ? decoded : null;
+  } catch {
+    return null;
+  }
+}
+
+function resolveExitLabel(returnTo: string): string {
+  if (returnTo.endsWith('/profile')) {
+    return 'Back to Profile';
+  }
+
+  if (returnTo.endsWith('/compare')) {
+    return 'Back to Compare';
+  }
+
+  return 'Back to Deck';
+}
+
+function DeckPlaySurface({
+  deck,
+  returnTo,
+}: {
+  deck: Deck;
+  returnTo: string | null;
+}) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
@@ -43,14 +79,27 @@ function DeckPlaySurface({ deck }: { deck: Deck }) {
   const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
+  const exitRoute = returnTo ?? `/deck/${deck.id as string}`;
+  const returnButtonLabel = resolveExitLabel(exitRoute);
+
   const goToDeckDetail = useCallback(() => {
-    router.replace(`/deck/${deck.id as string}` as never);
-  }, [deck.id, router]);
+    router.replace(exitRoute as never);
+  }, [exitRoute, router]);
+
+  const clearPendingTransition = useCallback(() => {
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+      transitionTimeoutRef.current = null;
+    }
+
+    setIsDispatchLocked(false);
+  }, []);
 
   const handleExitSession = useCallback(async () => {
+    clearPendingTransition();
     await session.endSession();
     goToDeckDetail();
-  }, [goToDeckDetail, session]);
+  }, [clearPendingTransition, goToDeckDetail, session]);
 
   useEffect(() => {
     if (session.state !== 'ready') {
@@ -59,12 +108,15 @@ function DeckPlaySurface({ deck }: { deck: Deck }) {
   }, [session.state]);
 
   useEffect(() => {
+    clearPendingTransition();
+    setLastPayload(null);
+  }, [clearPendingTransition, deck.id]);
+
+  useEffect(() => {
     return () => {
-      if (transitionTimeoutRef.current) {
-        clearTimeout(transitionTimeoutRef.current);
-      }
+      clearPendingTransition();
     };
-  }, []);
+  }, [clearPendingTransition]);
 
   const onUnifiedAction = useCallback<DeckActionHandler>(
     (action, meta) => {
@@ -149,9 +201,9 @@ function DeckPlaySurface({ deck }: { deck: Deck }) {
             testID="deck-play-view-profile"
             accessibilityRole="button"
             accessibilityLabel="View your profile"
-            accessibilityHint="Opens your deck profile"
+            accessibilityHint="Leaves swipe mode and opens your deck profile"
             onPress={() =>
-              router.push(`/deck/${deck.id as string}/profile` as never)
+              router.replace(`/deck/${deck.id as string}/profile` as never)
             }
             style={({ pressed }) => [
               styles.completeButton,
@@ -163,15 +215,17 @@ function DeckPlaySurface({ deck }: { deck: Deck }) {
           <Pressable
             testID="deck-play-back-to-detail"
             accessibilityRole="button"
-            accessibilityLabel="Back to deck detail"
-            accessibilityHint="Returns to the deck detail screen"
+            accessibilityLabel={returnButtonLabel}
+            accessibilityHint="Returns to the prior deck-related screen"
             onPress={goToDeckDetail}
             style={({ pressed }) => [
               styles.completeButtonSecondary,
               pressed ? styles.completeButtonPressed : null,
             ]}
           >
-            <Text style={styles.completeButtonSecondaryText}>Back to Deck</Text>
+            <Text style={styles.completeButtonSecondaryText}>
+              {returnButtonLabel}
+            </Text>
           </Pressable>
         </View>
       );
@@ -222,7 +276,7 @@ function DeckPlaySurface({ deck }: { deck: Deck }) {
             testID="deck-play-exit-session"
             accessibilityRole="button"
             accessibilityLabel="Exit swipe session"
-            accessibilityHint="Stops swiping and returns to the deck detail screen"
+            accessibilityHint="Stops swiping and returns to the previous deck screen"
             onPress={() => {
               void handleExitSession();
             }}
@@ -259,11 +313,15 @@ function DeckPlaySurface({ deck }: { deck: Deck }) {
 
 export default function DeckPlayScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ deckId?: string | string[] }>();
+  const params = useLocalSearchParams<{
+    deckId?: string | string[];
+    returnTo?: string | string[];
+  }>();
   const routeDeckId = Array.isArray(params.deckId)
     ? params.deckId[0]
     : params.deckId;
   const deckId = routeDeckId ? asDeckId(routeDeckId) : null;
+  const returnTo = normalizeReturnToPath(params.returnTo);
   const { deck, loading, error, refresh } = useDeckById(deckId);
 
   return (
@@ -290,18 +348,18 @@ export default function DeckPlayScreen() {
           </Text>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Go back"
-            onPress={() => router.back()}
+            accessibilityLabel="Back to decks"
+            onPress={() => router.replace(getDeckBrowserRoute() as never)}
             style={({ pressed }) => [
               styles.completeButton,
               pressed ? styles.completeButtonPressed : null,
             ]}
           >
-            <Text style={styles.completeButtonText}>Go back</Text>
+            <Text style={styles.completeButtonText}>Back to Decks</Text>
           </Pressable>
         </View>
       ) : (
-        <DeckPlaySurface deck={deck} />
+        <DeckPlaySurface deck={deck} returnTo={returnTo} />
       )}
     </View>
   );

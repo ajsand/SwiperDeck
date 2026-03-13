@@ -53,35 +53,72 @@ export function useDeckCompareReadiness(
   const [payloadLoading, setPayloadLoading] = useState(false);
   const [payloadError, setPayloadError] = useState<string | null>(null);
   const activePayloadRequestRef = useRef(0);
+  const payloadDeckKeyRef = useRef<string | null>(
+    deckId ? (deckId as string) : null,
+  );
+  const requestedDeckKey = deckId ? (deckId as string) : null;
+  const currentDeck = useMemo(() => {
+    if (!deck || !deckId || deck.id === deckId) {
+      return deck;
+    }
+
+    return null;
+  }, [deck, deckId]);
+  const currentSummary = useMemo(() => {
+    if (!summary || !deckId || summary.deckId === deckId) {
+      return summary;
+    }
+
+    return null;
+  }, [deckId, summary]);
+  const hasStaleRequestedState =
+    Boolean(deckId) &&
+    ((deck !== null && deck.id !== deckId) ||
+      (summary !== null && summary.deckId !== deckId));
+  const currentPayload = useMemo(() => {
+    if (!payload || !deckId || payload.deck.deckId === deckId) {
+      return payload;
+    }
+
+    return null;
+  }, [deckId, payload]);
+  const currentPayloadPreview = useMemo(() => {
+    if (!payloadPreview || !deckId || payloadPreview.deckId === deckId) {
+      return payloadPreview;
+    }
+
+    return null;
+  }, [deckId, payloadPreview]);
 
   const readiness = useMemo(() => {
-    if (!deck) {
+    if (!currentDeck) {
       return null;
     }
 
     return evaluateDeckCompareReadiness({
-      deck,
-      summary,
+      deck: currentDeck,
+      summary: currentSummary,
     });
-  }, [deck, summary]);
+  }, [currentDeck, currentSummary]);
 
   const consentDraft = useMemo(() => {
-    if (!deck || !summary || !readiness || !readiness.ready) {
+    if (!currentDeck || !currentSummary || !readiness || !readiness.ready) {
       return null;
     }
 
     return buildDeckCompareConsentDraft({
-      deck,
-      summary,
+      deck: currentDeck,
+      summary: currentSummary,
       readiness,
     });
-  }, [deck, readiness, summary]);
+  }, [currentDeck, currentSummary, readiness]);
 
-  useEffect(() => {
+  const startPayloadLoad = useCallback(() => {
     const requestId = activePayloadRequestRef.current + 1;
     activePayloadRequestRef.current = requestId;
+    payloadDeckKeyRef.current = requestedDeckKey;
 
-    if (!deck || !summary || !readiness?.ready) {
+    if (!currentDeck || !currentSummary || !readiness?.ready) {
       setPayload(null);
       setPayloadPreview(null);
       setPayloadLoading(false);
@@ -100,8 +137,8 @@ export function useDeckCompareReadiness(
         const db = await getDb();
         const nextPayload = await buildComparePayload({
           db,
-          deck,
-          summary,
+          deck: currentDeck,
+          summary: currentSummary,
           readiness,
         });
         const nextPreview = buildComparePayloadPreview(nextPayload);
@@ -138,23 +175,31 @@ export function useDeckCompareReadiness(
     return () => {
       cancelled = true;
     };
-  }, [deck, readiness, summary]);
+  }, [currentDeck, currentSummary, readiness, requestedDeckKey]);
+
+  useEffect(() => startPayloadLoad(), [startPayloadLoad]);
+
+  const currentPayloadError =
+    payloadDeckKeyRef.current === requestedDeckKey ? payloadError : null;
+  const currentPayloadLoading =
+    payloadDeckKeyRef.current === requestedDeckKey ? payloadLoading : false;
 
   const refetch = useCallback(async () => {
     refreshDeck();
     await refetchSummary();
-  }, [refreshDeck, refetchSummary]);
+    startPayloadLoad();
+  }, [refetchSummary, refreshDeck, startPayloadLoad]);
 
   return {
-    deck,
-    summary,
+    deck: currentDeck,
+    summary: currentSummary,
     readiness,
     consentDraft,
-    payload,
-    payloadPreview,
-    payloadLoading,
-    payloadError,
-    loading: deckLoading || summaryLoading,
+    payload: currentPayload,
+    payloadPreview: currentPayloadPreview,
+    payloadLoading: currentPayloadLoading && !hasStaleRequestedState,
+    payloadError: currentPayloadError,
+    loading: deckLoading || summaryLoading || hasStaleRequestedState,
     error: deckError?.message ?? summaryError,
     refetch,
   };

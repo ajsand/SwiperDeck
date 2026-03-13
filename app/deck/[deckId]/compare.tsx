@@ -9,6 +9,10 @@ import {
 } from 'react-native';
 
 import { useDeckCompareReadiness } from '@/hooks/useDeckCompareReadiness';
+import {
+  getDeckBrowserRoute,
+  getDeckProfileRoute,
+} from '@/lib/navigation/appShell';
 import { asDeckId, type DeckCompareReadinessState } from '@/types/domain';
 
 function formatState(state: DeckCompareReadinessState): string {
@@ -36,6 +40,10 @@ function formatPercent(value: number): string {
   return `${Math.round(value * 100)}%`;
 }
 
+function buildPlayRoute(deckId: string, returnTo: string): string {
+  return `/deck/${deckId}/play?returnTo=${encodeURIComponent(returnTo)}`;
+}
+
 export default function DeckCompareReadinessScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ deckId?: string | string[] }>();
@@ -52,6 +60,16 @@ export default function DeckCompareReadinessScreen() {
         <Stack.Screen options={{ title: 'Compare Readiness' }} />
         <View style={styles.stateContainer}>
           <Text style={styles.stateTitle}>No deck selected</Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.replace(getDeckBrowserRoute() as never)}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              pressed ? styles.buttonPressed : null,
+            ]}
+          >
+            <Text style={styles.primaryButtonText}>Back to Decks</Text>
+          </Pressable>
         </View>
       </View>
     );
@@ -99,6 +117,16 @@ export default function DeckCompareReadinessScreen() {
         <Stack.Screen options={{ title: 'Compare Readiness' }} />
         <View style={styles.stateContainer}>
           <Text style={styles.stateTitle}>Deck not found</Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.replace(getDeckBrowserRoute() as never)}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              pressed ? styles.buttonPressed : null,
+            ]}
+          >
+            <Text style={styles.primaryButtonText}>Back to Decks</Text>
+          </Pressable>
         </View>
       </View>
     );
@@ -115,13 +143,18 @@ export default function DeckCompareReadinessScreen() {
       ? {
           testID: 'deck-compare-open-decks',
           label: 'Browse Decks',
-          onPress: () => router.push('/' as never),
+          onPress: () => router.replace('/' as never),
         }
       : {
           testID: 'deck-compare-swipe-more',
           label: 'Swipe More',
           onPress: () =>
-            router.push(`/deck/${deck.id as string}/play` as never),
+            router.push(
+              buildPlayRoute(
+                deck.id as string,
+                `/deck/${deck.id as string}/compare`,
+              ) as never,
+            ),
         };
 
   return (
@@ -228,7 +261,7 @@ export default function DeckCompareReadinessScreen() {
             accessibilityRole="button"
             accessibilityLabel="Back to deck profile"
             onPress={() =>
-              router.push(`/deck/${deck.id as string}/profile` as never)
+              router.replace(getDeckProfileRoute(deck.id as string) as never)
             }
             style={({ pressed }) => [
               styles.secondaryButton,

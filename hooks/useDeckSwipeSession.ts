@@ -71,6 +71,7 @@ export function useDeckSwipeSession({
   deckId,
   deckCategory,
 }: UseDeckSwipeSessionOptions): UseDeckSwipeSessionResult {
+  const requestedDeckKey = deckId as string;
   const [state, setState] = useState<DeckSwipeSessionState>('loading');
   const [queue, setQueue] = useState<DeckCard[]>([]);
   const [currentDecision, setCurrentDecision] =
@@ -83,6 +84,9 @@ export function useDeckSwipeSession({
   const sessionClosedRef = useRef(false);
   const allCardsRef = useRef<DeckCard[]>([]);
   const lastPresentedCardIdRef = useRef<string | null>(null);
+  const stateDeckKeyRef = useRef(requestedDeckKey);
+  const sessionScopeRef = useRef(0);
+  const isCurrentDeckState = stateDeckKeyRef.current === requestedDeckKey;
 
   const retry = useCallback(() => {
     setRefreshCount((current) => current + 1);
@@ -106,8 +110,11 @@ export function useDeckSwipeSession({
 
   useEffect(() => {
     let cancelled = false;
+    const scope = sessionScopeRef.current + 1;
+    sessionScopeRef.current = scope;
 
     const loadSession = async () => {
+      stateDeckKeyRef.current = deckId as string;
       setState('loading');
       setErrorMessage(undefined);
       setQueue([]);
@@ -132,7 +139,7 @@ export function useDeckSwipeSession({
         );
         const remainingCards = queueEntries.map((entry) => entry.card);
 
-        if (cancelled) {
+        if (cancelled || sessionScopeRef.current !== scope) {
           return;
         }
 
@@ -154,7 +161,7 @@ export function useDeckSwipeSession({
         });
         sessionIdRef.current = session.id;
 
-        if (cancelled) {
+        if (cancelled || sessionScopeRef.current !== scope) {
           void closeSessionIfNeeded();
           return;
         }
@@ -163,7 +170,7 @@ export function useDeckSwipeSession({
         setCurrentDecision(queueEntries[0]?.decision ?? null);
         setState('ready');
       } catch (error) {
-        if (cancelled) {
+        if (cancelled || sessionScopeRef.current !== scope) {
           return;
         }
 
@@ -186,11 +193,18 @@ export function useDeckSwipeSession({
 
   const onAction = useCallback<DeckActionHandler>(
     async (action) => {
+      const scope = sessionScopeRef.current;
       const db = dbRef.current;
       const sessionId = sessionIdRef.current;
       const currentCard = queue[0];
 
-      if (!db || !sessionId || !currentCard || state !== 'ready') {
+      if (
+        !isCurrentDeckState ||
+        !db ||
+        !sessionId ||
+        !currentCard ||
+        state !== 'ready'
+      ) {
         return;
       }
 
@@ -221,6 +235,11 @@ export function useDeckSwipeSession({
           deckId,
           allCardsRef.current,
         );
+
+        if (sessionScopeRef.current !== scope) {
+          return;
+        }
+
         const nextQueue = nextEntries.map((entry) => entry.card);
         setQueue(nextQueue);
         setCurrentDecision(nextEntries[0]?.decision ?? null);
@@ -230,6 +249,10 @@ export function useDeckSwipeSession({
           void closeSessionIfNeeded();
         }
       } catch (error) {
+        if (sessionScopeRef.current !== scope) {
+          return;
+        }
+
         setErrorMessage(
           error instanceof Error
             ? error.message
@@ -239,16 +262,19 @@ export function useDeckSwipeSession({
         void closeSessionIfNeeded();
       }
     },
-    [closeSessionIfNeeded, deckId, queue, state],
+    [closeSessionIfNeeded, deckId, isCurrentDeckState, queue, state],
   );
 
   const currentCard = useMemo(
-    () => (state === 'ready' && queue.length > 0 ? queue[0] : null),
-    [queue, state],
+    () =>
+      isCurrentDeckState && state === 'ready' && queue.length > 0
+        ? queue[0]
+        : null,
+    [isCurrentDeckState, queue, state],
   );
 
   useEffect(() => {
-    if (state !== 'ready' || !currentCard) {
+    if (!isCurrentDeckState || state !== 'ready' || !currentCard) {
       lastPresentedCardIdRef.current = null;
       return;
     }
@@ -260,6 +286,7 @@ export function useDeckSwipeSession({
     lastPresentedCardIdRef.current = currentCard.id as string;
 
     let cancelled = false;
+    const scope = sessionScopeRef.current;
 
     const persistPresentation = async () => {
       const db = dbRef.current;
@@ -275,7 +302,7 @@ export function useDeckSwipeSession({
           presentedAt: Date.now(),
         });
       } catch (error) {
-        if (cancelled) {
+        if (cancelled || sessionScopeRef.current !== scope) {
           return;
         }
 
@@ -294,19 +321,28 @@ export function useDeckSwipeSession({
     return () => {
       cancelled = true;
     };
-  }, [closeSessionIfNeeded, currentCard, deckId, state]);
+  }, [closeSessionIfNeeded, currentCard, deckId, isCurrentDeckState, state]);
 
   const endSession = useCallback(async () => {
     await closeSessionIfNeeded();
+    sessionScopeRef.current += 1;
   }, [closeSessionIfNeeded]);
 
+  const exposedState: DeckSwipeSessionState = isCurrentDeckState
+    ? state
+    : 'loading';
+  const exposedQueue = isCurrentDeckState ? queue : [];
+  const exposedCurrentDecision = isCurrentDeckState ? currentDecision : null;
+  const exposedTotalCards = isCurrentDeckState ? totalCards : 0;
+  const exposedErrorMessage = isCurrentDeckState ? errorMessage : undefined;
+
   return {
-    state,
+    state: exposedState,
     currentCard,
-    currentDecision,
-    cardsRemaining: queue.length,
-    totalCards,
-    errorMessage,
+    currentDecision: exposedCurrentDecision,
+    cardsRemaining: exposedQueue.length,
+    totalCards: exposedTotalCards,
+    errorMessage: exposedErrorMessage,
     onAction,
     endSession,
     retry,

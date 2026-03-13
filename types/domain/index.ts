@@ -2,6 +2,7 @@ export * from './actions';
 export * from './catalog';
 export * from './compare';
 export * from './comparePayload';
+export * from './customDecks';
 export * from './deckCardState';
 export * from './deckCompareReport';
 export * from './deckProfile';

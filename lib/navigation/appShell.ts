@@ -31,6 +31,44 @@ export function shouldShowAppBottomNav(
   return true;
 }
 
+export function getDeckBrowserRoute(): string {
+  return '/';
+}
+
+export function getDeckDetailRoute(deckId: string | null | undefined): string {
+  if (!deckId || deckId.trim().length === 0) {
+    return getDeckBrowserRoute();
+  }
+
+  return `/deck/${deckId}`;
+}
+
+export function getDeckProfileRoute(deckId: string | null | undefined): string {
+  if (!deckId || deckId.trim().length === 0) {
+    return getDeckBrowserRoute();
+  }
+
+  return `/deck/${deckId}/profile`;
+}
+
+export function getDeckCompareRoute(deckId: string | null | undefined): string {
+  if (!deckId || deckId.trim().length === 0) {
+    return getDeckBrowserRoute();
+  }
+
+  return `/deck/${deckId}/compare`;
+}
+
+export function getCompareConsentRoute(
+  deckId: string | null | undefined,
+): string {
+  if (!deckId || deckId.trim().length === 0) {
+    return getDeckBrowserRoute();
+  }
+
+  return `/compare/${deckId}/consent`;
+}
+
 export function resolveAppNavSection(
   pathname: string | null | undefined,
 ): AppNavSection {

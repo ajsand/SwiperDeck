@@ -1,3 +1,4 @@
+import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
@@ -28,6 +29,7 @@ export function useDeckCardDetails(
   const [error, setError] = useState<string | null>(null);
   const activeRequestRef = useRef(0);
   const isMountedRef = useRef(true);
+  const lastCardIdRef = useRef<DeckCardId | null>(null);
 
   useEffect(() => {
     return () => {
@@ -44,6 +46,7 @@ export function useDeckCardDetails(
         return;
       }
 
+      lastCardIdRef.current = null;
       setCard(null);
       setDeck(null);
       setTagLabels([]);
@@ -56,8 +59,16 @@ export function useDeckCardDetails(
       return;
     }
 
+    const cardChanged = lastCardIdRef.current !== cardId;
+    lastCardIdRef.current = cardId;
+
     setLoading(true);
     setError(null);
+    if (cardChanged) {
+      setCard(null);
+      setDeck(null);
+      setTagLabels([]);
+    }
 
     try {
       const db = await getDb();
@@ -122,9 +133,11 @@ export function useDeckCardDetails(
     }
   }, [cardId]);
 
-  useEffect(() => {
-    void fetchCardDetails();
-  }, [fetchCardDetails]);
+  useFocusEffect(
+    useCallback(() => {
+      void fetchCardDetails();
+    }, [fetchCardDetails]),
+  );
 
   return {
     card,

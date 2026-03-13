@@ -4,8 +4,8 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import DeckDetailScreen from '../app/deck/[deckId]';
 import { asDeckId, type Deck } from '@/types/domain';
 
-const mockBack = jest.fn();
 const mockPush = jest.fn();
+const mockReplace = jest.fn();
 const mockUseDeckById = jest.fn();
 
 jest.mock('expo-router', () => ({
@@ -14,8 +14,8 @@ jest.mock('expo-router', () => ({
   },
   useLocalSearchParams: () => ({ deckId: 'deck_values' }),
   useRouter: () => ({
-    back: mockBack,
     push: mockPush,
+    replace: mockReplace,
   }),
 }));
 
@@ -98,7 +98,7 @@ describe('DeckDetailScreen', () => {
 
     expect(screen.getByTestId('deck-detail-not-found')).toBeTruthy();
     fireEvent.press(screen.getByTestId('deck-detail-go-back'));
-    expect(mockBack).toHaveBeenCalledTimes(1);
+    expect(mockReplace).toHaveBeenCalledWith('/');
   });
 
   it('renders deck metadata and navigates to the play route from the CTA', () => {
@@ -130,7 +130,9 @@ describe('DeckDetailScreen', () => {
     expect(screen.getByTestId('deck-detail-compare-readiness')).toBeTruthy();
 
     fireEvent.press(screen.getByTestId('deck-detail-start-swiping'));
-    expect(mockPush).toHaveBeenCalledWith('/deck/deck_values/play');
+    expect(mockPush).toHaveBeenCalledWith(
+      '/deck/deck_values/play?returnTo=%2Fdeck%2Fdeck_values',
+    );
 
     fireEvent.press(screen.getByTestId('deck-detail-compare-readiness'));
     expect(mockPush).toHaveBeenCalledWith('/deck/deck_values/compare');
@@ -170,6 +172,12 @@ describe('DeckDetailScreen', () => {
     expect(
       screen.getByText(
         'Custom decks stay local-first and are not compare-eligible under the current product scope.',
+      ),
+    ).toBeTruthy();
+    expect(screen.getByText('Custom deck mode')).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Custom decks stay local on this device. They can be swiped and profiled, but they do not yet use the richer prebuilt taxonomy, coverage-aware sequencing, compare flow, or report quality guarantees.',
       ),
     ).toBeTruthy();
     expect(screen.getByTestId('deck-detail-compare-readiness')).toBeTruthy();
